@@ -32,7 +32,7 @@ source ./scripts/setenv.sh
 
 ## Running the application
 
-Building the application will create an executables, for running reco over the WFD5 unpacked data.
+Building the application will create an executable for running reco over the WFD5 unpacked data.
 
 Assuming that `my_file.mid` is your midas file, you can run the reco via:
 ```bash
