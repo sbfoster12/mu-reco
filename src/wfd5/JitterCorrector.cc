@@ -7,8 +7,8 @@ void JitterCorrector::Configure(const nlohmann::json& config, const ServiceManag
 
     correctionFactor_ = config.value("correctionFactor", 1.0);
     inputRecoLabel_ = config.value("inputRecoLabel", "unpacker");
-    inputWaveformsLabel_ = config.value("inputWaveformsLabel", "WFD5Waveform");
-    outputWaveformsLabel_ = config.value("outputWaveformsLabel", "WFD5WaveformCorrected");
+    inputWaveformsLabel_ = config.value("inputWaveformsLabel", "WFD5WaveformCollection");
+    outputWaveformsLabel_ = config.value("outputWaveformsLabel", "WFD5WaveformCorrectedCollection");
     templateServiceLabel_ = config.value("templateServiceLabel", "TemplateService");
 }
 

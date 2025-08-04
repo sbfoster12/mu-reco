@@ -47,14 +47,15 @@ Running these commands will run the reconstruction configured in `reco_config.js
 To add a new reco stage, you should follow the following steps:
 1. Copy an existing RecoStage (e.g. `include/reco/wfd5/JitterCorrector.hh`) and modify it. It should derive from the `reco::RecoStage` class and must implement a couple virtual methods.
 2. Add the class to the `include/reco/LinkDef.hh` file, so ROOT can generate the dictionary for it.
-3. To use the reco stage, add it to the `RecoStages` array in the `reco_config.json` file. The reco stage will be executed in the order they are defined in the array. You can add parameters in the json that you parse on the `Configure` method.
+3. To use the reco stage, add it to the `RecoStages` array in the `reco_config.json` file. The reco stage will be executed in the order they are defined in the array. You can add parameters in the json that you parse in the `Configure` method.
+4. Often times, you will want to access collections from the `EventStore`. You can do this with a get method: `eventStore.get<reco::WFD5Waveform>(recoLabel, dataLabel)` where `recoLabel` is the label of the reco stage and `dataLabel` is the label of the data product you want to access.
 
 ## Instructions for adding a new service
 To add a new service, you should follow the following steps:
 1. Copy an existing Service (e.g. `include/reco/wfd5/TemplateService.hh`) and modify it. It should derive from the `reco::Service` class and must implement a couple virtual methods.
 2. Add the class to the `include/reco/LinkDef.hh` file, so ROOT can generate the dictionary for it.
-3. To use the service, add it to the `Services` array in the `reco_config.json` file. You can add parameters in the json that you parse on the `Configure` method.
-4. Services are accessible in a `RecoStage` via the `ServiceManager` class. You can get a service by its label, e.g. `GetService<reco::TemplateService>("templates")` where the argument is the label given to the service in the json configuration.
+3. To use the service, add it to the `Services` array in the `reco_config.json` file. You can add parameters in the json that you parse in the `Configure` method.
+4. Services are accessible in a `RecoStage` via the `ServiceManager` class. You can get a service by its label, e.g. `serviceManager.Get<reco::TemplateService>("templates")` where the argument is the label given to the service in the json configuration.
 
 ## Making histograms
 Histograms you make need to be added to the `EventStore`. The `EventStore` holds the collections of dataProducts for event event, the odb, and histograms that persistent event-to-event. Add a histogram like so:

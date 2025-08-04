@@ -10,7 +10,9 @@
 
 // WFD5 Reco classes
 #pragma link C++ class reco::JitterCorrector+;
+#pragma link C++ class reco::DetectorGrouper+;
 #pragma link C++ class reco::TemplateService+;
+#pragma link C++ class reco::ChannelMapService+;
 
 // // Common unpackers classes
 // #pragma link C++ class unpackers::Parser+;

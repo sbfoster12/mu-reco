@@ -2,22 +2,30 @@
   "RecoStages": [
     {
       "recoClass": "reco::JitterCorrector",
-      "recoLabel": "jitter1",
+      "recoLabel": "jitter",
       "inputRecoLabel": "unpacker",
       "inputWaveformsLabel": "WFD5WaveformCollection",
       "outputWaveformsLabel": "CorrectedWFD5WaveformCollection",
       "templateServiceLabel": "templates"
     },
     {
-      "recoClass": "reco::JitterCorrector",
-      "recoLabel": "jitter2",
-      "inputRecoLabel": "jitter1",
+      "recoClass": "reco::DetectorGrouper",
+      "recoLabel": "grouper",
+      "inputRecoLabel": "jitter",
       "inputWaveformsLabel": "CorrectedWFD5WaveformCollection",
-      "outputWaveformsLabel": "CorrectedWFD5WaveformCollection2",
-      "templateServiceLabel": "templates"
+      "outputWaveformsBaseLabel": "WFD5WaveformCollection",
+      "channelMapServiceLabel": "channelMap"
     }
   ],
   "Services": [
+    {
+      "type": "reco::ChannelMapService",
+      "label": "channelMap",
+      "config_files":{
+        "conf0":{"file":"/path/to/file1", "iov":[0,4000]},
+        "conf1":{"file":"/path/to/file2", "iov":[4000,14000]}
+      }
+    },
     {
       "type": "reco::TemplateService",
       "label": "templates",
