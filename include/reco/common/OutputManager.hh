@@ -46,7 +46,7 @@ namespace reco {
             }
 
             //Write the configuration to the file
-            dataProducts::RecoConfig recoConfig(config.dump());
+            dataProducts::RecoConfig recoConfig(config.dump(),configHolder.GetRun(),configHolder.GetSubrun());
             file_->cd();
             file_->WriteObject(&recoConfig, "reco_config");
         }

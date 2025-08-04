@@ -76,6 +76,31 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    // Parse the run/subrun number from the file name
+    std::cout << "reading in file: " << input_file_name << std::endl;
+    int run = 0;
+    int subrun = 0;
+    try
+    {
+        size_t start1 = input_file_name.find("run") + 3;
+        size_t end1 = input_file_name.find("_", start1);
+        std::string num1 = input_file_name.substr(start1, end1 - start1);
+
+        // Find the start and end of the second number
+        size_t start2 = end1 + 1;
+        size_t end2 = input_file_name.find(".", start2);
+        std::string num2 = input_file_name.substr(start2, end2 - start2);
+
+        // Convert strings to integers
+        std::stringstream(num1) >> run;
+        std::stringstream(num2) >> subrun;
+        std::cout << "     -> Run/Subrun of this file: " << run << " / " << subrun << std::endl;
+    }
+    catch (...)
+    {
+        std::cerr << "Warning: Unable to parse run/subrun from file" << std::endl;
+    }
+
     // output file name
     std::string output_file_name;
     output_file_name = input_file_name.substr(input_file_name.find_last_of("/\\") + 1);
@@ -112,6 +137,7 @@ int main(int argc, char *argv[])
     // Create configuration holder
     reco::ConfigHolder configHolder;
     configHolder.LoadFromFile(config_file_name);
+    configHolder.SetRunSubrun(run, subrun);
 
     // Create the output manager
     reco::OutputManager* outputManager = new reco::WFD5OutputManager(output_file_name);

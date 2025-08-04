@@ -36,8 +36,18 @@ namespace reco {
             return json::object();  // return empty object if not found
         }
 
+        void SetRunSubrun(int r, int sr) {
+            run_ = r;
+            subrun_ = sr;
+        }
+
+        int GetRun() const { return run_; }
+        int GetSubrun() const { return subrun_; }
+
     private:
         json config_;
+        int run_;
+        int subrun_;
     };
 } //namespace reco
 
