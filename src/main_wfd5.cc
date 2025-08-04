@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
     }
 
     // Parse the run/subrun number from the file name
-    std::cout << "reading in file: " << input_file_name << std::endl;
+    std::cout << "-> main: Reading in file: " << input_file_name << std::endl;
     int run = 0;
     int subrun = 0;
     try
@@ -94,18 +94,18 @@ int main(int argc, char *argv[])
         // Convert strings to integers
         std::stringstream(num1) >> run;
         std::stringstream(num2) >> subrun;
-        std::cout << "     -> Run/Subrun of this file: " << run << " / " << subrun << std::endl;
+        std::cout << "-> main: Run/Subrun of this file: " << run << " / " << subrun << std::endl;
     }
     catch (...)
     {
-        std::cerr << "Warning: Unable to parse run/subrun from file" << std::endl;
+        std::cerr << "-> main: Warning: Unable to parse run/subrun from file" << std::endl;
     }
 
     // output file name
     std::string output_file_name;
     output_file_name = input_file_name.substr(input_file_name.find_last_of("/\\") + 1);
     output_file_name = output_file_name.substr(0, output_file_name.find_first_of('.')) + ".root";
-    std::cout << "Output file: " << output_file_name << std::endl;
+    std::cout << "-> main: Output file: " << output_file_name << std::endl;
 
     // Set verbosity for unpacker
     LoggerHolder::getInstance().SetVerbosity(verbosity);
@@ -113,26 +113,9 @@ int main(int argc, char *argv[])
     // End of parsing command line arguments
     // -----------------------------------------------------------------------------------------------
 
-    // // create the output file structure
-    // TFile *outfile = new TFile(output_file_name.c_str(),"RECREATE");
-
-    // // without these next lines, time to process 1 file on my local machine: 5.500s, 62MB
-    // // outfile->SetCompressionLevel(0); // much faster, but the file size doubles (62->137 MB), 2.936s
-    // outfile->SetCompressionAlgorithm(4); // LZ4. 40-50% faster, but slightly larger file sizes. 3.292s, 91MB
-    // TTree *tree = new TTree("tree", "tree");
-
-    // dataProducts::WFD5HeaderCollection wfd5_headers;
-    // dataProducts::WFD5ChannelHeaderCollection wfd5_channel_headers;
-    // dataProducts::WFD5WaveformHeaderCollection wfd5_waveform_headers;
-    // dataProducts::WFD5WaveformCollection wfd5_waveforms;
-    // tree->Branch("wfd5_headers", &wfd5_headers);
-    // tree->Branch("wfd5_channel_headers", &wfd5_channel_headers);
-    // tree->Branch("wfd5_waveform_headers", &wfd5_waveform_headers);
-    // tree->Branch("wfd5_waveforms", &wfd5_waveforms);
-
-    // dataProducts::WFD5ODB wfd5_odb;
 
     // -----------------------------------------------------------------------------------------------
+    // Set up the various managers etc.
 
     // Create configuration holder
     std::shared_ptr<reco::ConfigHolder> configHolder = std::make_shared<reco::ConfigHolder>();
@@ -166,6 +149,8 @@ int main(int argc, char *argv[])
 
     // -----------------------------------------------------------------------------------------------
 
+    // -----------------------------------------------------------------------------------------------
+    // Time to start the midas event loop
     int nTotalMidasEvents = 0;
     int nSkippedMidasEvents= 0;
 
@@ -181,7 +166,7 @@ int main(int argc, char *argv[])
         }
 
         if (thisEvent->serial_number % 100 == 0) {
-            std::cout << "event_id: " << thisEvent->event_id << ", serial number: " << thisEvent->serial_number << std::endl;
+            std::cout << "-> main: event_id: " << thisEvent->event_id << ", serial number: " << thisEvent->serial_number << std::endl;
         }
         
         int event_id = thisEvent->event_id;
@@ -258,8 +243,8 @@ int main(int argc, char *argv[])
     delete outputManager;
     delete mReader;
 
-    std::cout << "Skipped " << nSkippedMidasEvents << "/" << nTotalMidasEvents << " midas events" << std::endl;
+    std::cout << "-> main: Skipped " << nSkippedMidasEvents << "/" << nTotalMidasEvents << " midas events" << std::endl;
 
-    std::cout << "All done!" << std::endl;
+    std::cout << "-> main: All done!" << std::endl;
     return 0;
 }

@@ -43,21 +43,32 @@ void DetectorGrouper::Process(EventStore& store, const ServiceManager& serviceMa
             if (channelMap.find(key) != channelMap.end()) {
 
                 // Get the detector name
-                std::string detectorName = channelMap.at(key);
+                std::string detectorSystem = channelMap.at(key).first;
+                std::string subdetector = channelMap.at(key).second;
+                thisWaveform->SetDetectorSystem(detectorSystem);
+                thisWaveform->SetSubdetector(subdetector);
+
+                // std::cout << "Waveform (crate " << thisWaveform->crateNum 
+                //           << ", amc " << thisWaveform->amcNum 
+                //           << ", channel " << thisWaveform->channelTag 
+                //           << ") mapped to detector system: " << detectorSystem 
+                //           << ", subdetector: " << subdetector << std::endl;
 
                 // Have we made this collection yet?
-                if (detectorWaveformsMap.find(detectorName) == detectorWaveformsMap.end()) {
-                    detectorWaveformsMap[detectorName] = std::vector<std::shared_ptr<dataProducts::WFD5Waveform>>();
+                if (detectorWaveformsMap.find(detectorSystem) == detectorWaveformsMap.end()) {
+                    detectorWaveformsMap[detectorSystem] = std::vector<std::shared_ptr<dataProducts::WFD5Waveform>>();
                 }
 
                 // Add the waveform to the appropriate detector collection
-                detectorWaveformsMap[detectorName].push_back(std::move(thisWaveform));
+                detectorWaveformsMap[detectorSystem].push_back(std::move(thisWaveform));
             } else {
-                // Not in channel map, so categorize as "OTHER"
-                if (detectorWaveformsMap.find("OTHER") == detectorWaveformsMap.end()) {
-                    detectorWaveformsMap["OTHER"] = std::vector<std::shared_ptr<dataProducts::WFD5Waveform>>();
+                // Not in channel map, so categorize as "Other"
+                if (detectorWaveformsMap.find("Other") == detectorWaveformsMap.end()) {
+                    detectorWaveformsMap["Other"] = std::vector<std::shared_ptr<dataProducts::WFD5Waveform>>();
                 }
-                detectorWaveformsMap["OTHER"].push_back(std::move(thisWaveform));
+                thisWaveform->SetDetectorSystem("Other");
+                thisWaveform->SetSubdetector("Other");
+                detectorWaveformsMap["Other"].push_back(std::move(thisWaveform));
             }
         }
 

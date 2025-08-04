@@ -24,18 +24,18 @@ namespace reco {
             int run = configHolder_->GetRun();
             int subrun = configHolder_->GetSubrun();
             
-            std::cout << "Configuring ChannelMapService for run: " << run << ", subrun: " << subrun << std::endl;
+            std::cout << "-> reco::ChannelMapService: Configuring ChannelMapService for run: " << run << ", subrun: " << subrun << std::endl;
 
             //TODO: parse the configuration channel map and store it in a map
-            channelMap_[std::make_tuple(0, 1, 0)] = "LYSO"; // this is just an example for now            
+            channelMap_[std::make_tuple(0, 1, 0)] = {"LYSO", "PENT"}; // this is just an example for now
         }
 
-        const std::map<std::tuple<int,int,int>, std::string>& GetChannelMap() const {
+        const std::map<std::tuple<int,int,int>, std::pair<std::string,std::string>>& GetChannelMap() const {
             return channelMap_;
         }
 
     private:
-        std::map<std::tuple<int,int,int>, std::string> channelMap_;  // key: (crate, wfd5, channel), value: channel name
+        std::map<std::tuple<int,int,int>, std::pair<std::string,std::string>> channelMap_;  // key: (crate, wfd5, channel), value: (detector system, subdetector)
 
         ClassDefOverride(ChannelMapService, 1);
 
