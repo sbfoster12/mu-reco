@@ -13,7 +13,7 @@ namespace reco {
     
     class WFD5OutputManager : public OutputManager {
     public:
-        WFD5OutputManager(const std::string& filename, const std::string& treename);
+        WFD5OutputManager(const std::string& filename);
         ~WFD5OutputManager();
 
         void FillEvent(const EventStore& eventStore) override;

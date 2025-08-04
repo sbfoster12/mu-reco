@@ -2,8 +2,8 @@
 
 using namespace reco;
 
-WFD5OutputManager::WFD5OutputManager(const std::string& filename, const std::string& treename)
-    : OutputManager(filename, treename) {}
+WFD5OutputManager::WFD5OutputManager(const std::string& filename)
+    : OutputManager(filename) {}
 
 WFD5OutputManager::~WFD5OutputManager() {}
 
@@ -13,6 +13,11 @@ void WFD5OutputManager::FillEvent(const EventStore& eventStore) {
 
     for (const auto& [collName, baseVec] : store) {
         if (baseVec.empty()) continue;
+
+        if (std::find(keepList_.begin(), keepList_.end(), collName) == keepList_.end()) {
+            // Skip collections not in keep list
+            continue;
+        }
 
         const TObject* firstObj = baseVec.front().get();
         if (!firstObj) continue;

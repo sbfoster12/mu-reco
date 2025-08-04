@@ -7,18 +7,39 @@
 #include <memory>
 #include <iostream>
 
+#include <nlohmann/json.hpp>
 #include <TFile.h>
 #include <TTree.h>
 #include <TObject.h>
 
 #include "reco/common/EventStore.hh"
 
+using json = nlohmann::json;
+
 namespace reco {
     
     class OutputManager {
     public:
-        OutputManager(const std::string& filename, const std::string& treename);
+        OutputManager(const std::string& filename);
         virtual ~OutputManager();
+
+        void Configure(const nlohmann::json& config) {
+            if (!config.contains("Output")) {
+                throw std::runtime_error("OutputManager: Missing or invalid 'Output' config");
+            }
+
+            if ( config["Output"].contains("keep") && config["Output"]["keep"].is_array() ) {
+                keepList_.clear();
+                for (const auto& colName : config["Output"]["keep"]) {
+                    if (!colName.is_string()) {
+                        throw std::runtime_error("OutputManager: 'keep' must be an array of strings");
+                    }
+                    keepList_.push_back(colName.get<std::string>());
+                }
+            } else {
+                throw std::runtime_error("OutputManager: 'keep' must be an array in 'Output' config");
+            }
+        }
 
         // Write event data from EventStore to tree
         virtual void FillEvent(const EventStore& eventStore) = 0;
@@ -40,6 +61,8 @@ namespace reco {
                 tree_->Branch(name.c_str(), buffer);
             }
         }
+
+        std::vector<std::string> keepList_; 
 
         std::unique_ptr<TFile> file_;
         TTree* tree_;

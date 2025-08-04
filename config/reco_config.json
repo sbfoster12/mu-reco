@@ -21,5 +21,15 @@
       "label": "templates",
       "file_path": "/path/to/file"
     }
-  ]
+  ],
+  "Output": {
+    "keep": [
+      "WFD5HeaderCollection",
+      "WFD5ChannelHeaderCollection",
+      "WFD5WaveformHeaderCollection",
+      "WFD5WaveformCollection",
+      "CorrectedWFD5WaveformCollection",
+      "CorrectedWFD5WaveformCollection2"
+    ]
+  }
 }

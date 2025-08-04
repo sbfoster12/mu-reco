@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     // output file name
     std::string output_file_name;
     output_file_name = input_file_name.substr(input_file_name.find_last_of("/\\") + 1);
-    output_file_name = output_file_name.substr(0, output_file_name.find_last_of('.')) + ".root";
+    output_file_name = output_file_name.substr(0, output_file_name.find_first_of('.')) + ".root";
     std::cout << "Output file: " << output_file_name << std::endl;
 
     // Set verbosity for unpacker
@@ -114,7 +114,8 @@ int main(int argc, char *argv[])
     configHolder.LoadFromFile(config_file_name);
 
     // Create the output manager
-    reco::OutputManager* outputManager = new reco::WFD5OutputManager(output_file_name,"tree");
+    reco::OutputManager* outputManager = new reco::WFD5OutputManager(output_file_name);
+    outputManager->Configure(configHolder.GetConfig());
 
     // Create the midas event unpacker
     unpackers::EventUnpacker* eventUnpacker = new unpackers::WFD5EventUnpacker();
@@ -209,7 +210,6 @@ int main(int argc, char *argv[])
                     recoManager.Run(eventStore, serviceManager);
                 } catch (const std::exception& e) {
                     std::cerr << "Error during reconstruction: " << e.what() << std::endl;
-                    // Possibly cleanup, log, or exit
                     return 1;
                 }
 

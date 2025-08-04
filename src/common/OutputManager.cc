@@ -2,9 +2,9 @@
 
 using namespace reco;
 
-OutputManager::OutputManager(const std::string& filename, const std::string& treename)
+OutputManager::OutputManager(const std::string& filename)
     : file_(std::make_unique<TFile>(filename.c_str(), "RECREATE")),
-      tree_(new TTree(treename.c_str(), treename.c_str())) {}
+      tree_(new TTree("tree", "tree")) {}
 
 reco::OutputManager::~OutputManager() {
     file_->cd();
