@@ -200,10 +200,10 @@ int main(int argc, char *argv[])
 
                 // Put the unpacked data into the event store
                 eventStore.clear();  // clear previous event's data
-                eventStore.put("WFD5HeaderCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5Header>("WFD5HeaderCollection"));
-                eventStore.put("WFD5ChannelHeaderCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5ChannelHeader>("WFD5ChannelHeaderCollection"));
-                eventStore.put("WFD5WaveformHeaderCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5WaveformHeader>("WFD5WaveformHeaderCollection"));
-                eventStore.put("WFD5WaveformCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5Waveform>("WFD5WaveformCollection"));
+                eventStore.put("unpacker","WFD5HeaderCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5Header>("WFD5HeaderCollection"));
+                eventStore.put("unpacker","WFD5ChannelHeaderCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5ChannelHeader>("WFD5ChannelHeaderCollection"));
+                eventStore.put("unpacker","WFD5WaveformHeaderCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5WaveformHeader>("WFD5WaveformHeaderCollection"));
+                eventStore.put("unpacker","WFD5WaveformCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5Waveform>("WFD5WaveformCollection"));
 
                 // Run reconstruction stages
                 try {

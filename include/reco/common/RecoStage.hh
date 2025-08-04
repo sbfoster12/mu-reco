@@ -21,11 +21,11 @@ namespace reco {
         virtual void Configure(const nlohmann::json& config, const ServiceManager& serviceManager) = 0;
         virtual void Process(EventStore& eventStore, const ServiceManager& serviceManager) = 0;
 
-        void SetLabel(const std::string& label) { label_ = label; }
-        const std::string& GetLabel() const { return label_; }
+        void SetRecoLabel(const std::string& recoLabel) { recoLabel_ = recoLabel; }
+        const std::string& GetRecoLabel() const { return recoLabel_; }
 
-    private:
-        std::string label_;
+    protected:
+        std::string recoLabel_;
 
         ClassDef(RecoStage, 1);
     };

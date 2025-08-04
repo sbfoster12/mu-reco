@@ -18,7 +18,15 @@ namespace reco {
 
         // Store a collection of typed shared_ptr<T>
         template <typename T>
-        void put(const std::string& name, std::vector<std::shared_ptr<T>> collection) {
+        void put(const std::string& reco_label, const std::string& data_label, std::vector<std::shared_ptr<T>> collection) {
+
+            //Check that data_label and reco_label have no underscores
+            if (data_label.find('_') != std::string::npos || reco_label.find('_') != std::string::npos) {
+                throw std::runtime_error("Data label or Reco label cannot contain underscores: " + data_label + ", " + reco_label);
+            }
+
+            std::string name = reco_label + "_" + data_label;
+
             if (store_.count(name)) {
                 throw std::runtime_error("Data product already exists: " + name);
             }
@@ -31,7 +39,14 @@ namespace reco {
         }
 
         // Store a collection of DataProductPtr directly (from your unpacker)
-        void put(const std::string& name, const dataProducts::DataProductPtrCollection& collection) {
+        void put(const std::string& reco_label, const std::string& data_label, const dataProducts::DataProductPtrCollection& collection) {
+            
+            //Check that data_label and reco_label have no underscores
+            if (data_label.find('_') != std::string::npos || reco_label.find('_') != std::string::npos) {
+                throw std::runtime_error("Data label or Reco label cannot contain underscores: " + data_label + ", " + reco_label);
+            }
+
+            std::string name = reco_label + "_" + data_label;
             if (store_.count(name)) {
                 throw std::runtime_error("Data product already exists: " + name);
             }
@@ -46,7 +61,14 @@ namespace reco {
         }
 
         template <typename T>
-        std::vector<std::shared_ptr<T>> get(const std::string& name) const {
+        std::vector<std::shared_ptr<T>> get(const std::string& reco_label, const std::string& data_label) const {
+            
+            //Check that data_label and reco_label have no underscores
+            if (data_label.find('_') != std::string::npos || reco_label.find('_') != std::string::npos) {
+                throw std::runtime_error("Data label or Reco label cannot contain underscores: " + data_label + ", " + reco_label);
+            }
+
+            std::string name = reco_label + "_" + data_label;
             auto it = store_.find(name);
             if (it == store_.end()) {
                 throw std::runtime_error("Data product not found: " + name);

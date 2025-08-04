@@ -23,6 +23,7 @@ namespace reco {
     private:
         void ApplyJitterCorrection(std::shared_ptr<dataProducts::WFD5Waveform>& wf);
 
+        std::string inputRecoLabel_;
         std::string inputWaveformsLabel_;
         std::string outputWaveformsLabel_;
         std::string templateServiceLabel_;

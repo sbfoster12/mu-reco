@@ -6,6 +6,7 @@ using namespace reco;
 void JitterCorrector::Configure(const nlohmann::json& config, const ServiceManager& serviceManager) {
 
     correctionFactor_ = config.value("correctionFactor", 1.0);
+    inputRecoLabel_ = config.value("inputRecoLabel", "unpacker");
     inputWaveformsLabel_ = config.value("inputWaveformsLabel", "WFD5Waveform");
     outputWaveformsLabel_ = config.value("outputWaveformsLabel", "WFD5WaveformCorrected");
     templateServiceLabel_ = config.value("templateServiceLabel", "TemplateService");
@@ -15,7 +16,7 @@ void JitterCorrector::Process(EventStore& store, const ServiceManager& serviceMa
     // std::cout << "JitterCorrector with name '" << GetLabel() << "' is processing...\n";
     try {
         // Get original waveforms as const shared_ptr collection (safe because get is const)
-        auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputWaveformsLabel_);
+        auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
 
         //Make new collection for corrected waveforms
         std::vector<std::shared_ptr<dataProducts::WFD5Waveform>> correctedWaveforms;
@@ -37,7 +38,7 @@ void JitterCorrector::Process(EventStore& store, const ServiceManager& serviceMa
         }
 
         // Store corrected waveforms under a new key
-        store.put(outputWaveformsLabel_, std::move(correctedWaveforms));
+        store.put(this->GetRecoLabel(), outputWaveformsLabel_, std::move(correctedWaveforms));
 
         // std::cout << "JitterCorrector: corrected " << waveforms.size() << " waveforms.\n";
 

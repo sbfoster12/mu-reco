@@ -14,12 +14,12 @@ void RecoManager::Configure(const ConfigHolder& configHolder, const ServiceManag
     }
 
     for (const auto& stageConfig : config["RecoStages"]) {
-        if (!stageConfig.contains("type") || !stageConfig.contains("label")) {
-            throw std::runtime_error("RecoManager: RecoStage missing 'type' or 'label'");
+        if (!stageConfig.contains("recoClass") || !stageConfig.contains("recoLabel")) {
+            throw std::runtime_error("RecoManager: RecoStage missing 'recoClass' or 'recoLabel'");
         }
 
-        const std::string& type = stageConfig["type"];
-        const std::string& label = stageConfig["label"];
+        const std::string& type = stageConfig["recoClass"];
+        const std::string& recoLabel = stageConfig["recoLabel"];
 
         TClass* cl = TClass::GetClass(type.c_str());
         if (!cl || !cl->InheritsFrom(RecoStage::Class())) {
@@ -36,7 +36,7 @@ void RecoManager::Configure(const ConfigHolder& configHolder, const ServiceManag
             throw std::runtime_error("RecoManager: Instantiated object is not a RecoStage");
         }
 
-        stage->SetLabel(label);
+        stage->SetRecoLabel(recoLabel);
         stage->Configure(stageConfig, serviceManager);
         stages_.emplace_back(stage);
     }
