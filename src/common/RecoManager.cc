@@ -1,5 +1,4 @@
 #include "reco/common/RecoManager.hh"
-#include "reco/common/EventStore.hh"
 
 #include <iostream>
 #include <stdexcept>
@@ -7,7 +6,9 @@
 
 using namespace reco;
 
-void RecoManager::Configure(const nlohmann::json& config) {
+void RecoManager::Configure(const ConfigHolder& configHolder, const ServiceManager& serviceManager) {
+
+    const nlohmann::json& config = configHolder.GetConfig();
     if (!config.contains("RecoStages") || !config["RecoStages"].is_array()) {
         throw std::runtime_error("RecoManager: Missing or invalid 'RecoStages' config");
     }
@@ -36,7 +37,7 @@ void RecoManager::Configure(const nlohmann::json& config) {
         }
 
         stage->SetLabel(label);
-        stage->Configure(stageConfig);
+        stage->Configure(stageConfig, serviceManager);
         stages_.emplace_back(stage);
     }
 }

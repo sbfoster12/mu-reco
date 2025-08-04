@@ -7,6 +7,7 @@
 #include "reco/common/EventStore.hh"
 #include "reco/common/ServiceManager.hh"
 #include "reco/wfd5/TemplateService.hh"
+#include "reco/common/JsonParserUtil.hh"
 
 namespace reco {
 
@@ -15,9 +16,9 @@ namespace reco {
         JitterCorrector() : correctionFactor_() {}
         ~JitterCorrector() override = default;
 
-        void Configure(const json& config) override;
+        void Configure(const json& config, const ServiceManager& serviceManager) override;
 
-        void Process(EventStore& store, ServiceManager& serviceManager) override;
+        void Process(EventStore& store, const ServiceManager& serviceManager) override;
 
     private:
         void ApplyJitterCorrection(std::shared_ptr<dataProducts::WFD5Waveform>& wf);

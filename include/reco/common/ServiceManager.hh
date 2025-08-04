@@ -9,6 +9,7 @@
 #include <nlohmann/json.hpp>
 
 #include "reco/common/Service.hh"
+#include "reco/common/ConfigHolder.hh"
 
 namespace reco {
     class ServiceManager {
@@ -17,7 +18,8 @@ namespace reco {
         ~ServiceManager() = default;
 
         // Create and configure services from JSON array (each service config must have "class" and "label")
-        void Configure(const nlohmann::json& config) {
+        void Configure(const ConfigHolder& configHolder) {
+            const nlohmann::json& config = configHolder.GetConfig();
             if (!config.contains("Services") || !config["Services"].is_array()) {
                 throw std::runtime_error("ServiceManager: Missing or invalid 'Services' config");
             }

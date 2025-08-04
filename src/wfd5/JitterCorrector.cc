@@ -3,14 +3,15 @@
 
 using namespace reco;
 
-void JitterCorrector::Configure(const nlohmann::json& config) {
+void JitterCorrector::Configure(const nlohmann::json& config, const ServiceManager& serviceManager) {
+
     correctionFactor_ = config.value("correctionFactor", 1.0);
     inputWaveformsLabel_ = config.value("inputWaveformsLabel", "WFD5Waveform");
     outputWaveformsLabel_ = config.value("outputWaveformsLabel", "WFD5WaveformCorrected");
     templateServiceLabel_ = config.value("templateServiceLabel", "TemplateService");
 }
 
-void JitterCorrector::Process(EventStore& store, ServiceManager& serviceManager) {
+void JitterCorrector::Process(EventStore& store, const ServiceManager& serviceManager) {
     // std::cout << "JitterCorrector with name '" << GetLabel() << "' is processing...\n";
     try {
         // Get original waveforms as const shared_ptr collection (safe because get is const)

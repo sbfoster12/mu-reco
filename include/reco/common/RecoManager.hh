@@ -7,9 +7,9 @@
 #include <nlohmann/json.hpp>
 
 #include "reco/common/RecoStage.hh"
-
-class EventStore;
-class ServiceManager;
+#include "reco/common/ConfigHolder.hh"
+#include "reco/common/ServiceManager.hh"
+#include "reco/common/EventStore.hh"
 
 namespace reco {
     
@@ -17,7 +17,7 @@ namespace reco {
     public:
         RecoManager() = default;
 
-        void Configure(const nlohmann::json& config);
+        void Configure(const ConfigHolder& configHolder, const ServiceManager& serviceManager);
         void Run(EventStore& eventStore, ServiceManager& serviceManager);
 
     private:

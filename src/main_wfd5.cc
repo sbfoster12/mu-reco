@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
 
     // Create the output manager
     reco::OutputManager* outputManager = new reco::WFD5OutputManager(output_file_name);
-    outputManager->Configure(configHolder.GetConfig());
+    outputManager->Configure(configHolder);
 
     // Create the midas event unpacker
     unpackers::EventUnpacker* eventUnpacker = new unpackers::WFD5EventUnpacker();
@@ -125,11 +125,11 @@ int main(int argc, char *argv[])
 
     // Create the service manager
     reco::ServiceManager serviceManager;
-    serviceManager.Configure(configHolder.GetConfig());
+    serviceManager.Configure(configHolder);
 
     // Create the reco manager
     reco::RecoManager recoManager;
-    recoManager.Configure(configHolder.GetConfig());
+    recoManager.Configure(configHolder, serviceManager);
 
     // Create some histograms
     auto hist = std::make_shared<TH1D>("energy", "Energy Spectrum", 100, 0, 1000);

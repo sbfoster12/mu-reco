@@ -2,14 +2,14 @@
   "RecoStages": [
     {
       "type": "reco::JitterCorrector",
-      "label": "jitter_1",
+      "label": "jitter1",
       "inputWaveformsLabel": "WFD5WaveformCollection",
       "outputWaveformsLabel": "CorrectedWFD5WaveformCollection",
       "templateServiceLabel": "templates"
     },
     {
       "type": "reco::JitterCorrector",
-      "label": "jitter_2",
+      "label": "jitter2",
       "inputWaveformsLabel": "CorrectedWFD5WaveformCollection",
       "outputWaveformsLabel": "CorrectedWFD5WaveformCollection2",
       "templateServiceLabel": "templates"
@@ -19,7 +19,7 @@
     {
       "type": "reco::TemplateService",
       "label": "templates",
-      "file_path": "/path/to/file"
+      "file_path": "config/templates.json"
     }
   ],
   "Output": {

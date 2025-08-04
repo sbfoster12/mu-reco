@@ -12,8 +12,8 @@ namespace reco {
     class Service : public TObject {
     public:
         virtual ~Service() = default;
-        virtual void Configure(const json& config) = 0;
-        
+        virtual void Configure(const nlohmann::json& config) = 0;
+
         void SetLabel(const std::string& label) { label_ = label; }
         const std::string& GetLabel() const { return label_; }
 

@@ -13,6 +13,7 @@
 #include <TObject.h>
 
 #include "reco/common/EventStore.hh"
+#include "reco/common/ConfigHolder.hh"
 
 using json = nlohmann::json;
 
@@ -23,7 +24,9 @@ namespace reco {
         OutputManager(const std::string& filename);
         virtual ~OutputManager();
 
-        void Configure(const nlohmann::json& config) {
+        void Configure(const ConfigHolder& configHolder) {
+            const nlohmann::json& config = configHolder.GetConfig();
+
             if (!config.contains("Output")) {
                 throw std::runtime_error("OutputManager: Missing or invalid 'Output' config");
             }

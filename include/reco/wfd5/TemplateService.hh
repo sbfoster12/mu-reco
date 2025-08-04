@@ -5,7 +5,9 @@
 #include <stdexcept>
 #include <iostream>
 
+#include "reco/common/ConfigHolder.hh"
 #include "reco/common/Service.hh"
+#include "reco/common/JsonParserUtil.hh"
 
 namespace reco {
 
@@ -15,7 +17,12 @@ namespace reco {
         virtual ~TemplateService() = default;
 
         void Configure(const nlohmann::json& config) override {
+
+            auto& jsonParserUtil = reco::JsonParserUtil::instance();
+
             file_path_ = config.value("file_path", "/path/to/file");
+            
+            auto jsonObj = jsonParserUtil.ParseFile(file_path_);  // Example usage of JsonParserUtil
         }
 
         int GetTemplate() {
