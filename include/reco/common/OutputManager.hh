@@ -12,6 +12,8 @@
 #include <TTree.h>
 #include <TObject.h>
 
+#include <data_products/common/RecoConfig.hh>
+
 #include "reco/common/EventStore.hh"
 #include "reco/common/ConfigHolder.hh"
 
@@ -42,6 +44,11 @@ namespace reco {
             } else {
                 throw std::runtime_error("OutputManager: 'drop' must be an array in 'Output' config");
             }
+
+            //Write the configuration to the file
+            dataProducts::RecoConfig recoConfig(config.dump());
+            file_->cd();
+            file_->WriteObject(&recoConfig, "reco_config");
         }
 
         // Write event data from EventStore to tree

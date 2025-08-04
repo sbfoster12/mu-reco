@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
     while (true) {
         TMEvent *thisEvent = TMReadEvent(mReader);
         //if (!thisEvent || nTotalMidasEvents > 100 )
-        if (!thisEvent || nTotalMidasEvents > 100 )
+        if (!thisEvent)
         {
             // Reached end of the file. Clean up and break
             delete thisEvent;

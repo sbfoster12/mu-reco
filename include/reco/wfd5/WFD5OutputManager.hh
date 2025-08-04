@@ -20,7 +20,7 @@ namespace reco {
 
         void WriteODB(const EventStore& eventStore) override {
             file_->cd();
-            dataProducts::WFD5ODB* odb = dynamic_cast<dataProducts::WFD5ODB*>(eventStore.GetODB().get());
+            dataProducts::WFD5ODB* odb = dynamic_cast<dataProducts::WFD5ODB*>(eventStore.GetODB().get()); // we do not own this pointer
             if (!odb) {
                 throw std::runtime_error("Failed to cast ODB to WFD5ODB");
             }
