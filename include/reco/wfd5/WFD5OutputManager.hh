@@ -27,6 +27,32 @@ namespace reco {
             file_->WriteObject(odb, "wfd5_odb");
         };
 
+        bool starts_with(const std::string& str, const std::string& prefix) {
+            return str.size() >= prefix.size() &&
+                str.compare(0, prefix.size(), prefix) == 0;
+        }
+
+        bool ends_with(const std::string& str, const std::string& suffix) {
+            return str.size() >= suffix.size() &&
+                str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+        }
+
+        bool matchesWildcard(const std::string& pattern, const std::string& text) {
+            if (pattern == "*") return true;
+
+            auto starPos = pattern.find('*');
+            if (starPos == std::string::npos) {
+                return pattern == text;
+            }
+
+            std::string prefix = pattern.substr(0, starPos);
+            std::string suffix = pattern.substr(starPos + 1);
+
+            if (!prefix.empty() && !starts_with(text, prefix)) return false;
+            if (!suffix.empty() && !ends_with(text, suffix)) return false;
+
+            return true;
+        }
 
     private:
         std::map<std::string, std::vector<dataProducts::WFD5Header>> wfd5HeaderBuffers_;

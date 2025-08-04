@@ -31,16 +31,16 @@ namespace reco {
                 throw std::runtime_error("OutputManager: Missing or invalid 'Output' config");
             }
 
-            if ( config["Output"].contains("keep") && config["Output"]["keep"].is_array() ) {
-                keepList_.clear();
-                for (const auto& colName : config["Output"]["keep"]) {
+            if ( config["Output"].contains("drop") && config["Output"]["drop"].is_array() ) {
+                dropList_.clear();
+                for (const auto& colName : config["Output"]["drop"]) {
                     if (!colName.is_string()) {
-                        throw std::runtime_error("OutputManager: 'keep' must be an array of strings");
+                        throw std::runtime_error("OutputManager: 'drop' must be an array of strings");
                     }
-                    keepList_.push_back(colName.get<std::string>());
+                    dropList_.push_back(colName.get<std::string>());
                 }
             } else {
-                throw std::runtime_error("OutputManager: 'keep' must be an array in 'Output' config");
+                throw std::runtime_error("OutputManager: 'drop' must be an array in 'Output' config");
             }
         }
 
@@ -65,7 +65,8 @@ namespace reco {
             }
         }
 
-        std::vector<std::string> keepList_; 
+        // Collections to not write to the tree
+        std::vector<std::string> dropList_; 
 
         std::unique_ptr<TFile> file_;
         TTree* tree_;

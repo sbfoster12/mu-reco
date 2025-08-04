@@ -11,13 +11,20 @@ void WFD5OutputManager::FillEvent(const EventStore& eventStore) {
    
     auto store = eventStore.GetStore();
 
-    for (const auto& [collName, baseVec] : store) {
+    for (const auto& pair : store) {
+        const auto& collName = pair.first;
+        const auto& baseVec = pair.second;
+
         if (baseVec.empty()) continue;
 
-        if (std::find(keepList_.begin(), keepList_.end(), collName) == keepList_.end()) {
-            // Skip collections not in keep list
+        if (std::any_of(dropList_.begin(), dropList_.end(),
+            [&](const std::string& pattern) {   // capture collName by value, NOT &
+                return matchesWildcard(pattern, collName);
+            })) {
             continue;
         }
+
+
 
         const TObject* firstObj = baseVec.front().get();
         if (!firstObj) continue;

@@ -25,13 +25,8 @@
     }
   ],
   "Output": {
-    "keep": [
-      "unpacker_WFD5HeaderCollection",
-      "unpacker_WFD5ChannelHeaderCollection",
-      "unpacker_WFD5WaveformHeaderCollection",
-      "unpacker_WFD5WaveformCollection",
-      "jitter1_CorrectedWFD5WaveformCollection",
-      "jitter2_CorrectedWFD5WaveformCollection2"
+    "drop": [
+      "unpacker*"
     ]
   }
 }
