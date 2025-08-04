@@ -12,6 +12,7 @@ namespace reco {
 
     class EventStore;
     class ServiceManager;
+    class ConfigHolder;
 
     class RecoStage : public TObject {
     public:
@@ -24,8 +25,14 @@ namespace reco {
         void SetRecoLabel(const std::string& recoLabel) { recoLabel_ = recoLabel; }
         const std::string& GetRecoLabel() const { return recoLabel_; }
 
+        void SetConfigHolder(std::shared_ptr<const ConfigHolder> configHolder) {
+            configHolder_ = configHolder;
+        }
+
     protected:
         std::string recoLabel_;
+
+        std::shared_ptr<const ConfigHolder> configHolder_;
 
         ClassDef(RecoStage, 1);
     };

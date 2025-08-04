@@ -26,8 +26,8 @@ namespace reco {
         OutputManager(const std::string& filename);
         virtual ~OutputManager();
 
-        void Configure(const ConfigHolder& configHolder) {
-            const nlohmann::json& config = configHolder.GetConfig();
+        void Configure(std::shared_ptr<const ConfigHolder> configHolder) {
+            const nlohmann::json& config = configHolder->GetConfig();
 
             if (!config.contains("Output")) {
                 throw std::runtime_error("OutputManager: Missing or invalid 'Output' config");
@@ -46,7 +46,7 @@ namespace reco {
             }
 
             //Write the configuration to the file
-            dataProducts::RecoConfig recoConfig(config.dump(),configHolder.GetRun(),configHolder.GetSubrun());
+            dataProducts::RecoConfig recoConfig(config.dump(),configHolder->GetRun(),configHolder->GetSubrun());
             file_->cd();
             file_->WriteObject(&recoConfig, "reco_config");
         }

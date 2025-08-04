@@ -17,7 +17,7 @@ namespace reco {
     public:
         RecoManager() = default;
 
-        void Configure(const ConfigHolder& configHolder, const ServiceManager& serviceManager);
+        void Configure(std::shared_ptr<const ConfigHolder> configHolder, const ServiceManager& serviceManager);
         void Run(EventStore& eventStore, ServiceManager& serviceManager);
 
     private:

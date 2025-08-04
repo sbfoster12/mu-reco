@@ -135,9 +135,9 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------------------------------
 
     // Create configuration holder
-    reco::ConfigHolder configHolder;
-    configHolder.LoadFromFile(config_file_name);
-    configHolder.SetRunSubrun(run, subrun);
+    std::shared_ptr<reco::ConfigHolder> configHolder = std::make_shared<reco::ConfigHolder>();
+    configHolder->LoadFromFile(config_file_name);
+    configHolder->SetRunSubrun(run, subrun);
 
     // Create the output manager
     reco::OutputManager* outputManager = new reco::WFD5OutputManager(output_file_name);

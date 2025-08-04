@@ -17,8 +17,14 @@ namespace reco {
         void SetLabel(const std::string& label) { label_ = label; }
         const std::string& GetLabel() const { return label_; }
 
-    private:
+        void SetConfigHolder(std::shared_ptr<const ConfigHolder> configHolder) {
+            configHolder_ = configHolder;
+        }
+
+    protected:
         std::string label_;
+
+        std::shared_ptr<const ConfigHolder> configHolder_;
 
         ClassDef(Service, 1);
     };

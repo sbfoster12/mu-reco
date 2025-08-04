@@ -20,6 +20,12 @@ namespace reco {
 
             auto& jsonParserUtil = reco::JsonParserUtil::instance();
 
+            // Get the run number from the configuration
+            int run = configHolder_->GetRun();
+            int subrun = configHolder_->GetSubrun();
+            
+            std::cout << "Configuring ChannelMapService for run: " << run << ", subrun: " << subrun << std::endl;
+
             //TODO: parse the configuration channel map and store it in a map
             channelMap_[std::make_tuple(0, 1, 0)] = "LYSO"; // this is just an example for now            
         }

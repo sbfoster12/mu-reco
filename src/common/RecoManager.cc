@@ -6,9 +6,9 @@
 
 using namespace reco;
 
-void RecoManager::Configure(const ConfigHolder& configHolder, const ServiceManager& serviceManager) {
+void RecoManager::Configure(std::shared_ptr<const ConfigHolder> configHolder, const ServiceManager& serviceManager) {
 
-    const nlohmann::json& config = configHolder.GetConfig();
+    const nlohmann::json& config = configHolder->GetConfig();
     if (!config.contains("RecoStages") || !config["RecoStages"].is_array()) {
         throw std::runtime_error("RecoManager: Missing or invalid 'RecoStages' config");
     }
@@ -36,6 +36,7 @@ void RecoManager::Configure(const ConfigHolder& configHolder, const ServiceManag
             throw std::runtime_error("RecoManager: Instantiated object is not a RecoStage");
         }
 
+        stage->SetConfigHolder(configHolder);
         stage->SetRecoLabel(recoLabel);
         stage->Configure(stageConfig, serviceManager);
         stages_.emplace_back(stage);
