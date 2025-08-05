@@ -4,7 +4,7 @@
 
 using namespace reco;
 
-void PileupIdentifier::Configure(const nlohmann::json& config, const ServiceManager& serviceManager) {
+void PileupIdentifier::Configure(const nlohmann::json& config, const ServiceManager& serviceManager, EventStore& eventStore) {
 
     inputRecoLabel_ = config.value("inputRecoLabel", "peaks");
     inputPeaksLabel_ = config.value("inputPeaksLabel", "Peaks");

@@ -6,9 +6,7 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "reco/common/ConfigHolder.hh"
 #include "reco/common/Service.hh"
-#include "reco/common/JsonParserUtil.hh"
 #include "reco/wfd5/TemplateLoaderService.hh"
 
 namespace reco {
@@ -18,7 +16,7 @@ namespace reco {
         TemplateFitterService() = default;
         virtual ~TemplateFitterService() = default;
 
-        void Configure(const nlohmann::json& config) override {
+        void Configure(const nlohmann::json& config, EventStore& eventStore) override {
 
             // auto& jsonParserUtil = reco::JsonParserUtil::instance();
             templateLoaderLabel_ = config.value("templateLoaderLabel", "templateLoader");

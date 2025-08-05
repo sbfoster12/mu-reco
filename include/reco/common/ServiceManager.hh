@@ -18,7 +18,7 @@ namespace reco {
         ~ServiceManager() = default;
 
         // Create and configure services from JSON array (each service config must have "class" and "label")
-        void Configure(std::shared_ptr<const ConfigHolder> configHolder) {
+        void Configure(std::shared_ptr<const ConfigHolder> configHolder, reco::EventStore& eventStore) {
             const nlohmann::json& config = configHolder->GetConfig();
             if (!config.contains("Services") || !config["Services"].is_array()) {
                 throw std::runtime_error("ServiceManager: Missing or invalid 'Services' config");
@@ -47,7 +47,7 @@ namespace reco {
                 // Configure the service with full JSON object
                 service->SetServiceManager(this); // this lets later services access previously created services
                 service->SetConfigHolder(configHolder);
-                service->Configure(servicesConfig);
+                service->Configure(servicesConfig, eventStore);
                 service->SetLabel(label.c_str());
 
                 // Store with label

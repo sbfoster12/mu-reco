@@ -3,13 +3,17 @@
 
 using namespace reco;
 
-void JitterCorrector::Configure(const nlohmann::json& config, const ServiceManager& serviceManager) {
+void JitterCorrector::Configure(const nlohmann::json& config, const ServiceManager& serviceManager, EventStore& eventStore) {
 
     correctionFactor_ = config.value("correctionFactor", 1.0);
     inputRecoLabel_ = config.value("inputRecoLabel", "unpacker");
     inputWaveformsLabel_ = config.value("inputWaveformsLabel", "WFD5WaveformCollection");
     outputWaveformsLabel_ = config.value("outputWaveformsLabel", "WaveformsCorreted");
     templateLoaderServiceLabel_ = config.value("templateLoaderServiceLabel", "templateLoader");
+
+    // Create some histograms
+    auto hist = std::make_shared<TH1D>("energy", "Energy Spectrum", 100, 0, 1000);
+    eventStore.putHistogram("energy", std::move(hist));
 }
 
 void JitterCorrector::Process(EventStore& store, const ServiceManager& serviceManager) {

@@ -100,6 +100,7 @@ namespace reco {
             if (histograms_.count(name)) {
                 std::cerr << "Warning: Histogram with name " << name << " already exists. Overwriting.\n";
             }
+            std::cout << "-> reco::EventStore: Created histogram '" << name << "' in the event store." << std::endl;
             histograms_[name] = std::move(hist);
         }
 

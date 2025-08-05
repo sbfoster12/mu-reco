@@ -16,7 +16,7 @@ namespace reco {
         JitterCorrector() : correctionFactor_() {}
         ~JitterCorrector() override = default;
 
-        void Configure(const json& config, const ServiceManager& serviceManager) override;
+        void Configure(const json& config, const ServiceManager& serviceManager, EventStore& eventStore) override;
 
         void Process(EventStore& store, const ServiceManager& serviceManager) override;
 

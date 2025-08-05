@@ -6,9 +6,7 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "reco/common/ConfigHolder.hh"
 #include "reco/common/Service.hh"
-#include "reco/common/JsonParserUtil.hh"
 #include "reco/wfd5/ChannelConfig.hh"
 
 namespace reco {
@@ -19,7 +17,7 @@ namespace reco {
         ChannelMapService() = default;
         virtual ~ChannelMapService() = default;
 
-        void Configure(const nlohmann::json& config) override;
+        void Configure(const nlohmann::json& config, EventStore& eventStore) override;
 
         const std::map<std::tuple<int,int,int>, ChannelConfig>& GetChannelMap() const {
             return channelConfigMap_;

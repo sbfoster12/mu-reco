@@ -5,17 +5,20 @@
 #include <TObject.h>
 #include <nlohmann/json.hpp>
 
+#include "reco/common/ConfigHolder.hh"
+#include "reco/common/EventStore.hh"
+#include "reco/common/JsonParserUtil.hh"
+
 using json = nlohmann::json;
 
 namespace reco {
 
-    class ConfigHolder;
     class ServiceManager;
 
     class Service : public TObject {
     public:
         virtual ~Service() = default;
-        virtual void Configure(const nlohmann::json& config) = 0;
+        virtual void Configure(const nlohmann::json& config, reco::EventStore& eventStore) = 0;
 
         void SetLabel(const std::string& label) { label_ = label; }
         const std::string& GetLabel() const { return label_; }

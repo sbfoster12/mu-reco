@@ -4,7 +4,7 @@
 
 using namespace reco;
 
-void RFFitter::Configure(const nlohmann::json& config, const ServiceManager& serviceManager) {
+void RFFitter::Configure(const nlohmann::json& config, const ServiceManager& serviceManager, EventStore& eventStore) {
 
     inputRecoLabel_ = config.value("inputRecoLabel", "jitter");
     inputWaveformsLabel_ = config.value("inputWaveformsLabel", "CorrectedWaveforms");

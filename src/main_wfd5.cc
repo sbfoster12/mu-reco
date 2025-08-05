@@ -132,11 +132,11 @@ int main(int argc, char *argv[])
 
     // Create the service manager
     reco::ServiceManager serviceManager;
-    serviceManager.Configure(configHolder);
+    serviceManager.Configure(configHolder, eventStore);
 
     // Create the reco manager
     reco::RecoManager recoManager;
-    recoManager.Configure(configHolder, serviceManager);
+    recoManager.Configure(configHolder, serviceManager, eventStore);
 
     // Create some histograms
     auto hist = std::make_shared<TH1D>("energy", "Energy Spectrum", 100, 0, 1000);

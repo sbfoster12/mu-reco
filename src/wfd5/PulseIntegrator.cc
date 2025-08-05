@@ -4,7 +4,7 @@
 
 using namespace reco;
 
-void PulseIntegrator::Configure(const nlohmann::json& config, const ServiceManager& serviceManager) {
+void PulseIntegrator::Configure(const nlohmann::json& config, const ServiceManager& serviceManager, EventStore& eventStore) {
 
     inputRecoLabel_ = config.value("inputRecoLabel", "grouped");
     inputWaveformsLabel_ = config.value("inputWaveformsLabel", "WaveformsXtal");

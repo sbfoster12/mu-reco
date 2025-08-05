@@ -3,7 +3,7 @@
 
 using namespace reco;
 
-void Fitter::Configure(const nlohmann::json& config, const ServiceManager& serviceManager) {
+void Fitter::Configure(const nlohmann::json& config, const ServiceManager& serviceManager, EventStore& eventStore) {
 
     inputRecoLabel_ = config.value("inputRecoLabel", "jitter");
     inputWaveformsLabel_ = config.value("inputWaveformsLabel", "CorrectedWaveforms");

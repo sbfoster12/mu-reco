@@ -6,7 +6,7 @@
 
 using namespace reco;
 
-void RecoManager::Configure(std::shared_ptr<const ConfigHolder> configHolder, const ServiceManager& serviceManager) {
+void RecoManager::Configure(std::shared_ptr<const ConfigHolder> configHolder, const ServiceManager& serviceManager, EventStore& eventStore) {
 
     const nlohmann::json& config = configHolder->GetConfig();
     if (!config.contains("RecoStages") || !config["RecoStages"].is_array()) {
@@ -38,7 +38,7 @@ void RecoManager::Configure(std::shared_ptr<const ConfigHolder> configHolder, co
 
         stage->SetConfigHolder(configHolder);
         stage->SetRecoLabel(recoLabel);
-        stage->Configure(stageConfig, serviceManager);
+        stage->Configure(stageConfig, serviceManager, eventStore);
         stages_.emplace_back(stage);
 
         std::cout << "-> reco:: RecoManager: Added RecoStage of type '" << type << "' with label '" << recoLabel << "'\n";

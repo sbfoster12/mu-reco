@@ -2,7 +2,7 @@
 
 using namespace reco;
 
- void ChannelMapService::Configure(const nlohmann::json& config) {
+ void ChannelMapService::Configure(const nlohmann::json& config, EventStore& eventStore) {
 
     auto& jsonParserUtil = reco::JsonParserUtil::instance();
 

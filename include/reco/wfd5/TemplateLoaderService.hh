@@ -6,9 +6,7 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "reco/common/ConfigHolder.hh"
 #include "reco/common/Service.hh"
-#include "reco/common/JsonParserUtil.hh"
 
 namespace reco {
 
@@ -17,7 +15,7 @@ namespace reco {
         TemplateLoaderService() = default;
         virtual ~TemplateLoaderService() = default;
 
-        void Configure(const nlohmann::json& config) override {
+        void Configure(const nlohmann::json& config, EventStore& eventStore) override {
 
             auto& jsonParserUtil = reco::JsonParserUtil::instance();
 

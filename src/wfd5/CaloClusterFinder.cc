@@ -4,7 +4,7 @@
 
 using namespace reco;
 
-void CaloClusterFinder::Configure(const nlohmann::json& config, const ServiceManager& serviceManager) {
+void CaloClusterFinder::Configure(const nlohmann::json& config, const ServiceManager& serviceManager, EventStore& eventStore) {
 
     inputRecoLabel_ = config.value("inputRecoLabel", "");
     inputFitResultsLabel_ = config.value("inputFitResultsLabel", "");

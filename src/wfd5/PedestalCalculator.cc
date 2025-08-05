@@ -4,7 +4,7 @@
 
 using namespace reco;
 
-void PedestalCalculator::Configure(const nlohmann::json& config, const ServiceManager& serviceManager) {
+void PedestalCalculator::Configure(const nlohmann::json& config, const ServiceManager& serviceManager, EventStore& eventStore) {
 
     inputRecoLabel_ = config.value("inputRecoLabel", "timeAligned");
     inputWaveformsLabel_ = config.value("inputWaveformsLabel", "Waveforms");

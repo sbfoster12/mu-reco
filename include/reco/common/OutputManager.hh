@@ -60,6 +60,7 @@ namespace reco {
             for (const auto& [name, hist] : store.GetAllHistograms()) {
                 file_->cd();
                 hist->Write(name.c_str());
+                std::cout << "-> reco::OutputManager: Wrote histogram '" << name << "' to the TFile." << std::endl;
             }
         }
 
