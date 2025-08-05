@@ -36,9 +36,9 @@ Building the application will create an executable for running reco over the WFD
 
 Assuming that `my_file.mid` is your midas file, you can run the reco via:
 ```bash
-./install/bin/reco_wfd5 ./config/reco_config.json my_file.mid 0
+./install/bin/reco_wfd5 .reco_config.json my_file.mid 0
 ```
-where the `0` is the verbosity level. 
+where the `0` is the verbosity level. Note that the config file must be in the `mu-reco/config` directory. The program will search for config files in the directory `$MU_RECO_PATH/CONFIG` which is set by the `setenv.sh` script.
 
 Running these commands will run the reconstruction configured in `reco_config.json` and will create a ROOT file that you can use for all your analysis needs!
 
