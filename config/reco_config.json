@@ -22,7 +22,7 @@
       "type": "reco::ChannelMapService",
       "label": "channelMap",
       "config_files":{
-        "config_file_0":{"file":"g-2_channel_map.json", "iov":[0,4000]}
+        "config_file_0":{"file":"g-2_channel_map.json", "iov":[10000,30000]}
       }
     },
     {

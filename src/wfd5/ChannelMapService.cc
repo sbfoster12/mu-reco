@@ -21,11 +21,9 @@ using namespace reco;
         throw std::runtime_error("ChannelMapService configuration must contain at least one config file");
     }
 
-    // Add logic here to choose config file from the run number
-    if (!configFiles.contains("config_file_0")) {
-        throw std::runtime_error("ChannelMapService configuration must contain 'config_file_0' key");
-    }
-    const auto& configFile = configFiles["config_file_0"];
+    // Get the appropriate configuration file for the given run and subrun
+    const auto& configFile = GetFileFromRunSubrun(run, subrun, configFiles);
+
     if (!configFile.contains("file")) {
         throw std::runtime_error("ChannelMapService configuration file must contain 'file' key");
     }
@@ -79,4 +77,21 @@ using namespace reco;
     } catch (const std::exception& e) {
         throw std::runtime_error("Failed to parse channel map file: " + std::string(e.what()));
     }
+}
+
+const nlohmann::json& ChannelMapService::GetFileFromRunSubrun(int run, int subrun, const nlohmann::json& configFiles) {
+    // This function retrieves the appropriate configuration file based on the run and subrun numbers
+    // It assumes that the configFiles is a JSON object with keys as file names and values as IOV ranges
+    for (const auto& [key, value] : configFiles.items()) {
+        if (value.contains("iov") && value["iov"].is_array() && value["iov"].size() == 2) {
+            int startRun = value["iov"][0];
+            int endRun = value["iov"][1];
+            if (run >= startRun && run <= endRun) {
+                std::cout << "-> reco::ChannelMapService: Found configuration file for run: " << run
+                          << ", subrun: " << subrun << " -> " << key << " with IOV: [" << startRun << ", " << endRun << "]" << std::endl;
+                return configFiles[key];
+            }
+        }
+    }
+    throw std::runtime_error("No configuration file found for run: " + std::to_string(run) + ", subrun: " + std::to_string(subrun));
 }

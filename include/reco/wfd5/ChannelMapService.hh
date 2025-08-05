@@ -12,6 +12,7 @@
 
 namespace reco {
 
+
     class ChannelMapService : public Service {
     public:
         ChannelMapService() = default;
@@ -22,6 +23,9 @@ namespace reco {
         const std::map<std::tuple<int,int,int>, std::pair<std::string,std::string>>& GetChannelMap() const {
             return channelMap_;
         }
+
+        //Get channel mapping file from specified run and subrun
+        const nlohmann::json& GetFileFromRunSubrun(int run, int subrun, const nlohmann::json& configFiles);
 
     private:
         std::map<std::tuple<int,int,int>, std::pair<std::string,std::string>> channelMap_;  // key: (crate, wfd5, channel), value: (detector system, subdetector)

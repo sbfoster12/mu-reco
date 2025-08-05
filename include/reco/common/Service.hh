@@ -9,6 +9,8 @@ using json = nlohmann::json;
 
 namespace reco {
 
+    class ConfigHolder;
+
     class Service : public TObject {
     public:
         virtual ~Service() = default;
