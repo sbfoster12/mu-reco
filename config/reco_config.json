@@ -13,10 +13,17 @@
       "templateServiceLabel": "templates"
     },
     {
-      "recoClass": "reco::DetectorGrouper",
-      "recoLabel": "grouper",
+      "recoClass": "reco::DigitizerTimeAligner",
+      "recoLabel": "timeAligned",
       "inputRecoLabel": "jitter",
       "inputWaveformsLabel": "CorrectedWaveforms",
+      "outputWaveformsLabel": "AlignedWaveforms"
+    },
+    {
+      "recoClass": "reco::DetectorGrouper",
+      "recoLabel": "grouped",
+      "inputRecoLabel": "timeAligned",
+      "inputWaveformsLabel": "AlignedWaveforms",
       "outputWaveformsBaseLabel": "Waveforms",
       "channelMapServiceLabel": "channelMap"
     }

@@ -4,13 +4,16 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-// Common reco classes
+// Common reco/service classes
 #pragma link C++ class reco::RecoStage+;
 #pragma link C++ class reco::Service+;
 
-// WFD5 Reco classes
+// WFD5 RecoStages
 #pragma link C++ class reco::JitterCorrector+;
+#pragma link C++ class reco::DigitizerTimeAligner+;
 #pragma link C++ class reco::DetectorGrouper+;
+
+// WFD5 services
 #pragma link C++ class reco::TemplateLoaderService+;
 #pragma link C++ class reco::TemplateFitterService+;
 #pragma link C++ class reco::ChannelMapService+;
