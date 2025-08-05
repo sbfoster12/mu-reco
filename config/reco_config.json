@@ -1,4 +1,8 @@
 {
+  
+  "Unpacker" : {
+    "max_events": -1
+  },
   "RecoStages": [
     {
       "recoClass": "reco::JitterCorrector",
