@@ -26,6 +26,21 @@
       "inputWaveformsLabel": "AlignedWaveforms",
       "outputWaveformsBaseLabel": "Waveforms",
       "channelMapServiceLabel": "channelMap"
+    },
+    {
+      "recoClass": "reco::Fitter",
+      "recoLabel": "xtalFitter",
+      "inputRecoLabel": "grouped",
+      "inputWaveformsLabel": "WaveformsXtal",
+      "outputFitResultLabel": "FitResults",
+      "templateFitterLabel": "templateFitter"
+    },
+    {
+      "recoClass": "reco::RFFitter",
+      "recoLabel": "xtalFitter",
+      "inputRecoLabel": "grouped",
+      "inputWaveformsLabel": "WaveformsXtal",
+      "outputFitResultLabel": "RFFitResults"
     }
   ],
   "Services": [

@@ -12,6 +12,8 @@
 #pragma link C++ class reco::JitterCorrector+;
 #pragma link C++ class reco::DigitizerTimeAligner+;
 #pragma link C++ class reco::DetectorGrouper+;
+#pragma link C++ class reco::Fitter+;
+#pragma link C++ class reco::RFFitter+;
 
 // WFD5 services
 #pragma link C++ class reco::TemplateLoaderService+;
