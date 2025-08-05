@@ -1,7 +1,7 @@
 {
   
   "Unpacker" : {
-    "max_events": -1
+    "max_midas_events": -1
   },
   "RecoStages": [
     {
