@@ -1,6 +1,6 @@
 
-#ifndef RFFFITTER_HH
-#define RFFFITTER_HH
+#ifndef XYPOSITIONFINDER_HH
+#define XYPOSITIONFINDER_HH
 
 #include <data_products/wfd5/WFD5Waveform.hh>
 
@@ -11,10 +11,10 @@
 
 namespace reco {
 
-    class RFFitter : public RecoStage {
+    class XYPositionFinder : public RecoStage {
     public:
-        RFFitter() {}
-        ~RFFitter() override = default;
+        XYPositionFinder() {}
+        ~XYPositionFinder() override = default;
 
         void Configure(const json& config, const ServiceManager& serviceManager) override;
 
@@ -23,11 +23,11 @@ namespace reco {
     private:
 
         std::string inputRecoLabel_;
-        std::string inputWaveformsLabel_;
-        std::string outputFitResultLabel_;
+        std::string inputFitResultsLabel_;
+        std::string outputPositionLabel_;
 
-        ClassDefOverride(RFFitter, 1);
+        ClassDefOverride(XYPositionFinder, 1);
     };
 }
 
-#endif  // RFFFITTER_HH
+#endif  // XYPOSITIONFINDER_HH

@@ -9,21 +9,28 @@
       "recoLabel": "jitter",
       "inputRecoLabel": "unpacker",
       "inputWaveformsLabel": "WFD5WaveformCollection",
-      "outputWaveformsLabel": "CorrectedWaveforms",
+      "outputWaveformsLabel": "Waveforms",
       "templateServiceLabel": "templates"
     },
     {
       "recoClass": "reco::DigitizerTimeAligner",
       "recoLabel": "timeAligned",
       "inputRecoLabel": "jitter",
-      "inputWaveformsLabel": "CorrectedWaveforms",
-      "outputWaveformsLabel": "AlignedWaveforms"
+      "inputWaveformsLabel": "Waveforms",
+      "outputWaveformsLabel": "Waveforms"
+    },
+    {
+      "recoClass": "reco::PedestalCalculator",
+      "recoLabel": "pedestal",
+      "inputRecoLabel": "timeAligned",
+      "inputWaveformsLabel": "Waveforms",
+      "outputWaveformsLabel": "Waveforms"
     },
     {
       "recoClass": "reco::DetectorGrouper",
       "recoLabel": "grouped",
-      "inputRecoLabel": "timeAligned",
-      "inputWaveformsLabel": "AlignedWaveforms",
+      "inputRecoLabel": "pedestal",
+      "inputWaveformsLabel": "Waveforms",
       "outputWaveformsBaseLabel": "Waveforms",
       "channelMapServiceLabel": "channelMap"
     },
@@ -37,10 +44,38 @@
     },
     {
       "recoClass": "reco::RFFitter",
-      "recoLabel": "xtalFitter",
+      "recoLabel": "RFFitter",
       "inputRecoLabel": "grouped",
       "inputWaveformsLabel": "WaveformsXtal",
       "outputFitResultLabel": "RFFitResults"
+    },
+    {
+      "recoClass": "reco::PulseIntegrator",
+      "recoLabel": "xtalIntegrator",
+      "inputRecoLabel": "grouped",
+      "inputWaveformsLabel": "WaveformsXtal",
+      "outputIntegralsLabel": "Integrals"
+    },
+    {
+      "recoClass": "reco::PeakIdentifier",
+      "recoLabel": "xtalPeakIdentifier",
+      "inputRecoLabel": "grouped",
+      "inputWaveformsLabel": "WaveformsXtal",
+      "outputPeaksLabel": "Peaks"
+    },
+    {
+      "recoClass": "reco::CaloClusterFinder",
+      "recoLabel": "xtalCaloClusterFinder",
+      "inputRecoLabel": "xtalFitter",
+      "inputFitResultsLabel": "FitResults",
+      "outputCaloClusterLabel": "CaloClusters"
+    },
+    {
+      "recoClass": "reco::XYPositionFinder",
+      "recoLabel": "xtalXYPositionFinder",
+      "inputRecoLabel": "xtalFitter",
+      "inputFitResultsLabel": "FitResults",
+      "outputPositionLabel": "XYPositions"
     }
   ],
   "Services": [

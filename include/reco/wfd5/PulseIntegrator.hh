@@ -1,6 +1,6 @@
 
-#ifndef RFFFITTER_HH
-#define RFFFITTER_HH
+#ifndef PULSEINTEGRATOR_HH
+#define PULSEINTEGRATOR_HH
 
 #include <data_products/wfd5/WFD5Waveform.hh>
 
@@ -11,10 +11,10 @@
 
 namespace reco {
 
-    class RFFitter : public RecoStage {
+    class PulseIntegrator : public RecoStage {
     public:
-        RFFitter() {}
-        ~RFFitter() override = default;
+        PulseIntegrator() {}
+        ~PulseIntegrator() override = default;
 
         void Configure(const json& config, const ServiceManager& serviceManager) override;
 
@@ -24,10 +24,10 @@ namespace reco {
 
         std::string inputRecoLabel_;
         std::string inputWaveformsLabel_;
-        std::string outputFitResultLabel_;
+        std::string outputIntegralsLabel_;
 
-        ClassDefOverride(RFFitter, 1);
+        ClassDefOverride(PulseIntegrator, 1);
     };
 }
 
-#endif  // RFFFITTER_HH
+#endif  // PULSEINTEGRATOR_HH

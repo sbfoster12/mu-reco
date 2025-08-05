@@ -1,6 +1,6 @@
 
-#ifndef RFFFITTER_HH
-#define RFFFITTER_HH
+#ifndef PEDESTALCALCULATOR_HH
+#define PEDESTALCALCULATOR_HH
 
 #include <data_products/wfd5/WFD5Waveform.hh>
 
@@ -11,10 +11,10 @@
 
 namespace reco {
 
-    class RFFitter : public RecoStage {
+    class PedestalCalculator : public RecoStage {
     public:
-        RFFitter() {}
-        ~RFFitter() override = default;
+        PedestalCalculator() {}
+        ~PedestalCalculator() override = default;
 
         void Configure(const json& config, const ServiceManager& serviceManager) override;
 
@@ -24,10 +24,10 @@ namespace reco {
 
         std::string inputRecoLabel_;
         std::string inputWaveformsLabel_;
-        std::string outputFitResultLabel_;
+        std::string outputWaveformsLabel_;
 
-        ClassDefOverride(RFFitter, 1);
+        ClassDefOverride(PedestalCalculator, 1);
     };
 }
 
-#endif  // RFFFITTER_HH
+#endif  // PEDESTALCALCULATOR_HH

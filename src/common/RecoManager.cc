@@ -40,6 +40,8 @@ void RecoManager::Configure(std::shared_ptr<const ConfigHolder> configHolder, co
         stage->SetRecoLabel(recoLabel);
         stage->Configure(stageConfig, serviceManager);
         stages_.emplace_back(stage);
+
+        std::cout << "-> reco:: RecoManager: Added RecoStage of type '" << type << "' with label '" << recoLabel << "'\n";
     }
 }
 
