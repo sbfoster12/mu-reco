@@ -1,0 +1,145 @@
+
+{
+    "channelMap": [
+        {
+            "crateNum": 8,
+            "amcSlotNum": 1,
+            "channelNum": 0,
+            "detectorSystem": "PMT Monitors",
+            "subdetector": "PMT0"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 1,
+            "channelNum": 1,
+            "detectorSystem": "PMT Monitors",
+            "subdetector": "PMT1"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 1,
+            "channelNum": 2,
+            "detectorSystem": "PMT Monitors",
+            "subdetector": "PMT2"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 1,
+            "channelNum": 3,
+            "detectorSystem": "Nim Trigger",
+            "subdetector": "Nim0"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 1,
+            "channelNum": 4,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal0"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 2,
+            "channelNum": 0,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal2"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 2,
+            "channelNum": 1,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal3"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 2,
+            "channelNum": 2,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal4"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 2,
+            "channelNum": 3,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal5"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 2,
+            "channelNum": 4,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal6"
+        },
+                {
+            "crateNum": 8,
+            "amcSlotNum": 3,
+            "channelNum": 0,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal7"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 3,
+            "channelNum": 1,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal8"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 3,
+            "channelNum": 2,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal9"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 3,
+            "channelNum": 3,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal10"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 3,
+            "channelNum": 4,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal11"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 4,
+            "channelNum": 0,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal12"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 4,
+            "channelNum": 1,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal13"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 4,
+            "channelNum": 2,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal14"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 4,
+            "channelNum": 3,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal15"
+        },
+        {
+            "crateNum": 8,
+            "amcSlotNum": 4,
+            "channelNum": 4,
+            "detectorSystem": "Xtal",
+            "subdetector": "Xtal16"
+        }
+    ]
+}

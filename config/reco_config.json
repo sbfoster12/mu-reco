@@ -5,15 +5,15 @@
       "recoLabel": "jitter",
       "inputRecoLabel": "unpacker",
       "inputWaveformsLabel": "WFD5WaveformCollection",
-      "outputWaveformsLabel": "CorrectedWFD5WaveformCollection",
+      "outputWaveformsLabel": "CorrectedWaveforms",
       "templateServiceLabel": "templates"
     },
     {
       "recoClass": "reco::DetectorGrouper",
       "recoLabel": "grouper",
       "inputRecoLabel": "jitter",
-      "inputWaveformsLabel": "CorrectedWFD5WaveformCollection",
-      "outputWaveformsBaseLabel": "WFD5WaveformCollection",
+      "inputWaveformsLabel": "CorrectedWaveforms",
+      "outputWaveformsBaseLabel": "Waveforms",
       "channelMapServiceLabel": "channelMap"
     }
   ],
@@ -22,8 +22,7 @@
       "type": "reco::ChannelMapService",
       "label": "channelMap",
       "config_files":{
-        "conf0":{"file":"/path/to/file1", "iov":[0,4000]},
-        "conf1":{"file":"/path/to/file2", "iov":[4000,14000]}
+        "config_file_0":{"file":"g-2_channel_map.json", "iov":[0,4000]}
       }
     },
     {
@@ -34,7 +33,8 @@
   ],
   "Output": {
     "drop": [
-      "unpacker*"
+      "unpacker*",
+      "jitter*"
     ]
   }
 }

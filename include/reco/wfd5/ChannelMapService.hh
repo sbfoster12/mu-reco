@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <stdexcept>
 #include <iostream>
+#include <cstdlib>
 
 #include "reco/common/ConfigHolder.hh"
 #include "reco/common/Service.hh"
@@ -16,19 +17,7 @@ namespace reco {
         ChannelMapService() = default;
         virtual ~ChannelMapService() = default;
 
-        void Configure(const nlohmann::json& config) override {
-
-            auto& jsonParserUtil = reco::JsonParserUtil::instance();
-
-            // Get the run number from the configuration
-            int run = configHolder_->GetRun();
-            int subrun = configHolder_->GetSubrun();
-            
-            std::cout << "-> reco::ChannelMapService: Configuring ChannelMapService for run: " << run << ", subrun: " << subrun << std::endl;
-
-            //TODO: parse the configuration channel map and store it in a map
-            channelMap_[std::make_tuple(0, 1, 0)] = {"LYSO", "PENT"}; // this is just an example for now
-        }
+        void Configure(const nlohmann::json& config) override;
 
         const std::map<std::tuple<int,int,int>, std::pair<std::string,std::string>>& GetChannelMap() const {
             return channelMap_;

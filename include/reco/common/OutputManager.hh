@@ -69,6 +69,7 @@ namespace reco {
         void CreateBranchIfMissing(const std::string& name, std::vector<T>* buffer) {
             if (!tree_->GetBranch(name.c_str())) {
                 tree_->Branch(name.c_str(), buffer);
+                std::cout << "-> reco::OutputManager: Created branch '" << name << "' in tree." << std::endl;
             }
         }
 

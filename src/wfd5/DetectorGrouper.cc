@@ -35,6 +35,11 @@ void DetectorGrouper::Process(EventStore& store, const ServiceManager& serviceMa
 
             // Create the key
             auto key = std::make_tuple(thisWaveform->crateNum, thisWaveform->amcNum, thisWaveform->channelTag);
+
+            // std::cout << "Processing waveform with key: (" 
+            //           << std::get<0>(key) << ", " 
+            //           << std::get<1>(key) << ", " 
+            //           << std::get<2>(key) << ")\n";
             
             //Get the channel map from the service
             const auto& channelMap = channelMapService->GetChannelMap();
@@ -74,7 +79,13 @@ void DetectorGrouper::Process(EventStore& store, const ServiceManager& serviceMa
 
         // Store each detector's collections with a unique label
         for (const auto& [detectorName, waveforms] : detectorWaveformsMap) {
-            store.put(this->GetRecoLabel(), outputWaveformsBaseLabel_ + detectorName, std::move(waveforms));
+            //remove whitespace from detectorName
+            std::string cleanDetectorName = detectorName;
+            cleanDetectorName.erase(
+                std::remove_if(cleanDetectorName.begin(), cleanDetectorName.end(), ::isspace),
+                cleanDetectorName.end()
+            );
+            store.put(this->GetRecoLabel(), outputWaveformsBaseLabel_ + cleanDetectorName, std::move(waveforms));
         }
 
         // std::cout << "DetectorGrouper: corrected " << waveforms.size() << " waveforms.\n";
