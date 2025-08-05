@@ -42,14 +42,14 @@ void DetectorGrouper::Process(EventStore& store, const ServiceManager& serviceMa
             //           << std::get<2>(key) << ")\n";
             
             //Get the channel map from the service
-            const auto& channelMap = channelMapService->GetChannelMap();
+            const auto& channelConfigMap = channelMapService->GetChannelMap();
             
             // Check that the key is in the channel map
-            if (channelMap.find(key) != channelMap.end()) {
+            if (channelConfigMap.find(key) != channelConfigMap.end()) {
 
                 // Get the detector name
-                std::string detectorSystem = channelMap.at(key).first;
-                std::string subdetector = channelMap.at(key).second;
+                std::string detectorSystem = channelConfigMap.at(key).GetDetectorSystem();
+                std::string subdetector = channelConfigMap.at(key).GetSubdetector();
                 thisWaveform->SetDetectorSystem(detectorSystem);
                 thisWaveform->SetSubdetector(subdetector);
 

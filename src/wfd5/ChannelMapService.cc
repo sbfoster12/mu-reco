@@ -55,23 +55,22 @@ using namespace reco;
             }
             int crateNum = entry["crateNum"];
             int amcSlotNum = entry["amcSlotNum"];
-            int channelNum = entry["channelNum"];
+        int channelNum = entry["channelNum"];
             std::string detectorSystem = entry["detectorSystem"];
             std::string subdetector = entry["subdetector"];
 
-            channelMap_[std::make_tuple(crateNum, amcSlotNum, channelNum)] = {detectorSystem, subdetector};
+            channelConfigMap_[std::make_tuple(crateNum, amcSlotNum, channelNum)] = ChannelConfig(detectorSystem, subdetector);
         }
         std::cout << "-> reco::ChannelMapService: Successfully loaded channel map with "
-                    << channelMap_.size() << " entries." << std::endl;
+                    << channelConfigMap_.size() << " entries." << std::endl;
         // Print the loaded channel map for debugging
-        for (const auto& [key, value] : channelMap_) {
+        for (const auto& [key, value] : channelConfigMap_) {
             const auto& [crateNum, amcSlotNum, channelNum] = key;
-            const auto& [detectorSystem, subdetector] = value;
             std::cout << "-> reco::ChannelMapService: Crate: " << crateNum
                         << ", AMC Slot: " << amcSlotNum
                         << ", Channel: " << channelNum
-                        << " -> Detector System: " << detectorSystem
-                        << ", Subdetector: " << subdetector << std::endl;
+                        << " -> Detector System: " << value.GetDetectorSystem()
+                        << ", Subdetector: " << value.GetSubdetector() << std::endl;
         }
         
     } catch (const std::exception& e) {
