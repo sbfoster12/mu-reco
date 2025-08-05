@@ -1,5 +1,5 @@
-#ifndef TEMPLATE_SERVICE_HH
-#define TEMPLATE_SERVICE_HH
+#ifndef TEMPLATELOADER_SERVICE_HH
+#define TEMPLATELOADER_SERVICE_HH
 
 #include <type_traits>
 #include <stdexcept>
@@ -12,10 +12,10 @@
 
 namespace reco {
 
-    class TemplateService : public Service {
+    class TemplateLoaderService : public Service {
     public:
-        TemplateService() = default;
-        virtual ~TemplateService() = default;
+        TemplateLoaderService() = default;
+        virtual ~TemplateLoaderService() = default;
 
         void Configure(const nlohmann::json& config) override {
 
@@ -31,9 +31,9 @@ namespace reco {
                 file_path_ = std::string(std::getenv("MU_RECO_PATH")) + "/config/" + file_name;
             }
             if (!std::filesystem::exists(file_path_)) {
-                throw std::runtime_error("TemplateService: File not found: " + file_path_);
+                throw std::runtime_error("TemplateLoaderService: File not found: " + file_path_);
             }
-            std::cout << "-> reco::TemplateService: Configuring with file: " << file_path_ << std::endl;
+            std::cout << "-> reco::TemplateLoaderService: Configuring with file: " << file_path_ << std::endl;
             auto jsonObj = jsonParserUtil.ParseFile(file_path_);  // Example usage of JsonParserUtil
         }
 
@@ -44,7 +44,7 @@ namespace reco {
     private:
         std::string file_path_;
 
-        ClassDefOverride(TemplateService, 1);
+        ClassDefOverride(TemplateLoaderService, 1);
 
     };
 }

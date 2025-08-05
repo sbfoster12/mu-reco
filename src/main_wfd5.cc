@@ -34,10 +34,8 @@ Some description...
 #include "reco/common/ConfigHolder.hh"
 // RecoStages
 #include "reco/common/RecoManager.hh"
-#include "reco/wfd5/JitterCorrector.hh"
 // Services
 #include "reco/common/ServiceManager.hh"
-#include "reco/wfd5/TemplateService.hh"
 
 #include <string>
 #include <sstream>

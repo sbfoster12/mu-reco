@@ -30,9 +30,14 @@
       }
     },
     {
-      "type": "reco::TemplateService",
-      "label": "templates",
+      "type": "reco::TemplateLoaderService",
+      "label": "templateLoader",
       "file_name": "templates.json"
+    },
+    {
+      "type": "reco::TemplateFitterService",
+      "label": "templateFitter",
+      "templateLoaderLabel": "templateLoader"
     }
   ],
   "Output": {

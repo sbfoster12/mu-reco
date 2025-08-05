@@ -8,8 +8,8 @@ void JitterCorrector::Configure(const nlohmann::json& config, const ServiceManag
     correctionFactor_ = config.value("correctionFactor", 1.0);
     inputRecoLabel_ = config.value("inputRecoLabel", "unpacker");
     inputWaveformsLabel_ = config.value("inputWaveformsLabel", "WFD5WaveformCollection");
-    outputWaveformsLabel_ = config.value("outputWaveformsLabel", "WFD5WaveformCorrectedCollection");
-    templateServiceLabel_ = config.value("templateServiceLabel", "TemplateService");
+    outputWaveformsLabel_ = config.value("outputWaveformsLabel", "WaveformsCorreted");
+    templateLoaderServiceLabel_ = config.value("templateLoaderServiceLabel", "templateLoader");
 }
 
 void JitterCorrector::Process(EventStore& store, const ServiceManager& serviceManager) {
@@ -23,7 +23,7 @@ void JitterCorrector::Process(EventStore& store, const ServiceManager& serviceMa
         correctedWaveforms.reserve(waveforms.size());
 
         //Get the template service (example of getting a service)
-        auto templateService = serviceManager.Get<TemplateService>(templateServiceLabel_);
+        auto templateLoaderService = serviceManager.Get<TemplateLoaderService>(templateLoaderServiceLabel_);
 
         for (const auto& wf : waveforms) {
             // Make a copy for correction

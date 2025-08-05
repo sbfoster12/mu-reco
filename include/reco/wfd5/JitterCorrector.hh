@@ -6,7 +6,7 @@
 #include "reco/common/RecoStage.hh"
 #include "reco/common/EventStore.hh"
 #include "reco/common/ServiceManager.hh"
-#include "reco/wfd5/TemplateService.hh"
+#include "reco/wfd5/TemplateLoaderService.hh"
 #include "reco/common/JsonParserUtil.hh"
 
 namespace reco {
@@ -26,7 +26,7 @@ namespace reco {
         std::string inputRecoLabel_;
         std::string inputWaveformsLabel_;
         std::string outputWaveformsLabel_;
-        std::string templateServiceLabel_;
+        std::string templateLoaderServiceLabel_;
         double correctionFactor_;
 
 

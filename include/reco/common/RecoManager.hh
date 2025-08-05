@@ -18,7 +18,7 @@ namespace reco {
         RecoManager() = default;
 
         void Configure(std::shared_ptr<const ConfigHolder> configHolder, const ServiceManager& serviceManager);
-        void Run(EventStore& eventStore, ServiceManager& serviceManager);
+        void Run(EventStore& eventStore, const ServiceManager& serviceManager);
 
     private:
         std::vector<std::shared_ptr<RecoStage>> stages_;

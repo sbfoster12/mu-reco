@@ -45,6 +45,7 @@ namespace reco {
                 }
 
                 // Configure the service with full JSON object
+                service->SetServiceManager(this); // this lets later services access previously created services
                 service->SetConfigHolder(configHolder);
                 service->Configure(servicesConfig);
                 service->SetLabel(label.c_str());

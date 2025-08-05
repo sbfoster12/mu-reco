@@ -43,7 +43,7 @@ void RecoManager::Configure(std::shared_ptr<const ConfigHolder> configHolder, co
     }
 }
 
-void RecoManager::Run(EventStore& eventStore, ServiceManager& serviceManager) {
+void RecoManager::Run(EventStore& eventStore, const ServiceManager& serviceManager) {
     for (const auto& stage : stages_) {
         stage->Process(eventStore, serviceManager);
     }

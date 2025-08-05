@@ -10,6 +10,7 @@ using json = nlohmann::json;
 namespace reco {
 
     class ConfigHolder;
+    class ServiceManager;
 
     class Service : public TObject {
     public:
@@ -23,10 +24,19 @@ namespace reco {
             configHolder_ = configHolder;
         }
 
+        void SetServiceManager(const ServiceManager* serviceManager) {
+            serviceManager_ = serviceManager;
+        }
+
+        const ServiceManager* GetServiceManager() const {
+            return serviceManager_;
+        }
+
     protected:
         std::string label_;
 
         std::shared_ptr<const ConfigHolder> configHolder_;
+        const ServiceManager* serviceManager_;
 
         ClassDef(Service, 1);
     };
