@@ -2,19 +2,38 @@
 #define CHANNEL_CONFIG_HH
 
 #include <string>
+#include <iostream>
+#include <nlohmann/json.hpp>
 
 class ChannelConfig {
 public:
     ChannelConfig() = default;
-    ChannelConfig(const std::string& system, const std::string& sub);
+    ChannelConfig(const nlohmann::json& json);
 
     const std::string& GetDetectorSystem() const;
     const std::string& GetSubdetector() const;
+    int GetCrateNum() const;
+    int GetAmcSlotNum() const;
+    int GetChannelNum() const;
 
     void SetDetectorSystem(const std::string& system);
     void SetSubdetector(const std::string& sub);
+    void SetCrateNum(int crateNum);
+    void SetAmcSlotNum(int amcSlotNum);
+    void SetChannelNum(int channelNum);
+
+    void Print() const {
+        std::cout << "Crate: " << crateNum_
+                  << ", AMC Slot: " << amcSlotNum_
+                  << ", Channel: " << channelNum_
+                  << ", Detector System: " << detectorSystem_
+                  << ", Subdetector: " << subdetector_ << std::endl;
+    }
 
 private:
+    int crateNum_;
+    int amcSlotNum_;
+    int channelNum_;
     std::string detectorSystem_;
     std::string subdetector_;
 };
