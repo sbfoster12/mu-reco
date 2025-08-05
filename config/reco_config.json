@@ -29,7 +29,7 @@
     {
       "type": "reco::TemplateService",
       "label": "templates",
-      "file_path": "templates.json"
+      "file_name": "templates.json"
     }
   ],
   "Output": {

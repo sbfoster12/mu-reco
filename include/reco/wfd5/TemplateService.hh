@@ -21,8 +21,15 @@ namespace reco {
 
             auto& jsonParserUtil = reco::JsonParserUtil::instance();
 
-            std::string dir = std::getenv("MU_RECO_PATH");
-            file_path_ = dir + "/config/" + config.value("file_path", "templates.json");
+            std::string file_name = config.value("file_name", "templates.json");
+            std::string file_path_ = "";
+            if (file_name.find('/') != std::string::npos) {
+                // If not a base name, try using this path directly
+                file_path_ = file_name;
+            } else {
+                // If a base name, prepend the config directory
+                file_path_ = std::string(std::getenv("MU_RECO_PATH")) + "/config/" + file_name;
+            }
             if (!std::filesystem::exists(file_path_)) {
                 throw std::runtime_error("TemplateService: File not found: " + file_path_);
             }
