@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <stdexcept>
 #include <iostream>
+#include <cstdlib>
 
 #include "reco/common/ConfigHolder.hh"
 #include "reco/common/Service.hh"
@@ -20,8 +21,12 @@ namespace reco {
 
             auto& jsonParserUtil = reco::JsonParserUtil::instance();
 
-            file_path_ = config.value("file_path", "/path/to/file");
-            
+            std::string dir = std::getenv("MU_RECO_PATH");
+            file_path_ = dir + "/config/" + config.value("file_path", "templates.json");
+            if (!std::filesystem::exists(file_path_)) {
+                throw std::runtime_error("TemplateService: File not found: " + file_path_);
+            }
+            std::cout << "-> reco::TemplateService: Configuring with file: " << file_path_ << std::endl;
             auto jsonObj = jsonParserUtil.ParseFile(file_path_);  // Example usage of JsonParserUtil
         }
 

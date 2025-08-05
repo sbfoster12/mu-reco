@@ -5,6 +5,9 @@
 #include <string>
 #include <fstream>
 #include <stdexcept>
+#include <iostream>
+#include <cstdlib>
+#include <filesystem>
 
 using json = nlohmann::json;
 
@@ -16,11 +19,14 @@ namespace reco {
 
         // Load JSON config from a file
         void LoadFromFile(const std::string& filename) {
+
             std::ifstream ifs(filename);
             if (!ifs.is_open()) {
                 throw std::runtime_error("Cannot open config file: " + filename);
             }
             ifs >> config_;
+
+            std::cout << "-> reco::ConfigHolder: Loaded config from file: " << filename << std::endl;
         }
 
         // Access the whole JSON config

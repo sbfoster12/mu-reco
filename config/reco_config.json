@@ -29,7 +29,7 @@
     {
       "type": "reco::TemplateService",
       "label": "templates",
-      "file_path": "/Users/sbfoster/Projects/mu-app/mu-reco/config/templates.json"
+      "file_path": "templates.json"
     }
   ],
   "Output": {
