@@ -14,14 +14,14 @@ A C++ library to perform reconstruction on unpacked MIDAS data.
 You can either clone this repository on its own via:
 
 ```bash
-git clone https://github.com/sbfoster12/mu-reco.git
+git clone https://github.com/PIONEER-Experiment/mu-reco.git
 ``` 
 
-or you can clone the app level repository. Follow the instructions here: https://github.com/sbfoster12/mu-app
+or you can clone the app level repository. Follow the instructions here: https://github.com/PIONEER-Experiment/mu-app
 
 ## Build instructions
 
-If you are building this repository on its own, you should first build and install the mu-data-products library and the mu-unpackers library. Details can be found here https://github.com/sbfoster12/mu-data-products.git and here https://github.com/sbfoster12/mu-unpackers.git.
+If you are building this repository on its own, you should first build and install the mu-data-products library and the mu-unpackers library. Details can be found here https://github.com/PIONEER-Experiment/mu-data-products.git and here https://github.com/PIONEER-Experiment/mu-unpackers.git.
 
 You should then source the `setenv.sh` script to set up the environment, and then you can build:
 
