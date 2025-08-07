@@ -17,15 +17,15 @@ void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) {
     // std::cout << "Fitter with name '" << GetLabel() << "' is processing...\n";
     try {
         // Get original waveforms as const shared_ptr collection (safe because get is const)
-        auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
+        auto waveforms = store.get<dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
+        auto templateFitter = serviceManager.Get<TemplateFitterService>(templateFitterLabel_);
 
         //Make a collection of fit results
         std::vector<std::shared_ptr<dataProducts::WaveformFit>> fitResults;
-        // correctedWaveforms.reserve(waveforms.size());
+        fitResults.reserve(waveforms.size());
 
-        auto templateFitter = serviceManager.Get<TemplateFitterService>(templateFitterLabel_);
 
-        for (const auto& wf : waveforms) {
+        for (const auto wf : waveforms) {
             // // Make a fit result and add it to the collection here
             // auto corrected = std::make_shared<dataProducts::WFD5Waveform>(*wf);
             // correctedWaveforms.push_back(std::move(corrected));
@@ -37,7 +37,7 @@ void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) {
                 << std::get<0>(id) << "/" << std::get<1>(id) << "/" << std::get<2>(id) 
                 << std::endl;
 
-                std::shared_ptr<dataProducts::WaveformFit> this_fit_result = std::make_shared<dataProducts::WaveformFit>(wf.get());
+                auto this_fit_result = std::make_shared<dataProducts::WaveformFit>(wf.get());
 
                 if (fit_debug)
                 {
@@ -64,7 +64,7 @@ void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) {
                 if (fit_debug) std::cout << "Final chi2: " << bestchi2 << std::endl;
                 if (fit_debug) std::cout << "Final Nfit: " << this_fit_result->nfit << std::endl;
                 fitResults.push_back(
-                    this_fit_result
+                    std::move(this_fit_result)
                 );
             }
             else

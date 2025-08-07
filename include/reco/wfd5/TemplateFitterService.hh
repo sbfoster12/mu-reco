@@ -54,7 +54,7 @@ namespace reco {
                     << std::endl;
                 pulseFitterHolder_[id] = new TemplateFit(
                     templateLoader->GetSpline(id),
-                    templateLoader->GetSpline(id)
+                    templateLoader->GetSpline(id) // potential for a second spline (i.e. particle vs. laser pulse shape)
                 );
                 
                 pulseFitterHolder_[id]->SetTSpline( templateLoader->GetTemplate(id),0 );

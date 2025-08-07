@@ -101,6 +101,7 @@ void WFD5OutputManager::FillEvent(const EventStore& eventStore) {
             throw std::runtime_error("Unsupported collection type: " + className + " for collection " + collName);
         }
     }
+    tree_->BranchRef();
 
     // Fill the tree
     tree_->Fill();
