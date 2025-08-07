@@ -10,7 +10,10 @@
       "inputRecoLabel": "unpacker",
       "inputWaveformsLabel": "WFD5WaveformCollection",
       "outputWaveformsLabel": "Waveforms",
-      "templateServiceLabel": "templates"
+      "templateServiceLabel": "templates",
+      "file_name":"pedestals.json",
+      "failOnError":false,
+      "debug":false
     },
     {
       "recoClass": "reco::DigitizerTimeAligner",
@@ -97,7 +100,7 @@
       "templateLoaderLabel": "templateLoader",
       "file_name":"fitters.json",
       "maxPulses":3,
-      "debug":true,
+      "debug":false,
       "restricted_chi2_min": -120,
       "restricted_chi2_max": 150,
       "timeoutLimit":2000000,

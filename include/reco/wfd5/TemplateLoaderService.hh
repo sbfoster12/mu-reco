@@ -22,6 +22,7 @@ namespace reco {
 
         void Configure(const nlohmann::json& config, EventStore& eventStore) override {
 
+            debug_ = config.value("debug", false);
             auto& jsonParserUtil = reco::JsonParserUtil::instance();
 
             std::string file_name = config.value("file_name", "templates.json");
@@ -36,7 +37,7 @@ namespace reco {
             if (!std::filesystem::exists(file_path_)) {
                 throw std::runtime_error("TemplateLoaderService: File not found: " + file_path_);
             }
-            std::cout << "-> reco::TemplateLoaderService: Configuring with file: " << file_path_ << std::endl;
+            if (debug_) std::cout << "-> reco::TemplateLoaderService: Configuring with file: " << file_path_ << std::endl;
             templateConfig_ = jsonParserUtil.ParseFile(file_path_);  // Example usage of JsonParserUtil
 
             std::shared_ptr<dataProducts::SplineHolder> sharedHolder = std::make_shared<dataProducts::SplineHolder>();
@@ -87,9 +88,9 @@ namespace reco {
                         std::string keyName = TString::Format("crate_%i_amc_%i_channel_%i",crate,amcNum, channel).Data();
                         // std::cout << "Searching for splines: " << keyName << std::endl;
                         if (this_file->GetKey(keyName.c_str())) {
-                            std::cout << "   -> Key \"" << keyName << "\" exists in the file." << std::endl;
+                            if (debug_) std::cout << "   -> Key \"" << keyName << "\" exists in the file." << std::endl;
                             TSpline3* this_spline = (TSpline3*)this_file->Get(keyName.c_str());
-                            std::cout << "   -> Loaded spline:" << this_spline << std::endl;
+                            if (debug_) std::cout << "   -> Loaded spline:" << this_spline << std::endl;
                             // this_spline->SetDirectory(0);
                             SetSpline({crate,amcNum,channel}, this_spline);
                         }
@@ -149,6 +150,7 @@ namespace reco {
         std::shared_ptr<dataProducts::SplineHolder> splineHolder_;
         std::vector<int> crateNumbers_ = {7,8};
         nlohmann::json templateConfig_;
+        bool debug_;
 
         ClassDefOverride(TemplateLoaderService, 1);
 

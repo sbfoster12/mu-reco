@@ -20,6 +20,7 @@ namespace reco {
         void Configure(const nlohmann::json& config, EventStore& eventStore) override {
 
             // load the json config
+            debug_ = config.value("debug", false);
             auto& jsonParserUtil = reco::JsonParserUtil::instance();
 
             std::string file_name = config.value("file_name", "fitters.json");
@@ -34,7 +35,7 @@ namespace reco {
             if (!std::filesystem::exists(file_path_)) {
                 throw std::runtime_error("TemplateFitterService: File not found: " + file_path_);
             }
-            std::cout << "-> reco::TemplateFitterService: Configuring with file: " << file_path_ << std::endl;
+            if (debug_) std::cout << "-> reco::TemplateFitterService: Configuring with file: " << file_path_ << std::endl;
             fitterConfig_ = jsonParserUtil.ParseFile(file_path_);  // Example usage of JsonParserUtil
 
             // auto& jsonParserUtil = reco::JsonParserUtil::instance();
@@ -43,13 +44,13 @@ namespace reco {
             // Get the loader templates from the services (Note that the template loader must be configure first!)
             auto templateLoader = GetServiceManager()->Get<TemplateLoaderService>(templateLoaderLabel_);
 
-            std::cout << "-> reco::TemplateFitterService: Using TemplateLoaderService with label: " << templateLoaderLabel_ << std::endl;
+            if (debug_) std::cout << "-> reco::TemplateFitterService: Using TemplateLoaderService with label: " << templateLoaderLabel_ << std::endl;
 
             // loop through templates in the TemplateFitterService
             for (dataProducts::ChannelID id: templateLoader->GetValidChannels())
             {
                 // create a template fitter for this channel
-                std::cout << "Creating a template fit for channel:" 
+                if (debug_) std::cout << "Creating a template fit for channel:" 
                     << std::get<0>(id) << "/" << std::get<1>(id) << "/" << std::get<2>(id) 
                     << std::endl;
                 pulseFitterHolder_[id] = new TemplateFit(
@@ -59,23 +60,23 @@ namespace reco {
                 
                 pulseFitterHolder_[id]->SetTSpline( templateLoader->GetTemplate(id),0 );
                 pulseFitterHolder_[id]->SetTSpline( templateLoader->GetTemplate(id),1 );
-                std::cout << "    -> Loading default config " << std::endl;
+                if (debug_) std::cout << "    -> Loading default config " << std::endl;
                 pulseFitterHolder_[id]->SetValueFromConfig(config);
-                std::cout << "    -> Done loading default config " << std::endl;
+                if (debug_) std::cout << "    -> Done loading default config " << std::endl;
 
                 // configure this template fitter based on the json file
             }
 
             // loop through custom configurations
-            std::cout << "Looking for override config" << std::endl;
+            if (debug_) std::cout << "Looking for override config" << std::endl;
             for (const auto& configi : fitterConfig_["fitters"]) {
                 std::vector<int> jid = configi["channel"];
                 dataProducts::ChannelID id = {jid[0],jid[1],jid[2]};
                 if (pulseFitterHolder_.count(id))
                 {
-                    std::cout << "overriding default fitter values for channel: " << jid[0] << "/" <<jid[1] << "/" <<jid[2] << std::endl;
+                    if (debug_) std::cout << "overriding default fitter values for channel: " << jid[0] << "/" <<jid[1] << "/" <<jid[2] << std::endl;
                     pulseFitterHolder_[id]->SetValueFromConfig(configi);
-                    std::cout << "    -> Done loading override config " << std::endl;
+                    if (debug_) std::cout << "    -> Done loading override config " << std::endl;
                     
                 }
             }
@@ -98,6 +99,7 @@ namespace reco {
         std::string templateLoaderLabel_;
         std::map<dataProducts::ChannelID, TemplateFit*> pulseFitterHolder_;
         nlohmann::json fitterConfig_;
+        bool debug_;
 
 
         ClassDefOverride(TemplateFitterService, 1);

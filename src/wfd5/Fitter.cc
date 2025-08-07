@@ -33,9 +33,9 @@ void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) {
             dataProducts::ChannelID id = wf->GetID();
             if (templateFitter->ValidChannel(id))
             {
-                std::cout << "Performing fit on "
-                << std::get<0>(id) << "/" << std::get<1>(id) << "/" << std::get<2>(id) 
-                << std::endl;
+                 if (fit_debug) std::cout << "Performing fit on "
+                    << std::get<0>(id) << "/" << std::get<1>(id) << "/" << std::get<2>(id) 
+                    << std::endl;
 
                 auto this_fit_result = std::make_shared<dataProducts::WaveformFit>(wf.get());
 
@@ -67,7 +67,7 @@ void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) {
                     std::move(this_fit_result)
                 );
             }
-            else
+            else if (fit_debug)
             {
                 std::cout << "No valid fitter found for channel" 
                     << std::get<0>(id) << "/" << std::get<1>(id) << "/" << std::get<2>(id) 
