@@ -2,6 +2,7 @@
 #define WFD5OUTPUTMANAGER_HH
 
 #include "reco/common/OutputManager.hh"
+#include "reco/wfd5/TemplateLoaderService.hh"
 
 #include <data_products/wfd5/WFD5Header.hh>
 #include <data_products/wfd5/WFD5ChannelHeader.hh>

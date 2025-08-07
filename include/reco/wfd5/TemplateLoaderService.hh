@@ -11,6 +11,7 @@
 #include "TSpline.h"
 #include "TFile.h"
 #include "data_products/wfd5/CubicSpline.hh"
+#include "data_products/wfd5/WFD5WaveformFit.hh"
 
 namespace reco {
 
@@ -38,10 +39,17 @@ namespace reco {
             std::cout << "-> reco::TemplateLoaderService: Configuring with file: " << file_path_ << std::endl;
             templateConfig_ = jsonParserUtil.ParseFile(file_path_);  // Example usage of JsonParserUtil
 
+            std::shared_ptr<dataProducts::SplineHolder> sharedHolder = std::make_shared<dataProducts::SplineHolder>();
+            splineHolder_ = sharedHolder;
+            
             int run = configHolder_->GetRun();
             int subrun = configHolder_->GetSubrun();
             InitializeWithRun(run);
-
+            
+            eventStore.putSplines(
+                templateConfig_.value("label","templateLoader"),
+                sharedHolder                
+            );
             // std::vector<std::string> template_root_file = jsonObj.value("templates", {});
             // std::cout << "Loading template from file:" << template_root_file << std::endl;
             // LoadSplines(template_root_file);          
@@ -63,7 +71,8 @@ namespace reco {
 
         void SetSpline(dataProducts::ChannelID id, TSpline3* sp)
         {
-            template_map_[id] = sp;
+            // template_map_[id] = sp;
+            splineHolder_->SetSpline(id, sp, 0);
         };
 
         void LoadSplines(std::string infile)
@@ -92,16 +101,17 @@ namespace reco {
 
         TSpline3* GetTemplate(dataProducts::ChannelID id) 
         {
-            if (template_map_.count(id))
+            if (splineHolder_->SplinePresent(id))
             {
-                return template_map_[id];
+                // return template_map_[id];
+                return splineHolder_->GetTSpline(id,0);
             }
             throw;
         }
 
         fitter::CubicSpline* GetSpline(dataProducts::ChannelID id)
         {
-            return buildCubicSpline( template_map_[id] );
+            return splineHolder_->GetSpline(id, 0);
         }
 
         fitter::CubicSpline* buildCubicSpline(const TSpline3* tSpline, fitter::CubicSpline::BoundaryType cond  = fitter::CubicSpline::BoundaryType::first) 
@@ -119,17 +129,24 @@ namespace reco {
 
         dataProducts::ChannelList GetValidChannels()
         {
-            dataProducts::ChannelList keys;
-            keys.reserve(template_map_.size());
-            for (const auto& pair : template_map_) {
-                keys.push_back(pair.first);
-            }
-            return keys;
+            // dataProducts::ChannelList keys;
+            // keys.reserve(template_map_.size());
+            // for (const auto& pair : template_map_) {
+            //     keys.push_back(pair.first);
+            // }
+            // return keys;
+            return splineHolder_->GetIDs();
+        }
+
+        std::shared_ptr<dataProducts::SplineHolder> GetSplineHolder()
+        {
+            return splineHolder_;
         }
 
     private:
         std::string file_path_;
-        std::map<dataProducts::ChannelID, TSpline3*> template_map_;
+        // std::map<dataProducts::ChannelID, TSpline3*> template_map_;
+        std::shared_ptr<dataProducts::SplineHolder> splineHolder_;
         std::vector<int> crateNumbers_ = {7,8};
         nlohmann::json templateConfig_;
 
