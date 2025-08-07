@@ -8,6 +8,7 @@
 #include <stdexcept>
 
 #include <data_products/common/DataProduct.hh>
+#include <data_products/wfd5/WFD5WaveformFit.hh>
 
 namespace reco {
 
@@ -104,6 +105,14 @@ namespace reco {
             histograms_[name] = std::move(hist);
         }
 
+        void putSplines(const std::string& name, std::shared_ptr<dataProducts::SplineHolder> splines) {
+            if (splines_.count(name)) {
+                std::cerr << "Warning: Spline holder with name " << name << " already exists. Overwriting.\n";
+            }
+            std::cout << "-> reco::EventStore: Created spline holder '" << name << "' in the event store." << std::endl;
+            splines_[name] = std::move(splines);
+        }
+
         std::shared_ptr<TH1> GetHistogram(const std::string& name) const {
             auto it = histograms_.find(name);
             if (it == histograms_.end()) {
@@ -116,6 +125,10 @@ namespace reco {
             return histograms_;
         }
 
+        const std::map<std::string, std::shared_ptr<dataProducts::SplineHolder>>& GetAllSplines() const {
+            return splines_;
+        }
+
         void clear() {
             store_.clear();
         }
@@ -124,6 +137,7 @@ namespace reco {
         std::map<std::string, dataProducts::DataProductPtrCollection> store_; //data products to store in the tree eventually
         std::shared_ptr<dataProducts::DataProduct> odb_;  // ODB data product, if any
         std::map<std::string, std::shared_ptr<TH1>> histograms_; //histograms
+        std::map<std::string, std::shared_ptr<dataProducts::SplineHolder>> splines_; //histograms
 
     };
 } //namespace reco

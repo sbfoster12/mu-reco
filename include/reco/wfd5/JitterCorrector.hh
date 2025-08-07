@@ -1,6 +1,7 @@
 #ifndef JITTERCORRECTOR_HH
 #define JITTERCORRECTOR_HH
 
+#include <data_products/common/DataProduct.hh>
 #include <data_products/wfd5/WFD5Waveform.hh>
 
 #include "reco/common/RecoStage.hh"
@@ -28,6 +29,12 @@ namespace reco {
         std::string outputWaveformsLabel_;
         std::string templateLoaderServiceLabel_;
         double correctionFactor_;
+
+        std::map<dataProducts::ChannelID, int> offsetMap_;
+
+        std::string file_name_;
+        bool debug_;
+        bool failOnError_;
 
 
         ClassDefOverride(JitterCorrector, 1);

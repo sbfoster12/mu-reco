@@ -64,6 +64,14 @@ namespace reco {
             }
         }
 
+        void WriteSplines(const EventStore& store) {
+            for (const auto& [name, splines] : store.GetAllSplines()) {
+                file_->cd();
+                splines->Write(name.c_str());
+                std::cout << "-> reco::OutputManager: Wrote spline holder '" << name << "' to the TFile." << std::endl;
+            }
+        }
+
     protected:
         // Helper to create branch if missing
         template <typename T>

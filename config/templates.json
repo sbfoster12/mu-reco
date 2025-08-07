@@ -1,3 +1,8 @@
 {
-    "templates":[]
+    "templates":[
+        {
+            "iov":[0,30000],
+            "file":"/home/jlab/github/uw-calo-itdp-studies-2024/analysis/create_splines/templates_combined_v4.root"
+        }
+    ]
 }

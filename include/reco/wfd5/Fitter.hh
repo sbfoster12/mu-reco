@@ -25,6 +25,7 @@ namespace reco {
         std::string inputWaveformsLabel_;
         std::string outputFitResultLabel_;
         std::string templateFitterLabel_;
+        bool fit_debug;
 
         ClassDefOverride(Fitter, 1);
     };
