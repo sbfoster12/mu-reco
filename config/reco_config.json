@@ -1,7 +1,7 @@
 {
   
   "Unpacker" : {
-    "max_midas_events": -1
+    "max_midas_events": 4
   },
   "RecoStages": [
     {
@@ -94,7 +94,27 @@
     {
       "type": "reco::TemplateFitterService",
       "label": "templateFitter",
-      "templateLoaderLabel": "templateLoader"
+      "templateLoaderLabel": "templateLoader",
+      "file_name":"fitters.json",
+      "maxPulses":3,
+      "debug":true,
+      "restricted_chi2_min": -120,
+      "restricted_chi2_max": 150,
+      "timeoutLimit":2000000,
+      "ampGuessScale":2.0,
+      "makeAlignedTree": false,
+      "minimumAmplitude": 10,
+      "maximumAmplitude": 8000,
+      "traceMinVal":-8000,
+      "traceMaxVal":8000,
+      "skipClipping":false,
+      "pulseFitterMinVal":-2000,
+      "pulseFitterMaxVal":2000,
+      "fit_laser_1":true,
+      "fit_laser_2":true,
+      "timeBounds": 4,
+      "chi2Threshold": 1,
+      "keepSplines": true
     }
   ],
   "Output": {

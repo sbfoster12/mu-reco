@@ -7,6 +7,7 @@
 #include <data_products/wfd5/WFD5ChannelHeader.hh>
 #include <data_products/wfd5/WFD5WaveformHeader.hh>
 #include <data_products/wfd5/WFD5Waveform.hh>
+#include <data_products/wfd5/WFD5WaveformFit.hh>
 #include <data_products/wfd5/WFD5ODB.hh>
 
 namespace reco {
@@ -59,6 +60,7 @@ namespace reco {
         std::map<std::string, std::vector<dataProducts::WFD5ChannelHeader>> channelHeaderBuffers_;
         std::map<std::string, std::vector<dataProducts::WFD5WaveformHeader>> waveformHeaderBuffers_;
         std::map<std::string, std::vector<dataProducts::WFD5Waveform>> waveformBuffers_;
+        std::map<std::string, std::vector<dataProducts::WaveformFit>> waveformFitBuffers_;
 
     };
 }

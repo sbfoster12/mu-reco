@@ -83,6 +83,19 @@ void WFD5OutputManager::FillEvent(const EventStore& eventStore) {
 
             CreateBranchIfMissing(collName, &typedVec);
 
+        } else if (className == "dataProducts::WaveformFit") {
+            auto& typedVec = waveformFitBuffers_[collName];
+            typedVec.clear();
+            typedVec.reserve(baseVec.size());
+
+            for (const auto& basePtr : baseVec) {
+                auto* wfit = dynamic_cast<dataProducts::WaveformFit*>(basePtr.get());
+                if (!wfit) throw std::runtime_error("Bad cast to dataProducts::WaveformFit for collection " + collName);
+                typedVec.push_back(*wfit);
+            }
+
+            CreateBranchIfMissing(collName, &typedVec);
+
         } else {
             // throw and exception for unsupported types
             throw std::runtime_error("Unsupported collection type: " + className + " for collection " + collName);
