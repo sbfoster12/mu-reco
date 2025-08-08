@@ -56,7 +56,10 @@
       "inputWaveformsLabel": "waveformsRF",
       "outputFitResultLabel": "RFfitResults",
       "fitStartTime": 200,
-      "fitEndTime": 800
+      "fitEndTime": 800,
+      "frequency": 0.39768,
+      "fixedFrequency": true,
+      "fitOption": "RQ"
     },
     {
       "recoClass": "reco::PulseIntegrator",
@@ -98,7 +101,7 @@
     "timeAligned",
     "pedestal",
     "grouped",
-    "endOfEventAnalysis"
+    "RFFitter"
     ],
   "Services": [
     {
