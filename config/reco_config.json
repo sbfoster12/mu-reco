@@ -1,7 +1,7 @@
 {
   
   "Unpacker" : {
-    "max_midas_events": 1,
+    "max_midas_events": 4,
     "verbosity": 0
   },
   "RecoStages": [
@@ -85,6 +85,12 @@
       "inputRecoLabel": "xtalFitter",
       "inputfitResultsLabel": "fitResults",
       "outputPositionLabel": "XYPositions"
+    },
+    {
+      "recoClass": "reco::EndOfEventAnalysis",
+      "recoLabel": "endOfEventAnalysis",
+      "lysoRecoLabel": "grouped",
+      "lysoWaveformsLabel": "waveformsXtal"
     }
   ],
   "RecoPath":[
@@ -92,7 +98,7 @@
     "timeAligned",
     "pedestal",
     "grouped",
-    "RFFitter"
+    "endOfEventAnalysis"
     ],
   "Services": [
     {
