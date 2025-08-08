@@ -4,11 +4,19 @@
 
 #include "reco/common/JsonParserUtil.hh"
 
-namespace reco {
+using namespace reco;
 
 JsonParserUtil& JsonParserUtil::instance() {
   static JsonParserUtil parser;
   return parser;
 }
 
-} // namespace util
+json JsonParserUtil::ParseFile(const std::string& filename) const {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        throw std::runtime_error("Could not open JSON file: " + filename);
+    }
+    json j;
+    file >> j;
+    return j;
+}

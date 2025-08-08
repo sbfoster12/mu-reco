@@ -17,15 +17,7 @@ namespace reco {
         JsonParserUtil& operator=(const JsonParserUtil&) = delete;
     
     public: 
-        json ParseFile(const std::string& filename) const {
-            std::ifstream file(filename);
-            if (!file.is_open()) {
-                throw std::runtime_error("Could not open JSON file: " + filename);
-            }
-            json j;
-            file >> j;
-            return j;
-        }
+        json ParseFile(const std::string& filename) const;
     };
 
 } // namespace reco

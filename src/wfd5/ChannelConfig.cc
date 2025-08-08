@@ -47,3 +47,11 @@ void ChannelConfig::SetAmcSlotNum(int amcSlotNum) {
 void ChannelConfig::SetChannelNum(int channelNum) {
     channelNum_ = channelNum;
 }
+
+void ChannelConfig::Print() const {
+    std::cout << "Crate: " << crateNum_
+                << ", AMC Slot: " << amcSlotNum_
+                << ", Channel: " << channelNum_
+                << ", Detector System: " << detectorSystem_
+                << ", Subdetector: " << subdetector_ << std::endl;
+}
