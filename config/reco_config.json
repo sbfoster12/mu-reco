@@ -2,7 +2,7 @@
   
   "Unpacker" : {
     "max_midas_events": 1,
-    "verbosity": 1
+    "verbosity": 0
   },
   "RecoStages": [
     {
