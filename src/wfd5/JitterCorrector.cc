@@ -48,7 +48,7 @@ void JitterCorrector::Configure(const nlohmann::json& config, const ServiceManag
 }
 
 void JitterCorrector::Process(EventStore& store, const ServiceManager& serviceManager) {
-    // std::cout << "JitterCorrector with name '" << GetLabel() << "' is processing...\n";
+    // std::cout << "JitterCorrector with name '" << GetRecoLabel() << "' is processing...\n";
     try {
          // Get the input waveforms
         auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
@@ -62,7 +62,7 @@ void JitterCorrector::Process(EventStore& store, const ServiceManager& serviceMa
                 throw std::runtime_error("Failed to retrieve waveform at index " + std::to_string(i));
             }
             //Make the new waveform
-            dataProducts::WFD5Waveform* newWaveform = new ((*newWaveforms)[i]) dataProducts::WFD5Waveform(*waveform);
+            dataProducts::WFD5Waveform* newWaveform = new ((*newWaveforms)[i]) dataProducts::WFD5Waveform(waveform);
             newWaveforms->Expand(i + 1);
 
              ApplyJitterCorrection(newWaveform);

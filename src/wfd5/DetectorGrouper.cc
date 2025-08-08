@@ -65,7 +65,7 @@ void DetectorGrouper::Process(EventStore& store, const ServiceManager& serviceMa
 
                 // Make the new waveform
                 int idx = detectorWaveformsMap[detectorSystem]->GetEntriesFast();
-                auto* newWaveform = new ((*detectorWaveformsMap[detectorSystem])[idx]) dataProducts::WFD5Waveform(*waveform);
+                auto* newWaveform = new ((*detectorWaveformsMap[detectorSystem])[idx]) dataProducts::WFD5Waveform(waveform);
                 detectorWaveformsMap[detectorSystem]->Expand(idx + 1);
                 newWaveform->SetDetectorSystem(detectorSystem);
                 newWaveform->SetSubdetector(subdetector);

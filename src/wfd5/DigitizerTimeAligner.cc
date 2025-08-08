@@ -25,7 +25,7 @@ void DigitizerTimeAligner::Process(EventStore& store, const ServiceManager& serv
                 throw std::runtime_error("Failed to retrieve waveform at index " + std::to_string(i));
             }
             //Make the new waveform
-            dataProducts::WFD5Waveform* newWaveform = new ((*newWaveforms)[i]) dataProducts::WFD5Waveform(*waveform);
+            dataProducts::WFD5Waveform* newWaveform = new ((*newWaveforms)[i]) dataProducts::WFD5Waveform(waveform);
             newWaveforms->Expand(i + 1);
 
              ApplyTimeAligner(newWaveform);
