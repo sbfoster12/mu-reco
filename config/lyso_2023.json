@@ -1,0 +1,12 @@
+
+{
+    "channelMap": [
+        {
+            "crateNum": 0,
+            "amcSlotNum": 3,
+            "channelNum": 2,
+            "detectorSystem": "RF",
+            "subdetector": "RF0"
+        }
+    ]
+}

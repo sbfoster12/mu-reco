@@ -6,33 +6,104 @@ using namespace reco;
 
 void RFFitter::Configure(const nlohmann::json& config, const ServiceManager& serviceManager, EventStore& eventStore) {
 
-    inputRecoLabel_ = config.value("inputRecoLabel", "jitter");
-    inputWaveformsLabel_ = config.value("inputWaveformsLabel", "CorrectedWaveforms");
-    outputFitResultLabel_ = config.value("outputFitResultLabel", "FitResultXtal");
+    inputRecoLabel_ = config.value("inputRecoLabel", "");
+    inputWaveformsLabel_ = config.value("inputWaveformsLabel", "");
+    outputFitResultLabel_ = config.value("outputFitResultLabel", "");
+    fitStartTime_ = config.value("fitStartTime", 0.0);
+    fitEndTime_ = config.value("fitEndTime", 100.0);
 }
 
 void RFFitter::Process(EventStore& store, const ServiceManager& serviceManager) {
-    // // std::cout << "RFFitter with name '" << GetLabel() << "' is processing...\n";
-    // try {
-    //     // Get original waveforms as const shared_ptr collection (safe because get is const)
-    //     auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
+    // std::cout << "RFFitter with name '" << GetRecoLabel() << "' is processing...\n";
+    try {
+         // Get the input waveforms
+        auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
 
-    //     //Make a collection of fit results
-    //     // std::vector<std::shared_ptr<dataProducts::WFD5Waveform>> correctedWaveforms;
-    //     // correctedWaveforms.reserve(waveforms.size());
+        //Make a collection new waveforms
+        auto fitResults = store.getOrCreate<dataProducts::RFWaveformFit>(this->GetRecoLabel(), outputFitResultLabel_);
 
-    //     for (const auto& wf : waveforms) {
-    //         // // Make a fit result and add it to the collection here
-    //         // auto corrected = std::make_shared<dataProducts::WFD5Waveform>(*wf);
-    //         // correctedWaveforms.push_back(std::move(corrected));
-    //     }
+        for (int i = 0; i < waveforms->GetEntriesFast(); ++i) {
+            auto* waveform = static_cast<dataProducts::WFD5Waveform*>(waveforms->ConstructedAt(i));
+            if (!waveform) {
+                throw std::runtime_error("Failed to retrieve waveform at index " + std::to_string(i));
+            }
+            //Make the new waveform
+            dataProducts::RFWaveformFit* newFitResult = new ((*fitResults)[i]) dataProducts::RFWaveformFit(waveform);
+            fitResults->Expand(i + 1);
 
-    //     // Store corrected fit results under a new key
-    //     // store.put(this->GetRecoLabel(), outputFitResultLabel_, std::move(fitResults));
+            // Do the fit
+            PerformRFFit(waveform,newFitResult);
 
-    //     // std::cout << "RFFitter: corrected " << waveforms.size() << " waveforms.\n";
+        }
 
-    // } catch (const std::exception& e) {
-    //    throw std::runtime_error(std::string("RFFitter error: ") + e.what());
-    // }
+    } catch (const std::exception& e) {
+       throw std::runtime_error(std::string("RFFitter error: ") + e.what());
+    }
+}
+
+void RFFitter::PerformRFFit(const dataProducts::WFD5Waveform* waveform, dataProducts::RFWaveformFit* fitResult) {
+    // std::cout << "Performing RF fit for waveform with index: " << waveform->waveformIndex << std::endl;
+
+    // Get the trace
+    auto trace = waveform->trace;
+
+    // Make a TGraph
+    TGraph* graph = new TGraph(trace.size());
+    for (size_t i = 0; i < trace.size(); ++i) {
+        graph->SetPoint(i, i, trace[i]);
+    }
+
+    // Make the fit function
+    TF1 fitFunc("fitFunc", "[1]*cos(x*[0]) + [2]*sin([0]*x) + [3]", 0, trace.size());
+
+    // Estimate baseline as mean value
+    double baseline = std::accumulate(trace.begin(), trace.end(), 0.0) / trace.size();
+
+    // Determine the number of (positive) zero crossings to estimate frequency and phase; also estimate the amplitude
+    int zeroCrossings = 0;
+    double firstPosCrossingTime = 0.0;
+    double amplitude = 0.0;
+    int spacing = 1;
+    for (size_t i = spacing; i < trace.size(); ++i) {
+        if ((trace[i-spacing] < baseline && trace[i] >= baseline)) {
+            zeroCrossings++;
+            if (firstPosCrossingTime == 0.0) {
+                firstPosCrossingTime = 0.5*(2*i - spacing);
+            }
+        }
+        if (std::abs(trace[i] - baseline) > std::abs(amplitude)) {
+            amplitude = std::abs(trace[i] - baseline);
+        }
+    }
+    // std::cout << zeroCrossings << " zero crossings found." << std::endl;
+    double freq = 2 * TMath::Pi() * (double)(zeroCrossings) / (trace.size() - spacing); // Estimate frequency
+
+    // Estimate the phase from the first zero crossing
+    double phase = 0.0;
+    if (firstPosCrossingTime > 0.0) {
+        phase = freq * firstPosCrossingTime;
+    }
+
+    // std::cout << "Estimated frequency: " << freq << ", phase: " << phase << ", A*cos: " <<  amplitude*TMath::Cos(phase) << ", -A*sin: " << -amplitude*TMath::Sin(phase) << ", amplitude: " << amplitude << ", baseline: " << baseline << std::endl;
+
+    // Set the initial parameters for the fit function
+    fitFunc.SetParameters(freq, amplitude*TMath::Cos(phase), -amplitude*TMath::Sin(phase), baseline); // Initial parameters
+
+    // Do the fit!
+    graph->Fit(&fitFunc, "RQ","", fitStartTime_,fitEndTime_);
+
+    // Store the fit results in the fitResult object
+    fitResult->chi2 = fitFunc.GetChisquare();
+    fitResult->ndf = fitFunc.GetNDF();
+    fitResult->converged = fitFunc.IsValid();
+    fitResult->frequency = fitFunc.GetParameter(0);
+    fitResult->amplitude = std::sqrt(fitFunc.GetParameter(1)*fitFunc.GetParameter(1) + fitFunc.GetParameter(2)*fitFunc.GetParameter(2));
+    fitResult->phase = std::atan2(fitFunc.GetParameter(2), fitFunc.GetParameter(1));
+    fitResult->pedestalLevel = fitFunc.GetParameter(3);
+
+    // Set the fit function
+    fitResult->SetFitFunc(std::move(fitFunc));
+
+    // Clean up
+    delete graph;
 }

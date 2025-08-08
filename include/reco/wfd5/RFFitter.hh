@@ -2,7 +2,12 @@
 #ifndef RFFFITTER_HH
 #define RFFFITTER_HH
 
+#include <TGraph.h>
+#include <TF1.h>
+#include <TMath.h>
+
 #include <data_products/wfd5/WFD5Waveform.hh>
+#include <data_products/wfd5/RFWaveformFit.hh>
 
 #include "reco/common/RecoStage.hh"
 #include "reco/common/EventStore.hh"
@@ -20,11 +25,16 @@ namespace reco {
 
         void Process(EventStore& store, const ServiceManager& serviceManager) override;
 
+        void PerformRFFit(const dataProducts::WFD5Waveform* waveform, dataProducts::RFWaveformFit* fitResult);
+
+
     private:
 
         std::string inputRecoLabel_;
         std::string inputWaveformsLabel_;
         std::string outputFitResultLabel_;
+        double fitStartTime_;
+        double fitEndTime_;
 
         ClassDefOverride(RFFitter, 1);
     };

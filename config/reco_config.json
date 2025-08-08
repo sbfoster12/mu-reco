@@ -50,8 +50,10 @@
       "recoClass": "reco::RFFitter",
       "recoLabel": "RFFitter",
       "inputRecoLabel": "grouped",
-      "inputWaveformsLabel": "waveformsXtal",
-      "outputFitResultLabel": "RFfitResults"
+      "inputWaveformsLabel": "waveformsRF",
+      "outputFitResultLabel": "RFfitResults",
+      "fitStartTime": 200,
+      "fitEndTime": 800
     },
     {
       "recoClass": "reco::PulseIntegrator",
@@ -87,14 +89,16 @@
     "timeAligned",
     "pedestal",
     "grouped",
-    "xtalFitter"
-  ],
+    "RFFitter"
+    ],
   "Services": [
     {
       "type": "reco::ChannelMapService",
       "label": "channelMap",
       "config_files":{
-        "config_file_0":{"file":"g-2_channel_map.json", "iov":[10000,30000]}
+        "config_file_0":{"file":"g-2_channel_map.json", "iov":[10000,30000]},
+        "config_file_1":{"file":"lyso_2023.json", "iov":[0,3000]}
+        
       }
     },
     {
@@ -129,10 +133,9 @@
     }
   ],
   "Output": {
-    "_drop": [],
-    "drop": [
-      "unpacker*",
-      "jitter*"
+    "drop": [],
+    "_drop": [
+      "unpacker*"
     ]
   }
 }
