@@ -1,8 +1,8 @@
 {
   
   "Unpacker" : {
-    "max_midas_events": 1,
-    "verbosity": 1
+    "max_midas_events": 10,
+    "verbosity": 0
   },
   "RecoStages": [
     {
@@ -61,7 +61,9 @@
       "recoLabel": "xtalIntegrator",
       "inputRecoLabel": "grouped",
       "inputWaveformsLabel": "waveformsXtal",
-      "outputIntegralsLabel": "Integrals"
+      "outputIntegralsLabel": "Integrals",
+      "debug":true,
+      "file_name":"integrators.json"
     },
     {
       "recoClass": "reco::PeakIdentifier",
@@ -90,7 +92,8 @@
     "timeAligned",
     "pedestal",
     "grouped",
-    "RFFitter"
+    "xtalIntegrator",
+    "xtalFitter"
     ],
   "Services": [
     {

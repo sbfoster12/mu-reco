@@ -25,6 +25,10 @@ namespace reco {
         std::string inputRecoLabel_;
         std::string inputWaveformsLabel_;
         std::string outputIntegralsLabel_;
+        nlohmann::json json_;
+        bool debug_;
+        std::string file_name_;
+        std::map<dataProducts::ChannelID,int> channelConfigMap_;
 
         ClassDefOverride(PulseIntegrator, 1);
     };
