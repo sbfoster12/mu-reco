@@ -13,26 +13,27 @@ void DigitizerTimeAligner::Configure(const nlohmann::json& config, const Service
 void DigitizerTimeAligner::Process(EventStore& store, const ServiceManager& serviceManager) {
     // std::cout << "DigitizerTimeAligner with name '" << GetLabel() << "' is processing...\n";
     try {
-        // Get original waveforms as const shared_ptr collection (safe because get is const)
+         // Get the input waveforms
         auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
 
-        //Make new collection for corrected waveforms
-        std::vector<std::shared_ptr<dataProducts::WFD5Waveform>> correctedWaveforms;
-        correctedWaveforms.reserve(waveforms.size());
+        //Make a collection new waveforms
+        auto newWaveforms = store.getOrCreate<dataProducts::WFD5Waveform>(this->GetRecoLabel(), outputWaveformsLabel_);
 
-        for (const auto& wf : waveforms) {
-            // Make a copy for correction
-            auto corrected = std::make_shared<dataProducts::WFD5Waveform>(*wf);
+        for (int i = 0; i < waveforms->GetEntriesFast(); ++i) {
+            auto* waveform = static_cast<dataProducts::WFD5Waveform*>(waveforms->ConstructedAt(i));
+            if (!waveform) {
+                throw std::runtime_error("Failed to retrieve waveform at index " + std::to_string(i));
+            }
+            //Make the new waveform
+            dataProducts::WFD5Waveform* newWaveform = new ((*newWaveforms)[i]) dataProducts::WFD5Waveform(waveform);
+            newWaveforms->Expand(i + 1);
 
-            correctedWaveforms.push_back(std::move(corrected));
+             ApplyTimeAligner(newWaveform);
         }
-
-        // Store corrected waveforms under a new key
-        store.put(this->GetRecoLabel(), outputWaveformsLabel_, std::move(correctedWaveforms));
-
-        // std::cout << "DigitizerTimeAligner: corrected " << waveforms.size() << " waveforms.\n";
-
     } catch (const std::exception& e) {
        throw std::runtime_error(std::string("DigitizerTimeAligner error: ") + e.what());
     }
+}
+
+void DigitizerTimeAligner::ApplyTimeAligner(dataProducts::WFD5Waveform* wf) {
 }

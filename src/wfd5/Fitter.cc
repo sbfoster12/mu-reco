@@ -14,21 +14,24 @@ void Fitter::Configure(const nlohmann::json& config, const ServiceManager& servi
 }
 
 void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) {
-    // std::cout << "Fitter with name '" << GetLabel() << "' is processing...\n";
+    // std::cout << "Fitter with name '" << GetRecoLabel() << "' is processing...\n";
     try {
-        // Get original waveforms as const shared_ptr collection (safe because get is const)
-        auto waveforms = store.get<dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
+
+        // Get the template fitter service
         auto templateFitter = serviceManager.Get<TemplateFitterService>(templateFitterLabel_);
 
-        //Make a collection of fit results
-        std::vector<std::shared_ptr<dataProducts::WaveformFit>> fitResults;
-        fitResults.reserve(waveforms.size());
+         // Get the input waveforms
+        auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
 
+        //Make a collection new waveforms
+        auto fitResults = store.getOrCreate<dataProducts::WaveformFit>(this->GetRecoLabel(), outputFitResultLabel_);
 
-        for (const auto wf : waveforms) {
-            // // Make a fit result and add it to the collection here
-            // auto corrected = std::make_shared<dataProducts::WFD5Waveform>(*wf);
-            // correctedWaveforms.push_back(std::move(corrected));
+        for (int i = 0; i < waveforms->GetEntriesFast(); ++i) {
+            auto* wf = static_cast<dataProducts::WFD5Waveform*>(waveforms->ConstructedAt(i));
+            if (!wf) {
+                throw std::runtime_error("Failed to retrieve waveform at index " + std::to_string(i));
+            }
+
 
             dataProducts::ChannelID id = wf->GetID();
             if (templateFitter->ValidChannel(id))
@@ -37,7 +40,10 @@ void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) {
                     << std::get<0>(id) << "/" << std::get<1>(id) << "/" << std::get<2>(id) 
                     << std::endl;
 
-                auto this_fit_result = std::make_shared<dataProducts::WaveformFit>(wf.get());
+                // Create a new fit result for this waveform
+                int idx = fitResults->GetEntriesFast();
+                dataProducts::WaveformFit* this_fit_result = new ((*fitResults)[idx]) dataProducts::WaveformFit(wf);
+                fitResults->Expand(idx + 1);
 
                 if (fit_debug)
                 {
@@ -53,7 +59,7 @@ void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) {
                 auto intermediate = std::chrono::high_resolution_clock::now();
                 // auto bestchi2 = 1;
                 auto bestchi2 = thisfitter->performMinimization();
-                if (bestchi2 > 0) thisfitter->setFitResult(this_fit_result.get());
+                if (bestchi2 > 0) thisfitter->setFitResult(this_fit_result);
                 auto end = std::chrono::high_resolution_clock::now();
                 std::chrono::duration<double, std::micro> elapsed = end - start;
                 std::chrono::duration<double, std::micro> elapsed2 = end - intermediate;
@@ -63,9 +69,6 @@ void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) {
 
                 if (fit_debug) std::cout << "Final chi2: " << bestchi2 << std::endl;
                 if (fit_debug) std::cout << "Final Nfit: " << this_fit_result->nfit << std::endl;
-                fitResults.push_back(
-                    std::move(this_fit_result)
-                );
             }
             else if (fit_debug)
             {
@@ -77,9 +80,6 @@ void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) {
             
 
         }
-
-        // Store corrected fit results under a new key
-        store.put(this->GetRecoLabel(), outputFitResultLabel_, std::move(fitResults));
 
     } catch (const std::exception& e) {
        throw std::runtime_error(std::string("Fitter error: ") + e.what());

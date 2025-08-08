@@ -47,15 +47,42 @@ Running these commands will run the reconstruction configured in `reco_config.js
 To add a new reco stage, you should follow the following steps:
 1. Copy an existing RecoStage (e.g. `include/reco/wfd5/JitterCorrector.hh`) and modify it. It should derive from the `reco::RecoStage` class and must implement a couple virtual methods.
 2. Add the class to the `include/reco/LinkDef.hh` file, so ROOT can generate the dictionary for it.
-3. To use the reco stage, add it to the `RecoStages` array in the `reco_config.json` file. The reco stage will be executed in the order they are defined in the array. You can add parameters in the json that you parse in the `Configure` method.
-4. Often times, you will want to access collections from the `EventStore`. You can do this with a get method: `eventStore.get<reco::WFD5Waveform>(recoLabel, dataLabel)` where `recoLabel` is the label of the reco stage and `dataLabel` is the label of the data product you want to access.
+3. To define the reco stage in your job, add it to the `RecoStages` array in the `reco_config.json` file. You can add any parameters in the json that you then must parse in the `Configure` method of the RecoStage. If you want to actually run the reco stage, add it to the `RecoPath` array. The reco stages will be executed in the order they are defined in the `RecoPath` array. The `RecoPath` is used to decouple stage definition from execution.
+4. Often times, you will want to access collections from the `EventStore`. You can do this with a get method: `TClonesArray* waveforms = store.get<const dataProducts::WFD5Waveform>(recoLabel, dataLabel);` where `recoLabel` is the label of the reco stage and `dataLabel` is the label of the data product you want to access. This will return a `TClonesArray*` object that you can loop over. A possible workflow might look like this:
+
+```cpp
+void YourRecoStage::Process(EventStore& store, const ServiceManager& serviceManager) {
+    try {
+         // Get the input waveforms
+        auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel, inputWaveformsLabel);
+
+        //Make a collection new waveforms
+        auto newWaveforms = store.getOrCreate<dataProducts::WFD5Waveform>(outputRecoLabel, outputWaveformsLabel);
+
+        for (int i = 0; i < waveforms->GetEntriesFast(); ++i) {
+            auto* waveform = static_cast<dataProducts::WFD5Waveform*>(waveforms->ConstructedAt(i));
+            if (!waveform) {
+                throw std::runtime_error("Failed to retrieve waveform at index " + std::to_string(i));
+            }
+            //Make the new waveform
+            dataProducts::WFD5Waveform* newWaveform = new ((*newWaveforms)[i]) dataProducts::WFD5Waveform(*waveform);
+            newWaveforms->Expand(i + 1);
+
+            // Do something with the waveform here!
+
+        }
+    } catch (const std::exception& e) {
+       throw std::runtime_error(std::string("YourRecoStage error: ") + e.what());
+    }
+}
+```
 
 ## Instructions for adding a new service
 To add a new service, you should follow the following steps:
 1. Copy an existing Service (e.g. `include/reco/wfd5/TemplateService.hh`) and modify it. It should derive from the `reco::Service` class and must implement a couple virtual methods.
 2. Add the class to the `include/reco/LinkDef.hh` file, so ROOT can generate the dictionary for it.
 3. To use the service, add it to the `Services` array in the `reco_config.json` file. You can add parameters in the json that you parse in the `Configure` method.
-4. Services are accessible in a `RecoStage` via the `ServiceManager` class. You can get a service by its label, e.g. `serviceManager.Get<reco::TemplateService>("templates")` where the argument is the label given to the service in the json configuration.
+4. Services are accessible in a `RecoStage` via the `ServiceManager` class. You can get a service by its label, e.g. `reco::Service templateFitter = serviceManager.Get<TemplateFitterService>(templateFitterLabel);` where the argument is the label given to the service in the json configuration.
 
 ## Making histograms
 Histograms you make need to be added to the `EventStore`. The `EventStore` holds the collections of dataProducts for event event, the odb, and histograms that persistent event-to-event. Add a histogram like so:

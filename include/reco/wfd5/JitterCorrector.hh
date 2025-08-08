@@ -22,7 +22,7 @@ namespace reco {
         void Process(EventStore& store, const ServiceManager& serviceManager) override;
 
     private:
-        void ApplyJitterCorrection(std::shared_ptr<dataProducts::WFD5Waveform>& wf);
+        void ApplyJitterCorrection(dataProducts::WFD5Waveform* wf);
 
         std::string inputRecoLabel_;
         std::string inputWaveformsLabel_;

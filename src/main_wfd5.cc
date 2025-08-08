@@ -207,12 +207,12 @@ int main(int argc, char *argv[])
             unpackers::unpackingStatus status = unpackers::unpackingStatus::Failure;
             while ( (status = eventUnpacker->UnpackEvent(thisEvent)) == unpackers::unpackingStatus::SuccessMore) {
 
-                // Put the unpacked data into the event store
+               // Put the unpacked data into the event store
                 eventStore.clear();  // clear previous event's data
-                eventStore.put("unpacker","WFD5HeaderCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5Header>("WFD5HeaderCollection"));
-                eventStore.put("unpacker","WFD5ChannelHeaderCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5ChannelHeader>("WFD5ChannelHeaderCollection"));
-                eventStore.put("unpacker","WFD5WaveformHeaderCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5WaveformHeader>("WFD5WaveformHeaderCollection"));
-                eventStore.put("unpacker","WFD5WaveformCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5Waveform>("WFD5WaveformCollection"));
+                eventStore.put<dataProducts::WFD5Header>("unpacker","WFD5HeaderCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5Header>("WFD5HeaderCollection"));
+                eventStore.put<dataProducts::WFD5ChannelHeader>("unpacker","WFD5ChannelHeaderCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5ChannelHeader>("WFD5ChannelHeaderCollection"));
+                eventStore.put<dataProducts::WFD5WaveformHeader>("unpacker","WFD5WaveformHeaderCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5WaveformHeader>("WFD5WaveformHeaderCollection"));
+                eventStore.put<dataProducts::WFD5Waveform>("unpacker","WFD5WaveformCollection", eventUnpacker->GetNextPtrCollection<dataProducts::WFD5Waveform>("WFD5WaveformCollection"));
 
                 // Run reconstruction stages
                 try {

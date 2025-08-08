@@ -48,41 +48,31 @@ void JitterCorrector::Configure(const nlohmann::json& config, const ServiceManag
 }
 
 void JitterCorrector::Process(EventStore& store, const ServiceManager& serviceManager) {
-    // std::cout << "JitterCorrector with name '" << GetLabel() << "' is processing...\n";
+    // std::cout << "JitterCorrector with name '" << GetRecoLabel() << "' is processing...\n";
     try {
-        // Get original waveforms as const shared_ptr collection (safe because get is const)
+         // Get the input waveforms
         auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
 
-        //Make new collection for corrected waveforms
-        std::vector<std::shared_ptr<dataProducts::WFD5Waveform>> correctedWaveforms;
-        correctedWaveforms.reserve(waveforms.size());
+        //Make a collection new waveforms
+        auto newWaveforms = store.getOrCreate<dataProducts::WFD5Waveform>(this->GetRecoLabel(), outputWaveformsLabel_);
 
-        //Get the template service (example of getting a service)
-        auto templateLoaderService = serviceManager.Get<TemplateLoaderService>(templateLoaderServiceLabel_);
+        for (int i = 0; i < waveforms->GetEntriesFast(); ++i) {
+            auto* waveform = static_cast<dataProducts::WFD5Waveform*>(waveforms->ConstructedAt(i));
+            if (!waveform) {
+                throw std::runtime_error("Failed to retrieve waveform at index " + std::to_string(i));
+            }
+            //Make the new waveform
+            dataProducts::WFD5Waveform* newWaveform = new ((*newWaveforms)[i]) dataProducts::WFD5Waveform(waveform);
+            newWaveforms->Expand(i + 1);
 
-        for (const auto& wf : waveforms) {
-            // Make a copy for correction
-            auto corrected = std::make_shared<dataProducts::WFD5Waveform>(*wf);
-
-            ApplyJitterCorrection(corrected);
-
-            //Fill a histogram for fun
-            // store.GetHistogram("energy")->Fill(50);
-
-            correctedWaveforms.push_back(std::move(corrected));
+             ApplyJitterCorrection(newWaveform);
         }
-
-        // Store corrected waveforms under a new key
-        store.put(this->GetRecoLabel(), outputWaveformsLabel_, std::move(correctedWaveforms));
-
-        // std::cout << "JitterCorrector: corrected " << waveforms.size() << " waveforms.\n";
-
     } catch (const std::exception& e) {
        throw std::runtime_error(std::string("JitterCorrector error: ") + e.what());
     }
 }
 
-void JitterCorrector::ApplyJitterCorrection(std::shared_ptr<dataProducts::WFD5Waveform>& wf) {
+void JitterCorrector::ApplyJitterCorrection(dataProducts::WFD5Waveform* wf) {
     // Implement jitter correction here
     if (offsetMap_.count(wf->GetID()))
     {
