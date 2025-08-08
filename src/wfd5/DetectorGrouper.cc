@@ -14,7 +14,7 @@ void DetectorGrouper::Configure(const nlohmann::json& config, const ServiceManag
 void DetectorGrouper::Process(EventStore& store, const ServiceManager& serviceManager) {
     // std::cout << "DetectorGrouper with name '" << GetLabel() << "' is processing...\n";
     try {
-        // Get the input waveforms as const shared_ptr collection (safe because get is const)
+        // Get the input waveforms
         auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
 
         //Get the channel map service
@@ -25,16 +25,14 @@ void DetectorGrouper::Process(EventStore& store, const ServiceManager& serviceMa
         }
 
         // Make map for all the individual detector waveform collections
-        std::map<std::string,std::vector<std::shared_ptr<dataProducts::WFD5Waveform>>> detectorWaveformsMap;
+        std::map<std::string,TClonesArray*> detectorWaveformsMap;
 
-        // Print out the channel map for debugging
-
-        for (const auto& wf : waveforms) {
-            // Make a copy of the waveforms
-            auto thisWaveform = std::make_shared<dataProducts::WFD5Waveform>(*wf);
+        // Loop over the waveforms
+        for (int i = 0; i < waveforms->GetEntriesFast(); ++i) {
+            auto* waveform = static_cast<dataProducts::WFD5Waveform*>(waveforms->ConstructedAt(i));
 
             // Create the key
-            auto key = std::make_tuple(thisWaveform->crateNum, thisWaveform->amcNum, thisWaveform->channelTag);
+            auto key = std::make_tuple(waveform->crateNum, waveform->amcNum, waveform->channelTag);
 
             // std::cout << "Processing waveform with key: (" 
             //           << std::get<0>(key) << ", " 
@@ -50,8 +48,27 @@ void DetectorGrouper::Process(EventStore& store, const ServiceManager& serviceMa
                 // Get the detector name
                 std::string detectorSystem = channelConfigMap.at(key).GetDetectorSystem();
                 std::string subdetector = channelConfigMap.at(key).GetSubdetector();
-                thisWaveform->SetDetectorSystem(detectorSystem);
-                thisWaveform->SetSubdetector(subdetector);
+
+                // Make the output name
+                std::string cleanDetectorName = detectorSystem;
+                cleanDetectorName.erase(
+                    std::remove_if(cleanDetectorName.begin(), cleanDetectorName.end(), ::isspace),
+                    cleanDetectorName.end()
+                );
+                std::string outputWaveformsLabel = outputWaveformsBaseLabel_ + cleanDetectorName;
+
+                // Have we retrieved this collection yet?
+                if (detectorWaveformsMap.find(detectorSystem) == detectorWaveformsMap.end()) {
+                    // Fill the map with the TClonesArray (get or create)
+                    detectorWaveformsMap[detectorSystem] = store.getOrCreate<dataProducts::WFD5Waveform>(this->GetRecoLabel(), outputWaveformsLabel);
+                }
+
+                // Make the new waveform
+                int idx = detectorWaveformsMap[detectorSystem]->GetEntriesFast();
+                auto* newWaveform = new ((*detectorWaveformsMap[detectorSystem])[idx]) dataProducts::WFD5Waveform(*waveform);
+                detectorWaveformsMap[detectorSystem]->Expand(idx + 1);
+                newWaveform->SetDetectorSystem(detectorSystem);
+                newWaveform->SetSubdetector(subdetector);
 
                 // std::cout << "Waveform (crate " << thisWaveform->crateNum 
                 //           << ", amc " << thisWaveform->amcNum 
@@ -59,37 +76,20 @@ void DetectorGrouper::Process(EventStore& store, const ServiceManager& serviceMa
                 //           << ") mapped to detector system: " << detectorSystem 
                 //           << ", subdetector: " << subdetector << std::endl;
 
-                // Have we made this collection yet?
-                if (detectorWaveformsMap.find(detectorSystem) == detectorWaveformsMap.end()) {
-                    detectorWaveformsMap[detectorSystem] = std::vector<std::shared_ptr<dataProducts::WFD5Waveform>>();
-                }
-
-                // Add the waveform to the appropriate detector collection
-                detectorWaveformsMap[detectorSystem].push_back(std::move(thisWaveform));
             } else {
                 // Not in channel map, so categorize as "Other"
+                std::string outputWaveformsLabel = outputWaveformsBaseLabel_ + "Other";
                 if (detectorWaveformsMap.find("Other") == detectorWaveformsMap.end()) {
-                    detectorWaveformsMap["Other"] = std::vector<std::shared_ptr<dataProducts::WFD5Waveform>>();
+                    // Fill the map with the TClonesArray (get or create)
+                    detectorWaveformsMap["Other"] = store.getOrCreate<dataProducts::WFD5Waveform>(this->GetRecoLabel(), outputWaveformsLabel);
                 }
-                thisWaveform->SetDetectorSystem("Other");
-                thisWaveform->SetSubdetector("Other");
-                detectorWaveformsMap["Other"].push_back(std::move(thisWaveform));
+                int idx = detectorWaveformsMap["Other"]->GetEntriesFast();
+                auto* newWaveform = new ((*detectorWaveformsMap["Other"])[idx]) dataProducts::WFD5Waveform(*waveform);
+                detectorWaveformsMap["Other"]->Expand(idx + 1);
+                newWaveform->SetDetectorSystem("Other");
+                newWaveform->SetSubdetector("Other");
             }
         }
-
-        // Store each detector's collections with a unique label
-        for (const auto& [detectorName, waveforms] : detectorWaveformsMap) {
-            //remove whitespace from detectorName
-            std::string cleanDetectorName = detectorName;
-            cleanDetectorName.erase(
-                std::remove_if(cleanDetectorName.begin(), cleanDetectorName.end(), ::isspace),
-                cleanDetectorName.end()
-            );
-            store.put(this->GetRecoLabel(), outputWaveformsBaseLabel_ + cleanDetectorName, std::move(waveforms));
-        }
-
-        // std::cout << "DetectorGrouper: corrected " << waveforms.size() << " waveforms.\n";
-
     } catch (const std::exception& e) {
        throw std::runtime_error(std::string("DetectorGrouper error: ") + e.what());
     }

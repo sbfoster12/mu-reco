@@ -14,25 +14,27 @@ void PedestalCalculator::Configure(const nlohmann::json& config, const ServiceMa
 void PedestalCalculator::Process(EventStore& store, const ServiceManager& serviceManager) {
     // std::cout << "PedestalCalculator with name '" << GetLabel() << "' is processing...\n";
     try {
-        // Get original waveforms as const shared_ptr collection (safe because get is const)
+         // Get the input waveforms
         auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
 
-        //Make a collection of fit results
-        std::vector<std::shared_ptr<dataProducts::WFD5Waveform>> newWaveforms;
-        newWaveforms.reserve(waveforms.size());
+        //Make a collection new waveforms
+        auto newWaveforms = store.getOrCreate<dataProducts::WFD5Waveform>(this->GetRecoLabel(), outputWaveformsLabel_);
 
-        for (const auto& wf : waveforms) {
-            // Make a fit result and add it to the collection here
-            auto newWaveform = std::make_shared<dataProducts::WFD5Waveform>(*wf);
-            newWaveforms.push_back(std::move(newWaveform));
+        for (int i = 0; i < waveforms->GetEntriesFast(); ++i) {
+            auto* waveform = static_cast<dataProducts::WFD5Waveform*>(waveforms->ConstructedAt(i));
+            if (!waveform) {
+                throw std::runtime_error("Failed to retrieve waveform at index " + std::to_string(i));
+            }
+            //Make the new waveform
+            dataProducts::WFD5Waveform* newWaveform = new ((*newWaveforms)[i]) dataProducts::WFD5Waveform(*waveform);
+            newWaveforms->Expand(i + 1);
+
+             ApplyPedestalCalculation(newWaveform);
         }
-
-        // Store corrected fit results under a new key
-        store.put(this->GetRecoLabel(), outputWaveformsLabel_, std::move(newWaveforms));
-
-        // std::cout << "PedestalCalculator: corrected " << waveforms.size() << " waveforms.\n";
-
     } catch (const std::exception& e) {
        throw std::runtime_error(std::string("PedestalCalculator error: ") + e.what());
     }
+}
+
+void PedestalCalculator::ApplyPedestalCalculation(dataProducts::WFD5Waveform* wf) {
 }

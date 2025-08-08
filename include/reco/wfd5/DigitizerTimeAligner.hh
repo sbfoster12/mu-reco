@@ -19,6 +19,8 @@ namespace reco {
 
         void Process(EventStore& store, const ServiceManager& serviceManager) override;
 
+        void ApplyTimeAligner(dataProducts::WFD5Waveform* wf);
+
     private:
 
         std::string inputRecoLabel_;

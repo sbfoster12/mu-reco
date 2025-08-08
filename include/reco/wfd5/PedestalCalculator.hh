@@ -20,6 +20,9 @@ namespace reco {
 
         void Process(EventStore& store, const ServiceManager& serviceManager) override;
 
+        void ApplyPedestalCalculation(dataProducts::WFD5Waveform* wf);
+
+
     private:
 
         std::string inputRecoLabel_;

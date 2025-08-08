@@ -7,6 +7,8 @@
 #include <memory>
 #include <stdexcept>
 
+#include <TClonesArray.h>
+
 #include <data_products/common/DataProduct.hh>
 #include <data_products/wfd5/WFD5WaveformFit.hh>
 
@@ -17,29 +19,55 @@ namespace reco {
         EventStore() = default;
         ~EventStore() = default;
 
-        // Store a collection of typed shared_ptr<T>
+        // get or create a TClonesArray for a specific reco_label and data_label
         template <typename T>
-        void put(const std::string& reco_label, const std::string& data_label, std::vector<std::shared_ptr<T>> collection) {
+        TClonesArray* getOrCreate(const std::string& reco_label, const std::string& data_label) {
 
+            // Check that data_label and reco_label have no underscores
+            if (data_label.find('_') != std::string::npos || reco_label.find('_') != std::string::npos) {
+                throw std::runtime_error("Data label or Reco label cannot contain underscores: " + data_label + ", " + reco_label);
+            }
+            std::string label = reco_label + "_" + data_label;
+
+            // Check if buffer already exists
+            auto it = buffers_.find(label);
+            if (it != buffers_.end()) {
+                // Check type matches T
+                const char* className = it->second->GetClass()->GetName();
+                if (std::string(className) != T::Class()->GetName()) {
+                    throw std::runtime_error("Type mismatch for label " + label + 
+                                            ": requested " + T::Class()->GetName() + 
+                                            ", found " + className);
+                }
+                return it->second;
+            }
+            // If not, create a new TClonesArray for the type T
+            TClonesArray* arr = new TClonesArray(T::Class()->GetName());
+            buffers_[label] = arr;
+            bufferKeys_.push_back(label);
+            std::cout << "-> reco::EventStore: Created TClonesArray for '" << label << "'." << std::endl;
+            return arr;
+        }
+
+        // Get a collection by name const
+        template <typename T>
+        TClonesArray* get(const std::string& reco_label, const std::string& data_label) const {
+            
             //Check that data_label and reco_label have no underscores
             if (data_label.find('_') != std::string::npos || reco_label.find('_') != std::string::npos) {
                 throw std::runtime_error("Data label or Reco label cannot contain underscores: " + data_label + ", " + reco_label);
             }
-
-            std::string name = reco_label + "_" + data_label;
-
-            if (store_.count(name)) {
-                throw std::runtime_error("Data product already exists: " + name);
+            std::string label = reco_label + "_" + data_label;
+            auto it = buffers_.find(label);
+            if (it == buffers_.end()) {
+                throw std::runtime_error("Data product not found: " + label);
             }
-            dataProducts::DataProductPtrCollection baseCollection;
-            baseCollection.reserve(collection.size());
-            for (auto& item : collection) {
-                baseCollection.push_back(std::static_pointer_cast<dataProducts::DataProduct>(item));
-            }
-            store_[name] = std::move(baseCollection);
+            return it->second;
+
         }
 
-        // Store a collection of DataProductPtr directly (from your unpacker)
+        // Store a collection of DataProductPtr into a TClonesArray (used from the unpacker)
+        template <typename T>
         void put(const std::string& reco_label, const std::string& data_label, const dataProducts::DataProductPtrCollection& collection) {
             
             //Check that data_label and reco_label have no underscores
@@ -47,11 +75,24 @@ namespace reco {
                 throw std::runtime_error("Data label or Reco label cannot contain underscores: " + data_label + ", " + reco_label);
             }
 
-            std::string name = reco_label + "_" + data_label;
-            if (store_.count(name)) {
-                throw std::runtime_error("Data product already exists: " + name);
+            // Can't check for duplicates anymore b/c we expect the TClonesArray to stick around
+            // std::string name = reco_label + "_" + data_label;
+            // if (buffers_.count(name)) {
+            //     throw std::runtime_error("Data product already exists: " + name);
+            // }
+    
+            auto buffer = getOrCreate<T>(reco_label, data_label);
+
+            // Fill buffer with copies of unpacked objects
+            for (const auto& basePtr : collection) {
+                auto* derivedPtr = dynamic_cast<T*>(basePtr.get());
+                if (!derivedPtr) {
+                    throw std::runtime_error("Bad cast to " + std::string(T::Class()->GetName()));
+                }
+                new ((*buffer)[buffer->GetEntriesFast()]) T(*derivedPtr);
             }
-            store_[name] = collection;  // copy shared_ptr vector
+            buffer->Expand(buffer->GetEntriesFast());
+
         }
 
         void put_odb(std::shared_ptr<dataProducts::DataProduct> odb) {
@@ -61,40 +102,16 @@ namespace reco {
             odb_ = odb;
         }
 
-        template <typename T>
-        std::vector<std::shared_ptr<T>> get(const std::string& reco_label, const std::string& data_label) const {
-            
-            //Check that data_label and reco_label have no underscores
-            if (data_label.find('_') != std::string::npos || reco_label.find('_') != std::string::npos) {
-                throw std::runtime_error("Data label or Reco label cannot contain underscores: " + data_label + ", " + reco_label);
-            }
-
-            std::string name = reco_label + "_" + data_label;
-            auto it = store_.find(name);
-            if (it == store_.end()) {
-                throw std::runtime_error("Data product not found: " + name);
-            }
-            const auto& baseVec = it->second;
-
-            std::vector<std::shared_ptr<T>> typedVec;
-            typedVec.reserve(baseVec.size());
-
-            for (const auto& basePtr : baseVec) {
-                auto casted = std::dynamic_pointer_cast<T>(basePtr);
-                if (!casted) {
-                    throw std::runtime_error("Bad cast for data product: " + name);
-                }
-                typedVec.push_back(std::move(casted));
-            }
-            return typedVec;
-        }
-
         std::shared_ptr<dataProducts::DataProduct> GetODB() const {
             return odb_;
         }
 
-        std::map<std::string, dataProducts::DataProductPtrCollection> GetStore() const {
-            return store_;
+        const std::unordered_map<std::string, TClonesArray*>& GetBuffers() const {
+            return buffers_;
+        }
+
+        const std::vector<std::string>& GetBufferKeys() const {
+            return bufferKeys_;
         }
 
         void putHistogram(const std::string& name, std::shared_ptr<TH1> hist) {
@@ -130,14 +147,21 @@ namespace reco {
         }
 
         void clear() {
-            store_.clear();
+            for (auto& [key, buffer] : buffers_) {
+                buffer->Clear("C");
+            }
         }
 
     private:
-        std::map<std::string, dataProducts::DataProductPtrCollection> store_; //data products to store in the tree eventually
+        std::unordered_map<std::string, TClonesArray*> buffers_; //buffers for the data product collections
+        std::vector<std::string> bufferKeys_; //keys for the data products (need to know insertion order for TRefs)
         std::shared_ptr<dataProducts::DataProduct> odb_;  // ODB data product, if any
         std::map<std::string, std::shared_ptr<TH1>> histograms_; //histograms
-        std::map<std::string, std::shared_ptr<dataProducts::SplineHolder>> splines_; //histograms
+        std::map<std::string, std::shared_ptr<dataProducts::SplineHolder>> splines_; //splines
+
+
+
+
 
     };
 } //namespace reco

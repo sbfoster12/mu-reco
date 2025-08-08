@@ -9,7 +9,7 @@
       "recoLabel": "jitter",
       "inputRecoLabel": "unpacker",
       "inputWaveformsLabel": "WFD5WaveformCollection",
-      "outputWaveformsLabel": "Waveforms",
+      "outputWaveformsLabel": "waveforms",
       "templateServiceLabel": "templates",
       "file_name":"pedestals.json",
       "failOnError":false,
@@ -19,67 +19,75 @@
       "recoClass": "reco::DigitizerTimeAligner",
       "recoLabel": "timeAligned",
       "inputRecoLabel": "jitter",
-      "inputWaveformsLabel": "Waveforms",
-      "outputWaveformsLabel": "Waveforms"
+      "inputWaveformsLabel": "waveforms",
+      "outputWaveformsLabel": "waveforms"
     },
     {
       "recoClass": "reco::PedestalCalculator",
       "recoLabel": "pedestal",
       "inputRecoLabel": "timeAligned",
-      "inputWaveformsLabel": "Waveforms",
-      "outputWaveformsLabel": "Waveforms"
+      "inputWaveformsLabel": "waveforms",
+      "outputWaveformsLabel": "waveforms"
     },
     {
       "recoClass": "reco::DetectorGrouper",
       "recoLabel": "grouped",
       "inputRecoLabel": "pedestal",
-      "inputWaveformsLabel": "Waveforms",
-      "outputWaveformsBaseLabel": "Waveforms",
+      "inputWaveformsLabel": "waveforms",
+      "outputWaveformsBaseLabel": "waveforms",
       "channelMapServiceLabel": "channelMap"
     },
     {
       "recoClass": "reco::Fitter",
       "recoLabel": "xtalFitter",
       "inputRecoLabel": "grouped",
-      "inputWaveformsLabel": "WaveformsXtal",
-      "outputFitResultLabel": "FitResults",
-      "templateFitterLabel": "templateFitter"
+      "inputWaveformsLabel": "waveformsXtal",
+      "outputFitResultLabel": "fitResults",
+      "templateFitterLabel": "templateFitter",
+      "debug": false
     },
     {
       "recoClass": "reco::RFFitter",
       "recoLabel": "RFFitter",
       "inputRecoLabel": "grouped",
-      "inputWaveformsLabel": "WaveformsXtal",
-      "outputFitResultLabel": "RFFitResults"
+      "inputWaveformsLabel": "waveformsXtal",
+      "outputFitResultLabel": "RFfitResults"
     },
     {
       "recoClass": "reco::PulseIntegrator",
       "recoLabel": "xtalIntegrator",
       "inputRecoLabel": "grouped",
-      "inputWaveformsLabel": "WaveformsXtal",
+      "inputWaveformsLabel": "waveformsXtal",
       "outputIntegralsLabel": "Integrals"
     },
     {
       "recoClass": "reco::PeakIdentifier",
       "recoLabel": "xtalPeakIdentifier",
       "inputRecoLabel": "grouped",
-      "inputWaveformsLabel": "WaveformsXtal",
+      "inputWaveformsLabel": "waveformsXtal",
       "outputPeaksLabel": "Peaks"
     },
     {
       "recoClass": "reco::CaloClusterFinder",
       "recoLabel": "xtalCaloClusterFinder",
       "inputRecoLabel": "xtalFitter",
-      "inputFitResultsLabel": "FitResults",
+      "inputfitResultsLabel": "fitResults",
       "outputCaloClusterLabel": "CaloClusters"
     },
     {
       "recoClass": "reco::XYPositionFinder",
       "recoLabel": "xtalXYPositionFinder",
       "inputRecoLabel": "xtalFitter",
-      "inputFitResultsLabel": "FitResults",
+      "inputfitResultsLabel": "fitResults",
       "outputPositionLabel": "XYPositions"
     }
+  ],
+  "RecoPath":[
+    "jitter",
+    "timeAligned",
+    "pedestal",
+    "grouped",
+    "xtalFitter"
   ],
   "Services": [
     {
@@ -121,6 +129,7 @@
     }
   ],
   "Output": {
+    "_drop": [],
     "drop": [
       "unpacker*",
       "jitter*"
