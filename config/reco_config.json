@@ -28,7 +28,9 @@
       "recoLabel": "pedestal",
       "inputRecoLabel": "timeAligned",
       "inputWaveformsLabel": "waveforms",
-      "outputWaveformsLabel": "waveforms"
+      "outputWaveformsLabel": "waveforms",
+      "pedestalMethod" : "FirstN",
+      "numSamples": 10
     },
     {
       "recoClass": "reco::DetectorGrouper",

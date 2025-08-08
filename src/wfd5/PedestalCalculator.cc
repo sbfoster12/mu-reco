@@ -9,6 +9,8 @@ void PedestalCalculator::Configure(const nlohmann::json& config, const ServiceMa
     inputRecoLabel_ = config.value("inputRecoLabel", "timeAligned");
     inputWaveformsLabel_ = config.value("inputWaveformsLabel", "Waveforms");
     outputWaveformsLabel_ = config.value("outputWaveformsLabel", "Waveforms");
+    pedestalMethod_ = config.value("pedestalMethod", "FirstN");
+    numSamples_ = config.value("numSamples", 10);
 }
 
 void PedestalCalculator::Process(EventStore& store, const ServiceManager& serviceManager) {
@@ -29,12 +31,54 @@ void PedestalCalculator::Process(EventStore& store, const ServiceManager& servic
             dataProducts::WFD5Waveform* newWaveform = new ((*newWaveforms)[i]) dataProducts::WFD5Waveform(waveform);
             newWaveforms->Expand(i + 1);
 
-             ApplyPedestalCalculation(newWaveform);
+             ComputePedestal(newWaveform);
         }
     } catch (const std::exception& e) {
        throw std::runtime_error(std::string("PedestalCalculator error: ") + e.what());
     }
 }
 
-void PedestalCalculator::ApplyPedestalCalculation(dataProducts::WFD5Waveform* wf) {
+void PedestalCalculator::ComputePedestal(dataProducts::WFD5Waveform* wf) {
+    
+    // Initialize the pedestal
+    double pedestal = 0.0;
+    double pedestalStdev = 0.0;
+
+    // Get the trace
+    const auto& trace = wf->trace;
+
+    int startIndex = -1;
+    int endIndex = -1;
+    
+    if (pedestalMethod_ == "FirstN") {
+        startIndex = 0;
+        endIndex = std::min(numSamples_, static_cast<int>(trace.size()));
+    } else if (pedestalMethod_ == "MiddleN") {
+        startIndex = (trace.size() - numSamples_) / 2;
+        endIndex = startIndex + numSamples_ < trace.size() ? startIndex + numSamples_ : trace.size();
+    } else if (pedestalMethod_ == "LastN") {
+        startIndex = std::max(0, static_cast<int>(trace.size()) - numSamples_);
+        endIndex = trace.size();
+    } else {
+        throw std::runtime_error("Unknown pedestal method: " + pedestalMethod_);
+    }
+
+    std::vector<short> pedestalSamples;
+    for (size_t i = startIndex; i < endIndex; ++i) {
+        pedestalSamples.push_back(trace[i]);
+        pedestal += trace[i];
+    }
+    pedestal /= (endIndex - startIndex);
+
+    // Compute the standard deviation
+    for (const auto& sample : pedestalSamples) {
+        pedestalStdev += (sample - pedestal) * (sample - pedestal);
+    }
+    pedestalStdev = std::sqrt(pedestalStdev / pedestalSamples.size());
+
+    // Set the waveform pedestal values
+    wf->pedestalLevel = pedestal;
+    wf->pedestalStdev = pedestalStdev;
+    wf->pedestalSamples = pedestalSamples;
+    wf->pedestalStartSample = startIndex;
 }
