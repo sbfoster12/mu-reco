@@ -28,7 +28,9 @@
       "recoLabel": "pedestal",
       "inputRecoLabel": "timeAligned",
       "inputWaveformsLabel": "waveforms",
-      "outputWaveformsLabel": "waveforms"
+      "outputWaveformsLabel": "waveforms",
+      "pedestalMethod" : "FirstN",
+      "numSamples": 10
     },
     {
       "recoClass": "reco::DetectorGrouper",
@@ -85,6 +87,12 @@
       "inputRecoLabel": "xtalFitter",
       "inputfitResultsLabel": "fitResults",
       "outputPositionLabel": "XYPositions"
+    },
+    {
+      "recoClass": "reco::EndOfEventAnalysis",
+      "recoLabel": "endOfEventAnalysis",
+      "lysoRecoLabel": "grouped",
+      "lysoWaveformsLabel": "waveformsXtal"
     }
   ],
   "RecoPath":[
@@ -93,7 +101,8 @@
     "pedestal",
     "grouped",
     "xtalIntegrator",
-    "xtalFitter"
+    "xtalFitter",
+    "endOfEventAnalysis"
     ],
   "Services": [
     {

@@ -17,44 +17,10 @@ namespace reco {
         ServiceManager() = default;
         ~ServiceManager() = default;
 
-        // Create and configure services from JSON array (each service config must have "class" and "label")
-        void Configure(std::shared_ptr<const ConfigHolder> configHolder, reco::EventStore& eventStore) {
-            const nlohmann::json& config = configHolder->GetConfig();
-            if (!config.contains("Services") || !config["Services"].is_array()) {
-                throw std::runtime_error("ServiceManager: Missing or invalid 'Services' config");
-            }
+        // Configure method
+        void Configure(std::shared_ptr<const ConfigHolder> configHolder, reco::EventStore& eventStore);
 
-            for (const auto& servicesConfig : config["Services"]) { 
-                if (!servicesConfig.contains("type") || !servicesConfig.contains("label")) {
-                    throw std::runtime_error("Service config missing 'type' or 'label'");
-                }
-                std::string className = servicesConfig["type"];
-                std::string label = servicesConfig["label"];
-
-                // Use ROOT RTTI to create instance
-                TClass* cl = TClass::GetClass(className.c_str());
-                if (!cl || !cl->InheritsFrom(Service::Class())) {
-                    throw std::runtime_error("Invalid or unknown service type: " + className);
-                }
-
-                TObject* obj = static_cast<TObject*>(cl->New());
-                Service* service = dynamic_cast<Service*>(obj);
-                if (!service) {
-                    delete obj;
-                    throw std::runtime_error("Failed to cast to Service for type: " + className);
-                }
-
-                // Configure the service with full JSON object
-                service->SetServiceManager(this); // this lets later services access previously created services
-                service->SetConfigHolder(configHolder);
-                service->Configure(servicesConfig, eventStore);
-                service->SetLabel(label.c_str());
-
-                // Store with label
-                Add(label, std::shared_ptr<Service>(service));
-            }
-        }
-
+        // Templated Add method
         template<typename T>
         void Add(const std::string& label, std::shared_ptr<T> service) {
             static_assert(std::is_base_of<Service, T>::value, "T must derive from Service");
@@ -64,6 +30,7 @@ namespace reco {
             services_[label] = std::static_pointer_cast<Service>(service);
         }
 
+        // Templated Get method
         template<typename T>
         std::shared_ptr<T> Get(const std::string& label) const {
             auto it = services_.find(label);
@@ -71,6 +38,11 @@ namespace reco {
                 throw std::runtime_error("Service not found: " + label);
             }
             return std::dynamic_pointer_cast<T>(it->second);
+        }
+
+        // Get all services
+        const std::map<std::string, std::shared_ptr<Service>>& GetServices() const {
+            return services_;
         }
 
     private:

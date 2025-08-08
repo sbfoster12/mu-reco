@@ -158,11 +158,6 @@ namespace reco {
         std::shared_ptr<dataProducts::DataProduct> odb_;  // ODB data product, if any
         std::map<std::string, std::shared_ptr<TH1>> histograms_; //histograms
         std::map<std::string, std::shared_ptr<dataProducts::SplineHolder>> splines_; //splines
-
-
-
-
-
     };
 } //namespace reco
 

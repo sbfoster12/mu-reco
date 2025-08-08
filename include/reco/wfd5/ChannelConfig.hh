@@ -22,14 +22,8 @@ public:
     void SetAmcSlotNum(int amcSlotNum);
     void SetChannelNum(int channelNum);
 
-    void Print() const {
-        std::cout << "Crate: " << crateNum_
-                  << ", AMC Slot: " << amcSlotNum_
-                  << ", Channel: " << channelNum_
-                  << ", Detector System: " << detectorSystem_
-                  << ", Subdetector: " << subdetector_ << std::endl;
-    }
-
+    void Print() const;
+    
 private:
     int crateNum_;
     int amcSlotNum_;

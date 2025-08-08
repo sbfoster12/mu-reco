@@ -2,6 +2,8 @@
 #ifndef PEDESTALCALCULATOR_HH
 #define PEDESTALCALCULATOR_HH
 
+#include <algorithm>
+
 #include <data_products/wfd5/WFD5Waveform.hh>
 
 #include "reco/common/RecoStage.hh"
@@ -20,14 +22,15 @@ namespace reco {
 
         void Process(EventStore& store, const ServiceManager& serviceManager) override;
 
-        void ApplyPedestalCalculation(dataProducts::WFD5Waveform* wf);
-
+        void ComputePedestal(dataProducts::WFD5Waveform* wf);
 
     private:
 
         std::string inputRecoLabel_;
         std::string inputWaveformsLabel_;
         std::string outputWaveformsLabel_;
+        std::string pedestalMethod_; // e.g. "FirstN", "MiddleN", "LastN"
+        int numSamples_;
 
         ClassDefOverride(PedestalCalculator, 1);
     };

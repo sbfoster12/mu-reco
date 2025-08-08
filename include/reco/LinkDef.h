@@ -20,6 +20,7 @@
 #pragma link C++ class reco::PileupIdentifier+;
 #pragma link C++ class reco::CaloClusterFinder+;
 #pragma link C++ class reco::XYPositionFinder+;
+#pragma link C++ class reco::EndOfEventAnalysis+;
 
 // WFD5 services
 #pragma link C++ class reco::TemplateLoaderService+;
