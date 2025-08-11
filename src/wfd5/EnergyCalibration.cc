@@ -47,7 +47,8 @@ void EnergyCalibration::Configure(const nlohmann::json& config, const ServiceMan
     for (const auto& configi : thisConfig["calibration"]) 
     {
         calibrationMap_[std::make_tuple(configi["crateNum"], configi["amcSlotNum"], configi["channelNum"])] = configi["calib"];
-        if (debug_) std::cout << "Loading configuration for energy calibration in channel ("
+        // if (debug_) 
+        std::cout << "Loading configuration for energy calibration in channel ("
             << configi["crateNum"]      << " / "
             << configi["amcSlotNum"]        << " / "
             << configi["channelNum"]    << ") -> " 
@@ -72,7 +73,7 @@ void EnergyCalibration::Process(EventStore& store, const ServiceManager& service
             auto output = store.getOrCreate<dataProducts::WaveformIntegral>(this->GetRecoLabel(), outputWaveformsLabel_);
             for (int i = 0; i < input->GetEntriesFast(); i++)
             {
-                auto inputObject = (dataProducts::WaveformIntegral*) input->At(0);
+                auto inputObject = (dataProducts::WaveformIntegral*) input->At(i);
                 auto outputObject = new ((*output)[i]) dataProducts::WaveformIntegral(inputObject);
                 if (!calibrationMap_.count(inputObject->GetID()))
                 {
@@ -98,7 +99,7 @@ void EnergyCalibration::Process(EventStore& store, const ServiceManager& service
             auto output = store.getOrCreate<dataProducts::WaveformFit>(this->GetRecoLabel(), outputWaveformsLabel_);
             for (int i = 0; i < input->GetEntriesFast(); i++)
             {
-                auto inputObject = (dataProducts::WaveformFit*) input->At(0);
+                auto inputObject = (dataProducts::WaveformFit*) input->At(i);
                 auto outputObject = new ((*output)[i]) dataProducts::WaveformFit(inputObject);
                 if (!calibrationMap_.count(inputObject->GetID()))
                 {
