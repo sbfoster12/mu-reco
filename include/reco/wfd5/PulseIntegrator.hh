@@ -3,6 +3,7 @@
 #define PULSEINTEGRATOR_HH
 
 #include <data_products/wfd5/WFD5Waveform.hh>
+#include <data_products/wfd5/WaveformIntegral.hh>
 
 #include "reco/common/RecoStage.hh"
 #include "reco/common/EventStore.hh"
@@ -10,6 +11,16 @@
 #include "reco/common/JsonParserUtil.hh"
 
 namespace reco {
+
+    struct PulseIntegrationConfig {
+        bool skipChannel;
+        int nPresamples;
+        int windowLength;
+        int minAmplitude;
+        int strategy;
+        double nSigma;
+
+    };
 
     class PulseIntegrator : public RecoStage {
     public:
@@ -25,6 +36,16 @@ namespace reco {
         std::string inputRecoLabel_;
         std::string inputWaveformsLabel_;
         std::string outputIntegralsLabel_;
+        nlohmann::json json_;
+        bool debug_;
+        std::string file_name_;
+
+        PulseIntegrationConfig defaultConfig_;
+        std::map<dataProducts::ChannelID, PulseIntegrationConfig> channelConfigMap_;
+
+        bool seeded_;
+        std::string inputSeedRecoLabel_;
+        std::string inputSeedLabel_;
 
         ClassDefOverride(PulseIntegrator, 1);
     };

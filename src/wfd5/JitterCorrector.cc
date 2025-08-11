@@ -65,7 +65,7 @@ void JitterCorrector::Process(EventStore& store, const ServiceManager& serviceMa
             dataProducts::WFD5Waveform* newWaveform = new ((*newWaveforms)[i]) dataProducts::WFD5Waveform(waveform);
             newWaveforms->Expand(i + 1);
 
-             ApplyJitterCorrection(newWaveform);
+            ApplyJitterCorrection(newWaveform);
         }
     } catch (const std::exception& e) {
        throw std::runtime_error(std::string("JitterCorrector error: ") + e.what());
@@ -93,6 +93,6 @@ void JitterCorrector::ApplyJitterCorrection(dataProducts::WFD5Waveform* wf) {
             << std::get<1>(wf->GetID()) << " / "
             << std::get<2>(wf->GetID()) 
             << std::endl;
-        if (failOnError_) throw;
+        throw;
     }
 }

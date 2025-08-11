@@ -4,11 +4,13 @@
 #include "reco/common/OutputManager.hh"
 #include "reco/wfd5/TemplateLoaderService.hh"
 
+// any new dataproduct to be written to the tree must be included here!
 #include <data_products/wfd5/WFD5Header.hh>
 #include <data_products/wfd5/WFD5ChannelHeader.hh>
 #include <data_products/wfd5/WFD5WaveformHeader.hh>
 #include <data_products/wfd5/WFD5Waveform.hh>
 #include <data_products/wfd5/WFD5WaveformFit.hh>
+#include <data_products/wfd5/WaveformIntegral.hh>
 #include <data_products/wfd5/WFD5ODB.hh>
 
 namespace reco {

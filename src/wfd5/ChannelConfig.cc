@@ -6,6 +6,8 @@ ChannelConfig::ChannelConfig(const nlohmann::json& json) {
     channelNum_ = json.value("channelNum", -1);
     detectorSystem_ = json.value("detectorSystem", "");
     subdetector_ = json.value("subdetector", "");
+    x_ = json.value("x", 0.0);
+    y_ = json.value("y", 0.0);
 }
 
 const std::string& ChannelConfig::GetDetectorSystem() const {
@@ -28,6 +30,13 @@ int ChannelConfig::GetChannelNum() const {
     return channelNum_;
 }
 
+double ChannelConfig::GetX() const {
+    return x_;
+}
+double ChannelConfig::GetY() const {
+    return y_;
+}
+
 void ChannelConfig::SetDetectorSystem(const std::string& system) {
     detectorSystem_ = system;
 }
@@ -48,10 +57,19 @@ void ChannelConfig::SetChannelNum(int channelNum) {
     channelNum_ = channelNum;
 }
 
+void ChannelConfig::SetX(double ding) {
+    x_ = ding;
+}
+void ChannelConfig::SetY(double ding) {
+    y_ = ding;
+}
+
 void ChannelConfig::Print() const {
     std::cout << "Crate: " << crateNum_
                 << ", AMC Slot: " << amcSlotNum_
                 << ", Channel: " << channelNum_
                 << ", Detector System: " << detectorSystem_
-                << ", Subdetector: " << subdetector_ << std::endl;
+                << ", Subdetector: " << subdetector_
+                << ", x/y: " << x_  << "/" << y_
+                << std::endl;
 }
