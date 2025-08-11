@@ -11,6 +11,9 @@ void RFFitter::Configure(const nlohmann::json& config, const ServiceManager& ser
     outputFitResultLabel_ = config.value("outputFitResultLabel", "");
     fitStartTime_ = config.value("fitStartTime", 0.0);
     fitEndTime_ = config.value("fitEndTime", 100.0);
+    frequency_ = config.value("frequency", -1.0); // important that this is -1.0, not 1 to get a double; -1 means "use the zero crossings to estimate the frequency"
+    fixFrequency_ = config.value("fixedFrequency", false);
+    fitOption_ = config.value("fitOption", "R");
 }
 
 void RFFitter::Process(EventStore& store, const ServiceManager& serviceManager) {
@@ -75,8 +78,12 @@ void RFFitter::PerformRFFit(const dataProducts::WFD5Waveform* waveform, dataProd
             amplitude = std::abs(trace[i] - baseline);
         }
     }
-    // std::cout << zeroCrossings << " zero crossings found." << std::endl;
-    double freq = 2 * TMath::Pi() * (double)(zeroCrossings) / (trace.size() - spacing); // Estimate frequency
+
+    // Use the provided frequency if > 0
+    double freq = frequency_;
+    if (freq < 0.0) {
+        freq = 2 * TMath::Pi() * (double)(zeroCrossings) / (trace.size() - spacing); // Estimate frequency
+    }
 
     // Estimate the phase from the first zero crossing
     double phase = 0.0;
@@ -89,8 +96,12 @@ void RFFitter::PerformRFFit(const dataProducts::WFD5Waveform* waveform, dataProd
     // Set the initial parameters for the fit function
     fitFunc.SetParameters(freq, amplitude*TMath::Cos(phase), -amplitude*TMath::Sin(phase), baseline); // Initial parameters
 
+    if (fixFrequency_) {
+        fitFunc.FixParameter(0, freq); // Fix frequency if specified
+    }
+
     // Do the fit!
-    graph->Fit(&fitFunc, "RQ","", fitStartTime_,fitEndTime_);
+    graph->Fit(&fitFunc, fitOption_.c_str(),"", fitStartTime_,fitEndTime_);
 
     // Store the fit results in the fitResult object
     fitResult->chi2 = fitFunc.GetChisquare();

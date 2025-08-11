@@ -35,6 +35,9 @@ namespace reco {
         std::string outputFitResultLabel_;
         double fitStartTime_;
         double fitEndTime_;
+        double frequency_;
+        bool fixFrequency_;
+        std::string fitOption_;
 
         ClassDefOverride(RFFitter, 1);
     };
