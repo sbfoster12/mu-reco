@@ -16,6 +16,11 @@ public:
     int GetAmcSlotNum() const;
     int GetChannelNum() const;
 
+    void SetX(double ding);
+    void SetY(double ding);
+    double GetX() const;
+    double GetY() const;
+
     void SetDetectorSystem(const std::string& system);
     void SetSubdetector(const std::string& sub);
     void SetCrateNum(int crateNum);
@@ -30,6 +35,7 @@ private:
     int channelNum_;
     std::string detectorSystem_;
     std::string subdetector_;
+    double x_,y_;
 };
 
 #endif // CHANNEL_CONFIG_HH

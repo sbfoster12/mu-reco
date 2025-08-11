@@ -70,6 +70,9 @@ void DetectorGrouper::Process(EventStore& store, const ServiceManager& serviceMa
                 newWaveform->SetDetectorSystem(detectorSystem);
                 newWaveform->SetSubdetector(subdetector);
 
+                newWaveform->x = channelConfigMap.at(key).GetX();
+                newWaveform->y = channelConfigMap.at(key).GetY();
+
                 // std::cout << "Waveform (crate " << thisWaveform->crateNum 
                 //           << ", amc " << thisWaveform->amcNum 
                 //           << ", channel " << thisWaveform->channelTag 
@@ -88,6 +91,9 @@ void DetectorGrouper::Process(EventStore& store, const ServiceManager& serviceMa
                 detectorWaveformsMap["Other"]->Expand(idx + 1);
                 newWaveform->SetDetectorSystem("Other");
                 newWaveform->SetSubdetector("Other");
+
+                newWaveform->x = 0.0;
+                newWaveform->y = 0.0;
             }
         }
     } catch (const std::exception& e) {

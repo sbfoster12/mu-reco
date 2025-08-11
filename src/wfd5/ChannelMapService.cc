@@ -58,7 +58,7 @@ using namespace reco;
             int channelNum = entry["channelNum"];
             std::string detectorSystem = entry["detectorSystem"];
             std::string subdetector = entry["subdetector"];
-
+            
             channelConfigMap_[std::make_tuple(crateNum, amcSlotNum, channelNum)] = ChannelConfig(entry);
         }
         std::cout << "-> reco::ChannelMapService: Successfully loaded channel map with "
