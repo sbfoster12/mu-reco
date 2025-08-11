@@ -109,7 +109,7 @@ void XYPositionFinder::Cluster(dataProducts::ClusteredHits* thisCluster)
     avgX /= weightSum;
     avgY /= weightSum;
 
-    std::cout << std::endl << "Result: (" << avgX << ", " << avgY << ")." << std::endl;
+    if (debug_) std::cout << std::endl << "Result: (" << avgX << ", " << avgY << ")." << std::endl;
 
     thisCluster->x = avgX;
     thisCluster->y = avgY;
@@ -136,7 +136,7 @@ void XYPositionFinder::Process(EventStore& store, const ServiceManager& serviceM
                 if(debug_) std::cout << "Warning: No inputs found for xyClustering" << std::endl;
                 return;
             }
-            std::cout << "Found " << inputCollection->GetEntriesFast() << " objects to cluster" << std::endl;
+            if (debug_) std::cout << "Found " << inputCollection->GetEntriesFast() << " objects to cluster" << std::endl;
             auto inputObject = (dataProducts::WaveformIntegral*) inputCollection->At(0);
             thisCluster = new ((*xyPositions)[i]) dataProducts::ClusteredHits(inputObject);
         }
@@ -149,13 +149,13 @@ void XYPositionFinder::Process(EventStore& store, const ServiceManager& serviceM
                 if(debug_) std::cout << "Warning: No inputs found for xyClustering" << std::endl;
                 return;
             }
-            std::cout << "Found " << inputCollection->GetEntriesFast() << " objects to cluster" << std::endl;
+            if (debug_) std::cout << "Found " << inputCollection->GetEntriesFast() << " objects to cluster" << std::endl;
             auto inputObject = (dataProducts::WaveformFit*) inputCollection->At(0);
             thisCluster = new ((*xyPositions)[i]) dataProducts::ClusteredHits(inputObject);
         }
         xyPositions->Expand(i + 1);
 
-        std::cout << "Beginning clustering process" << std::endl;
+        if (debug_) std::cout << "Beginning clustering process" << std::endl;
 
         xs.clear();
         ys.clear();

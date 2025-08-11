@@ -65,15 +65,58 @@ void EnergyCalibration::Process(EventStore& store, const ServiceManager& service
     try {
          // Get the input waveforms
         TClonesArray *input;
+        double scale = 1.0;
         if(integrals_)
         {
             input = store.get<const dataProducts::WaveformIntegral>(inputRecoLabel_, inputWaveformsLabel_);
             auto output = store.getOrCreate<dataProducts::WaveformIntegral>(this->GetRecoLabel(), outputWaveformsLabel_);
+            for (int i = 0; i < input->GetEntriesFast(); i++)
+            {
+                auto inputObject = (dataProducts::WaveformIntegral*) input->At(0);
+                auto outputObject = new ((*output)[i]) dataProducts::WaveformIntegral(inputObject);
+                if (!calibrationMap_.count(inputObject->GetID()))
+                {
+                    if(debug_) std::cout << "Warning: no calibration constant found for channel ("
+                        << inputObject->crateNum << " / "
+                        << inputObject->amcNum << " / "
+                        << inputObject->channelTag << " ) "
+                        << std::endl;
+                    if (failOnError_) throw; 
+                    scale = 1.0;
+                }
+                else
+                {
+                    scale = calibrationMap_[inputObject->GetID()];
+                    outputObject->CalibrateEnergies(scale);
+                }
+                output->Expand(i + 1);
+            }
         }
         else 
         {
             input = store.get<const dataProducts::WaveformFit>(inputRecoLabel_, inputWaveformsLabel_);
             auto output = store.getOrCreate<dataProducts::WaveformFit>(this->GetRecoLabel(), outputWaveformsLabel_);
+            for (int i = 0; i < input->GetEntriesFast(); i++)
+            {
+                auto inputObject = (dataProducts::WaveformFit*) input->At(0);
+                auto outputObject = new ((*output)[i]) dataProducts::WaveformFit(inputObject);
+                if (!calibrationMap_.count(inputObject->GetID()))
+                {
+                    if(debug_) std::cout << "Warning: no calibration constant found for channel ("
+                        << inputObject->crateNum << " / "
+                        << inputObject->amcNum << " / "
+                        << inputObject->channelTag << " ) "
+                        << std::endl;
+                    if (failOnError_) throw; 
+                    scale = 1.0;
+                }
+                else
+                {
+                    scale = calibrationMap_[inputObject->GetID()];
+                    outputObject->CalibrateEnergies(scale);
+                }
+                output->Expand(i + 1);   
+            }
         }
 
         //Make a collection new waveforms

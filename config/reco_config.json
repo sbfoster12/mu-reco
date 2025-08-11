@@ -82,14 +82,29 @@
     },
     {
       "recoClass": "reco::EnergyCalibration",
-      "recoLabel": "xtalEnergyCalibrator",
-      "inputRecoLabel": "grouped",
-      "inputWaveformsLabel": "waveformsXtal",
-      "outputPeaksLabel": "waveformsXtalCalibrated",
+      "recoLabel": "xtalIntegralEnergyCalibrator",
+      "inputRecoLabel": "xtalIntegrator",
+      "inputWaveformsLabel": "integrals",
+      "outputPeaksLabel": "integralsCalibrated",
+      "integrals":true,
+      "failOnError":false,
       "constant_files":[
         {"iov":[0,30000],"file":"energy_calibration_default.json"}
       ],
-      "debug":true
+      "debug":false
+    },
+    {
+      "recoClass": "reco::EnergyCalibration",
+      "recoLabel": "xtalFitEnergyCalibrator",
+      "inputRecoLabel": "xtalFitter",
+      "inputWaveformsLabel": "fitResults",
+      "outputPeaksLabel": "fitResultsCalibrated",
+      "integrals":false,
+      "failOnError":false,
+      "constant_files":[
+        {"iov":[0,30000],"file":"energy_calibration_default.json"}
+      ],
+      "debug":false
     },
     {
       "recoClass": "reco::CaloClusterFinder",
@@ -106,7 +121,7 @@
       "outputPositionLabel": "XYPositionsFit",
       "integrals":false,
       "useFirstFitInTime":true,
-      "debug":true
+      "debug":false
     },
     {
       "recoClass": "reco::XYPositionFinder",
@@ -115,7 +130,7 @@
       "inputFitResultsLabel": "integrals",
       "outputPositionLabel": "XYPositionsIntegral",
       "integrals":true,
-      "debug":true
+      "debug":false
     },
     {
       "recoClass": "reco::EndOfEventAnalysis",
@@ -131,7 +146,8 @@
     "grouped",
     "xtalIntegrator",
     "xtalFitter",
-    "xtalEnergyCalibrator",
+    "xtalIntegralEnergyCalibrator",
+    "xtalFitEnergyCalibrator",
     "xtalXYPositionFinderFit",
     "xtalXYPositionFinderIntegral",
     "endOfEventAnalysis"
