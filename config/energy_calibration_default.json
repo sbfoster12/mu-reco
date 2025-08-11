@@ -1,0 +1,10 @@
+{
+    "calibration":[
+        {
+            "crateNum":8,
+            "amcSlotNum":2,
+            "channelNum":1,
+            "calib":30.0
+        }
+    ]
+}
