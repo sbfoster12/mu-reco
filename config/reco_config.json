@@ -121,7 +121,7 @@
     "xtalIntegrator",
     "xtalFitter",
     "xtalXYPositionFinderFit",
-    "xtalXYPositionFinderIntegralNO",
+    "xtalXYPositionFinderIntegral",
     "endOfEventAnalysis"
     ],
   "Services": [
