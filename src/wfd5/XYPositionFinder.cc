@@ -13,7 +13,7 @@ void XYPositionFinder::Configure(const nlohmann::json& config, const ServiceMana
     inputFitResultsLabel_ = config.value("inputFitResultsLabel", "DEFAULT");
     outputPositionLabel_ = config.value("outputPositionLabel", "");
     debug_ = config.value("debug", false); 
-    integrals_ = config.value("processIntegrals", false); // same module can take integrals or fit result
+    integrals_ = config.value("integrals", false); // same module can take integrals or fit result
     weighting_ = config.value("weightingMode", 0);
 
     // First fit in the pulse train
@@ -131,6 +131,12 @@ void XYPositionFinder::Process(EventStore& store, const ServiceManager& serviceM
         {
             // process integral results
             inputCollection = store.get<const dataProducts::WaveformIntegral>(inputRecoLabel_, inputFitResultsLabel_);
+            if (inputCollection->GetEntriesFast() < 1) 
+            {
+                if(debug_) std::cout << "Warning: No inputs found for xyClustering" << std::endl;
+                return;
+            }
+            std::cout << "Found " << inputCollection->GetEntriesFast() << " objects to cluster" << std::endl;
             auto inputObject = (dataProducts::WaveformIntegral*) inputCollection->At(0);
             thisCluster = new ((*xyPositions)[i]) dataProducts::ClusteredHits(inputObject);
         }
@@ -138,12 +144,18 @@ void XYPositionFinder::Process(EventStore& store, const ServiceManager& serviceM
         {
             // process fit results
             inputCollection = store.get<const dataProducts::WaveformFit>(inputRecoLabel_, inputFitResultsLabel_);
+            if (inputCollection->GetEntriesFast() < 1) 
+            {
+                if(debug_) std::cout << "Warning: No inputs found for xyClustering" << std::endl;
+                return;
+            }
+            std::cout << "Found " << inputCollection->GetEntriesFast() << " objects to cluster" << std::endl;
             auto inputObject = (dataProducts::WaveformFit*) inputCollection->At(0);
             thisCluster = new ((*xyPositions)[i]) dataProducts::ClusteredHits(inputObject);
         }
         xyPositions->Expand(i + 1);
 
-
+        std::cout << "Beginning clustering process" << std::endl;
 
         xs.clear();
         ys.clear();
