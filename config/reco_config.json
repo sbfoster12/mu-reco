@@ -67,7 +67,7 @@
       "inputRecoLabel": "grouped",
       "inputWaveformsLabel": "waveformsXtal",
       "outputIntegralsLabel": "integrals",
-      "debug":true,
+      "debug":false,
       "file_name":"integrators.json",
       "nPresamples":25,
       "windowLength":100,
@@ -79,6 +79,17 @@
       "inputRecoLabel": "grouped",
       "inputWaveformsLabel": "waveformsXtal",
       "outputPeaksLabel": "Peaks"
+    },
+    {
+      "recoClass": "reco::EnergyCalibration",
+      "recoLabel": "xtalEnergyCalibrator",
+      "inputRecoLabel": "grouped",
+      "inputWaveformsLabel": "waveformsXtal",
+      "outputPeaksLabel": "waveformsXtalCalibrated",
+      "constant_files":[
+        {"iov":[0,30000],"file":"energy_calibration_default.json"}
+      ],
+      "debug":true
     },
     {
       "recoClass": "reco::CaloClusterFinder",
@@ -120,8 +131,9 @@
     "grouped",
     "xtalIntegrator",
     "xtalFitter",
+    "xtalEnergyCalibrator",
     "xtalXYPositionFinderFit",
-    "xtalXYPositionFinderIntegralNO",
+    "xtalXYPositionFinderIntegral",
     "endOfEventAnalysis"
     ],
   "Services": [
@@ -131,7 +143,6 @@
       "config_files":{
         "config_file_0":{"file":"g-2_channel_map.json", "iov":[10000,30000]},
         "config_file_1":{"file":"lyso_2023.json", "iov":[0,3000]}
-        
       }
     },
     {
