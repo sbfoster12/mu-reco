@@ -2,6 +2,7 @@
 #define JSONPARSERUTIL_HH
 
 #include <nlohmann/json.hpp>
+#include <iostream>
 
 using json = nlohmann::json;
 
@@ -35,15 +36,7 @@ namespace reco {
             return ParseFile(file_path_);  // Example usage of JsonParserUtil
         }
 
-        json ParseFile(const std::string& filename) const {
-            std::ifstream file(filename);
-            if (!file.is_open()) {
-                throw std::runtime_error("Could not open JSON file: " + filename);
-            }
-            json j;
-            file >> j;
-            return j;
-        }
+        json ParseFile(const std::string& filename) const;
     };
 
 } // namespace reco

@@ -63,9 +63,12 @@
       "recoLabel": "xtalIntegrator",
       "inputRecoLabel": "grouped",
       "inputWaveformsLabel": "waveformsXtal",
-      "outputIntegralsLabel": "Integrals",
+      "outputIntegralsLabel": "integrals",
       "debug":true,
-      "file_name":"integrators.json"
+      "file_name":"integrators.json",
+      "nPresamples":25,
+      "windowLength":100,
+      "strategy":1
     },
     {
       "recoClass": "reco::PeakIdentifier",
@@ -83,10 +86,22 @@
     },
     {
       "recoClass": "reco::XYPositionFinder",
-      "recoLabel": "xtalXYPositionFinder",
+      "recoLabel": "xtalXYPositionFinderFit",
       "inputRecoLabel": "xtalFitter",
-      "inputfitResultsLabel": "fitResults",
-      "outputPositionLabel": "XYPositions"
+      "inputFitResultsLabel": "fitResults",
+      "outputPositionLabel": "XYPositionsFit",
+      "integrals":false,
+      "useFirstFitInTime":true,
+      "debug":true
+    },
+    {
+      "recoClass": "reco::XYPositionFinder",
+      "recoLabel": "xtalXYPositionFinderIntegral",
+      "inputRecoLabel": "xtalIntegrator",
+      "inputFitResultsLabel": "integrals",
+      "outputPositionLabel": "XYPositionsIntegral",
+      "integrals":true,
+      "debug":true
     },
     {
       "recoClass": "reco::EndOfEventAnalysis",
@@ -102,6 +117,8 @@
     "grouped",
     "xtalIntegrator",
     "xtalFitter",
+    "xtalXYPositionFinderFit",
+    "xtalXYPositionFinderIntegralNO",
     "endOfEventAnalysis"
     ],
   "Services": [

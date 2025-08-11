@@ -34,21 +34,27 @@
             "amcSlotNum": 1,
             "channelNum": 4,
             "detectorSystem": "Xtal",
-            "subdetector": "Xtal0"
+            "subdetector": "Xtal0",
+            "x":1.0,
+            "y":0.35
         },
         {
             "crateNum": 8,
             "amcSlotNum": 2,
             "channelNum": 0,
             "detectorSystem": "Xtal",
-            "subdetector": "Xtal2"
+            "subdetector": "Xtal2",
+            "x":3.0,
+            "y":0.35
         },
         {
             "crateNum": 8,
             "amcSlotNum": 2,
             "channelNum": 1,
             "detectorSystem": "Xtal",
-            "subdetector": "Xtal3"
+            "subdetector": "Xtal3",
+            "x":6.0,
+            "y":0.35
         },
         {
             "crateNum": 8,

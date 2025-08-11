@@ -3,6 +3,9 @@
 #define XYPOSITIONFINDER_HH
 
 #include <data_products/wfd5/WFD5Waveform.hh>
+#include <data_products/wfd5/ClusteredHits.hh>
+#include <data_products/wfd5/WaveformIntegral.hh>
+#include <data_products/wfd5/WFD5WaveformFit.hh>
 
 #include "reco/common/RecoStage.hh"
 #include "reco/common/EventStore.hh"
@@ -25,6 +28,20 @@ namespace reco {
         std::string inputRecoLabel_;
         std::string inputFitResultsLabel_;
         std::string outputPositionLabel_;
+        bool integrals_;
+        bool debug_;
+        int weighting_;
+        int fitIndex_;
+
+        std::vector<double> xs,ys,weights,energies;
+        double weightSum;
+
+        bool useFirstFitInFitSequence_,useHighestEnergyFit_;
+        bool useFirstFitinTime_;
+
+        void ProcessIntegralsToXY(TClonesArray* input, dataProducts::ClusteredHits* thisCluster);
+        void ProcessFitsToXY(TClonesArray* input, dataProducts::ClusteredHits* thisCluster);
+        void Cluster(dataProducts::ClusteredHits* thisCluster);
 
         ClassDefOverride(XYPositionFinder, 1);
     };
