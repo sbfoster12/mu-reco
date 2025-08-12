@@ -220,10 +220,11 @@
   "Output": {
     "_drop": [],
     "drop": [
-      "#unpacker*",
-      "#jitter*",
-      "#timeAligned*",
-      "#pedestal*"
+      "unpacker*",
+      "pruned*",
+      "jitter*",
+      "timeAligned*",
+      "pedestal*"
     ],
     "compressionLevel": 1,
     "compressionAlgorithm": 4
