@@ -51,7 +51,8 @@ namespace reco {
 
         std::unique_ptr<TFile> file_;
         TTree* tree_;
-        
+        int compressionLevel_;
+        int compressionAlgorithm_;
     };
 } //namespace reco
 

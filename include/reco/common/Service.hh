@@ -19,6 +19,7 @@ namespace reco {
     public:
         virtual ~Service() = default;
         virtual void Configure(const nlohmann::json& config, reco::EventStore& eventStore) = 0;
+        virtual void EndOfJobPrint() const {};
 
         void SetLabel(const std::string& label) { label_ = label; }
         const std::string& GetLabel() const { return label_; }

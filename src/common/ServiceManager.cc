@@ -39,3 +39,13 @@ void ServiceManager::Configure(std::shared_ptr<const ConfigHolder> configHolder,
         Add(label, std::shared_ptr<Service>(service));
     }
 }
+
+void ServiceManager::EndOfJobPrint() const {
+    for (const auto& [_, service] : services_) {
+        if (service) {
+            service->EndOfJobPrint();
+        } else {
+            std::cerr << "ServiceManager: Warning - Service pointer is null for label: " << service->GetLabel() << std::endl;
+        }
+    }
+}

@@ -151,7 +151,12 @@
     "xtalXYPositionFinderFit",
     "xtalXYPositionFinderIntegral",
     "endOfEventAnalysis"
-    ],
+  ],
+  "RecoManager": {
+    "timeProfilerLabel": "timeProfiler"
+  },
+  "ServiceManager": {
+  },
   "Services": [
     {
       "type": "reco::ChannelMapService",
@@ -190,12 +195,21 @@
       "timeBounds": 4,
       "chi2Threshold": 1,
       "keepSplines": true
+    },
+    {
+      "type": "reco::TimeProfilerService",
+      "label": "timeProfiler"
     }
   ],
   "Output": {
-    "drop": [],
-    "_drop": [
-      "unpacker*"
-    ]
+    "_drop": [],
+    "drop": [
+      "unpacker*",
+      "jitter*",
+      "timeAligned*",
+      "pedestal*"
+    ],
+    "compressionLevel": 1,
+    "compressionAlgorithm": 4
   }
 }

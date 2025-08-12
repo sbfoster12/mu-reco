@@ -45,6 +45,8 @@ namespace reco {
             return services_;
         }
 
+        void EndOfJobPrint() const;
+
     private:
         std::map<std::string, std::shared_ptr<Service>> services_;
     };

@@ -4,7 +4,9 @@ using namespace reco;
 
 OutputManager::OutputManager(const std::string& filename)
     : file_(std::make_unique<TFile>(filename.c_str(), "RECREATE")),
-      tree_(new TTree("tree", "tree")) {}
+      tree_(new TTree("tree", "tree")),
+      compressionLevel_(0),
+      compressionAlgorithm_(4) {}
 
 reco::OutputManager::~OutputManager() {
     file_->cd();
@@ -28,9 +30,35 @@ void OutputManager::Configure(std::shared_ptr<const ConfigHolder> configHolder) 
             }
             dropList_.push_back(colName.get<std::string>());
         }
+        std::cout << "-> OutputManager: Collections to drop: ";
+        for (const auto& colName : dropList_) {
+            std::cout << colName << " ";
+        }
+        std::cout << std::endl;
     } else {
         throw std::runtime_error("OutputManager: 'drop' must be an array in 'Output' config");
     }
+
+    if (config["Output"].contains("compressionLevel") && config["Output"]["compressionLevel"].is_number_integer()) {
+        compressionLevel_ = config["Output"]["compressionLevel"].get<int>();
+    } else {
+        compressionLevel_ = 4; // Default compression level
+    }
+
+    if (config["Output"].contains("compressionAlgorithm") && config["Output"]["compressionAlgorithm"].is_number_integer()) {
+        compressionAlgorithm_ = config["Output"]["compressionAlgorithm"].get<int>();
+    } else {
+        compressionAlgorithm_ = 4; // Default compression algorithm
+    }
+
+    // // Set the compression level for the TFile
+    file_->SetCompressionLevel(compressionLevel_);
+    file_->SetCompressionAlgorithm(compressionAlgorithm_);
+    // compression level 1->0: 9.8s->7.3s, but 113 MB -> 294 MB
+    // compression algorithm 1->4 (LZ4): 9.8s->7.8s, but 113 MB -> 163 MB
+
+    // outfile->SetCompressionLevel(0); // much faster, but the file size doubles (62->137 MB), 2.936s
+    // outfile->SetCompressionAlgorithm(4); // LZ4. 40-50% faster, but slightly larger file sizes. 3.292s, 91MB
 
     //Write the configuration to the file
     dataProducts::RecoConfig recoConfig(config.dump(),configHolder->GetRun(),configHolder->GetSubrun());
