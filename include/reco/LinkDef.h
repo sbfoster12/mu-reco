@@ -7,6 +7,7 @@
 // Common reco/service classes
 #pragma link C++ class reco::RecoStage+;
 #pragma link C++ class reco::Service+;
+#pragma link C++ class reco::TimeProfilerService+;
 
 // WFD5 RecoStages
 #pragma link C++ class reco::JitterCorrector+;

@@ -1,7 +1,7 @@
 {
   
   "Unpacker" : {
-    "max_midas_events": 10,
+    "max_midas_events": 100,
     "verbosity": 0
   },
   "RecoStages": [
@@ -67,7 +67,7 @@
       "inputRecoLabel": "grouped",
       "inputWaveformsLabel": "waveformsXtal",
       "outputIntegralsLabel": "integrals",
-      "debug":true,
+      "debug":false,
       "file_name":"integrators.json",
       "nPresamples":25,
       "windowLength":100,
@@ -95,7 +95,7 @@
       "outputPositionLabel": "XYPositionsFit",
       "integrals":false,
       "useFirstFitInTime":true,
-      "debug":true
+      "debug":false
     },
     {
       "recoClass": "reco::XYPositionFinder",
@@ -104,7 +104,7 @@
       "inputFitResultsLabel": "integrals",
       "outputPositionLabel": "XYPositionsIntegral",
       "integrals":true,
-      "debug":true
+      "debug":false
     },
     {
       "recoClass": "reco::EndOfEventAnalysis",
@@ -123,7 +123,12 @@
     "xtalXYPositionFinderFit",
     "xtalXYPositionFinderIntegral",
     "endOfEventAnalysis"
-    ],
+  ],
+  "RecoManager": {
+    "timeProfilerLabel": "timeProfiler"
+  },
+  "ServiceManager": {
+  },
   "Services": [
     {
       "type": "reco::ChannelMapService",
@@ -163,12 +168,21 @@
       "timeBounds": 4,
       "chi2Threshold": 1,
       "keepSplines": true
+    },
+    {
+      "type": "reco::TimeProfilerService",
+      "label": "timeProfiler"
     }
   ],
   "Output": {
-    "drop": [],
-    "_drop": [
-      "unpacker*"
-    ]
+    "_drop": [],
+    "drop": [
+      "unpacker*",
+      "jitter*",
+      "timeAligned*",
+      "pedestal*"
+    ],
+    "compressionLevel": 1,
+    "compressionAlgorithm": 4
   }
 }

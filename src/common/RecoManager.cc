@@ -50,7 +50,7 @@ void RecoManager::Configure(std::shared_ptr<const ConfigHolder> configHolder, co
             stage->Configure(stageConfig, serviceManager, eventStore);
             stages_.emplace_back(stage);
 
-            std::cout << "-> reco:: RecoManager: Added RecoStage of type '" << type << "' with label '" << recoLabel << "'\n";
+            std::cout << "-> reco::RecoManager: Added RecoStage of type '" << type << "' with label '" << recoLabel << "'\n";
 
         } else {
             std::cerr << "Stage not found for label: " << label << "\n";
@@ -60,6 +60,7 @@ void RecoManager::Configure(std::shared_ptr<const ConfigHolder> configHolder, co
 
 void RecoManager::Run(EventStore& eventStore, const ServiceManager& serviceManager) {
     for (const auto& stage : stages_) {
-        stage->Process(eventStore, serviceManager);
+        stage->RunStage(eventStore, serviceManager);
     }
 }
+
