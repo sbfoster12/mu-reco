@@ -24,7 +24,7 @@ void EnergyCalibration::Configure(const nlohmann::json& config, const ServiceMan
     int runNum = 0;
     bool found_calib = false;
     json thisConfig;
-    for (auto &configi: config["constant_files"] )
+    for (auto &configi: config["constant_files"])
     {
         auto iov = configi["iov"];
         if (runNum >= iov[0] && runNum <= iov[1])
