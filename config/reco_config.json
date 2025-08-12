@@ -1,7 +1,7 @@
 {
   
   "Unpacker" : {
-    "max_midas_events": -1,
+    "max_midas_events": 10,
     "verbosity": 0
   },
   "RecoStages": [
@@ -17,9 +17,24 @@
       "debug":false
     },
     {
+      "recoClass": "reco::EmptyChannelPruner",
+      "recoLabel": "pruned",
+      "inputRecoLabel": "unpacker",
+      "inputWaveformsLabel": "WFD5WaveformCollection",
+      "outputWaveformsLabel": "waveforms",
+      "minAmplitude":25.0,
+      "file_name":"minimum_amplitudes.json",
+      "keepChannels":[
+        [8,1,2],
+        [8,1,4]
+      ],
+      "failOnError":false,
+      "debug":false
+    },
+    {
       "recoClass": "reco::DigitizerTimeAligner",
       "recoLabel": "timeAligned",
-      "inputRecoLabel": "jitter",
+      "inputRecoLabel": "pruned",
       "inputWaveformsLabel": "waveforms",
       "outputWaveformsLabel": "waveforms"
     },
@@ -141,6 +156,7 @@
   ],
   "RecoPath":[
     "jitter",
+    "pruned",
     "timeAligned",
     "pedestal",
     "grouped",
@@ -204,10 +220,10 @@
   "Output": {
     "_drop": [],
     "drop": [
-      "unpacker*",
-      "jitter*",
-      "timeAligned*",
-      "pedestal*"
+      "#unpacker*",
+      "#jitter*",
+      "#timeAligned*",
+      "#pedestal*"
     ],
     "compressionLevel": 1,
     "compressionAlgorithm": 4
