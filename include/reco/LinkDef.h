@@ -11,6 +11,7 @@
 
 // WFD5 RecoStages
 #pragma link C++ class reco::EnergyCalibration+;
+#pragma link C++ class reco::WaveformInitializer+;
 #pragma link C++ class reco::JitterCorrector+;
 #pragma link C++ class reco::DigitizerTimeAligner+;
 #pragma link C++ class reco::PedestalCalculator+;

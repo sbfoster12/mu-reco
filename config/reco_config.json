@@ -6,10 +6,19 @@
   },
   "RecoStages": [
     {
-      "recoClass": "reco::JitterCorrector",
-      "recoLabel": "jitter",
+      "recoClass": "reco::WaveformInitializer",
+      "recoLabel": "initializer",
       "inputRecoLabel": "unpacker",
       "inputWaveformsLabel": "WFD5WaveformCollection",
+      "outputWaveformsLabel": "waveforms",
+      "failOnError":false,
+      "debug":false
+    },
+    {
+      "recoClass": "reco::JitterCorrector",
+      "recoLabel": "jitter",
+      "inputRecoLabel": "initializer",
+      "inputWaveformsLabel": "waveforms",
       "outputWaveformsLabel": "waveforms",
       "templateServiceLabel": "templates",
       "file_name":"pedestals.json",
@@ -139,7 +148,9 @@
       "lysoWaveformsLabel": "waveformsXtal"
     }
   ],
+  "_RecoPath":[],
   "RecoPath":[
+    "initializer",
     "jitter",
     "timeAligned",
     "pedestal",
@@ -205,6 +216,7 @@
     "_drop": [],
     "drop": [
       "unpacker*",
+      "initializer*",
       "jitter*",
       "timeAligned*",
       "pedestal*"

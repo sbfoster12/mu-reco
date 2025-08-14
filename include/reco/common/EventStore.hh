@@ -147,6 +147,14 @@ namespace reco {
             return splines_;
         }
 
+        // Run / Subrun information
+        void SetRunSubrun(int run, int subrun) {
+            run_ = run;
+            subrun_ = subrun;
+        }
+        int GetRun() const { return run_; }
+        int GetSubrun() const { return subrun_; }
+
         void clear() {
             for (auto& [key, buffer] : buffers_) {
                 buffer->Clear("C");
@@ -159,6 +167,9 @@ namespace reco {
         std::shared_ptr<dataProducts::DataProduct> odb_;  // ODB data product, if any
         std::map<std::string, std::shared_ptr<TH1>> histograms_; //histograms
         std::map<std::string, std::shared_ptr<dataProducts::SplineHolder>> splines_; //splines
+
+        int run_; // run number
+        int subrun_; // subrun number
     };
 } //namespace reco
 
