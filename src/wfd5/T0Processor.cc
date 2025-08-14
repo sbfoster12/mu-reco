@@ -11,6 +11,7 @@ void T0Processor::Configure(const nlohmann::json& config, const ServiceManager& 
 
     failOnError_ = config.value("failOnError", false);
     debug_ = config.value("debug",false);
+    defaultTime_ = config.value("defaultTime",0.0);
 
     triggerSearchWindow_ = {
         config.value("triggerWindowLow", 0),
@@ -18,10 +19,48 @@ void T0Processor::Configure(const nlohmann::json& config, const ServiceManager& 
     };
     failIfT0OutsideWindow_ = config.value("failIfT0OutsideWindow", false);
     failIfT0NotFound_ = config.value("failIfT0NotFound", false);
-    std::vector<int> id = config["t0Channel"];
-    t0Channel_ = dataProducts::ChannelID(id[0], id[1], id[2]);    
+    if (config.contains("t0Channel"))
+    {
+        std::vector<int> id = config["t0Channel"];
+        t0Channel_ = dataProducts::ChannelID(id[0], id[1], id[2]);
+    }
 
-    defaultTime_ = config.value("defaultTime",0.0);
+    channelMapServiceLabel_ = config.value("channelMapServiceLabel", "channelMap");
+    auto channelMapService = serviceManager.Get<reco::ChannelMapService>(channelMapServiceLabel_);
+    if (!channelMapService) {
+        throw std::runtime_error("ChannelMapService not found: " + channelMapServiceLabel_);
+    }
+
+    if (debug_) std::cout << "Getting the T0 channel:" << std::endl;
+    int nt0 = 0;
+    for (auto& map_entry:channelMapService->GetChannelMap())
+    {
+        if (map_entry.second.GetSubdetector().find("T0") != std::string::npos)
+        {
+            nt0 += 1;
+            t0Channel_ = map_entry.first;
+            if (debug_) std::cout << "   -> found t0 channel in config with labels " 
+                << map_entry.second.GetDetectorSystem() << " / " << map_entry.second.GetSubdetector() 
+                << " -> ("
+                << std::get<0>(map_entry.first) << " / "
+                << std::get<1>(map_entry.first) << " / "
+                << std::get<2>(map_entry.first) << ")"
+                << std::endl;
+        }
+    }
+
+    if (nt0 > 1)
+    {
+        throw std::runtime_error("Error, during search of the channel map found "+std::to_string(nt0)+" 't0' detectors in config");
+    }
+    else if (nt0 == 0)
+    {
+        std::cout << "Warning: could not find t0 in channel map, defaulting to t0Channel from config -> (" 
+                << std::get<0>(t0Channel_) << " / "
+                << std::get<1>(t0Channel_) << " / "
+                << std::get<2>(t0Channel_) << ")"
+                << std::endl;
+    }
 
     // Create some histograms
     // auto hist = std::make_shared<TH1D>("energy", "Energy Spectrum", 100, 0, 1000);

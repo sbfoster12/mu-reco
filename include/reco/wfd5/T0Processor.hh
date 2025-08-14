@@ -9,6 +9,7 @@
 #include "reco/common/EventStore.hh"
 #include "reco/common/ServiceManager.hh"
 #include "reco/wfd5/TemplateLoaderService.hh"
+#include "reco/wfd5/ChannelMapService.hh"
 #include "reco/common/JsonParserUtil.hh"
 
 namespace reco {
@@ -31,6 +32,7 @@ namespace reco {
         bool failIfT0OutsideWindow_;
         bool failIfT0NotFound_;
         dataProducts::ChannelID t0Channel_;
+        std::string channelMapServiceLabel_;
         double defaultTime_;
 
         bool debug_;

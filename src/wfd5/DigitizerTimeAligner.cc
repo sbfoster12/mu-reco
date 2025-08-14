@@ -14,7 +14,6 @@ void DigitizerTimeAligner::Configure(const nlohmann::json& config, const Service
     requireT0Seed_ = config.value("requireT0Seed", false);
     debug_ = config.value("debug", false);
 
-    // TODO: add reading in of custom cable length offsets
     channelMapServiceLabel_ = config.value("channelMapServiceLabel", "channelMap");
     auto channelMapService = serviceManager.Get<reco::ChannelMapService>(channelMapServiceLabel_);
     if (!channelMapService) {
@@ -84,7 +83,7 @@ void DigitizerTimeAligner::ApplyTimeAligner(dataProducts::WFD5Waveform* wf, data
     if (foundSeed_)
     {
         if (debug_) std::cout << "   -> Found time seed:" << seed << " with time " << seed->GetTimeSeed() << std::endl;
-        if (debug_) std::cout << "   -> known offset for this channel:" << known_offset << std::endl;
+        if (debug_) std::cout << "   -> known offset for this channel: " << known_offset << std::endl;
         // get clock counter difference between this waveform and the t0 reference waveform
         // auto seed_cc = seed_wf->clockCounter;
         wf->digitizationShift = int(seed_wf->clockCounter) - int(wf->clockCounter);
