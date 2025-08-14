@@ -24,7 +24,7 @@ namespace reco {
         }
 
         //Get channel mapping file from specified run and subrun
-        const nlohmann::json& GetFileFromRunSubrun(int run, int subrun, const nlohmann::json& configFiles);
+        std::string GetFileFromRunSubrun(int run, int subrun, const nlohmann::json& configFiles);
 
     private:
         std::map<std::tuple<int,int,int>, ChannelConfig> channelConfigMap_;  // key: (crate, wfd5, channel), value: ChannelConfig
