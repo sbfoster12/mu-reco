@@ -39,16 +39,23 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 # Add all the subdirectories
 add_subdirectory(src)
 
-# Create the wfd5 executable
-add_executable(reco_wfd5 src/main_wfd5.cc)
+option(BUILD_EXECUTABLE "Build an executable" OFF)
+if (BUILD_EXECUTABLE)
+  # Create the wfd5 executable
+  add_executable(reco_wfd5 src/main_wfd5.cc)
 
-# Link libraries
-target_link_libraries(reco_wfd5
-    PUBLIC 
-        DataProducts::data_products
-        Unpackers::unpackers
-        reco
-)
+  # Link libraries
+  target_link_libraries(reco_wfd5
+      PUBLIC 
+          DataProducts::data_products
+          Unpackers::unpackers
+          reco
+  )
+  # Install the executables
+  install(TARGETS reco_wfd5
+          DESTINATION bin
+  )
+endif()
 
 # Install the libraries
 install(TARGETS 
@@ -56,10 +63,6 @@ install(TARGETS
         LIBRARY DESTINATION lib
 )
 
-# Install the executables
-install(TARGETS reco_wfd5
-        DESTINATION bin
-)
 
 # Enable debugging symbols
 # target_compile_options(unpack_wfd5 PRIVATE -g -v)
