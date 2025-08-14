@@ -36,7 +36,8 @@
             "detectorSystem": "Xtal",
             "subdetector": "Xtal0",
             "x":1.0,
-            "y":0.35
+            "y":0.35,
+            "timeOffset":540.2
         },
         {
             "crateNum": 8,

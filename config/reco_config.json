@@ -32,11 +32,28 @@
       "debug":false
     },
     {
+      "recoClass": "reco::T0Processor",
+      "recoLabel": "t0PeakLocator",
+      "inputRecoLabel": "pruned",
+      "inputWaveformsLabel": "waveforms",
+      "outputWaveformsLabel": "t0",
+      "failOnError":false,
+      "defaultTime":0,
+      "debug":false,
+      "t0Channel":[8,2,0],
+      "triggerWindowLow":50,
+      "triggerWindowHigh":150
+    },
+    {
       "recoClass": "reco::DigitizerTimeAligner",
       "recoLabel": "timeAligned",
       "inputRecoLabel": "pruned",
       "inputWaveformsLabel": "waveforms",
-      "outputWaveformsLabel": "waveforms"
+      "outputWaveformsLabel": "waveforms",
+      "inputT0Reco":"t0PeakLocator",
+      "inputT0Label": "t0",
+      "requireT0Seed":false,
+      "debug":true
     },
     {
       "recoClass": "reco::PedestalCalculator",
@@ -130,11 +147,11 @@
     },
     {
       "recoClass": "reco::TimeSeeder",
-      "recoLabel": "t0TimeSeeder",
+      "recoLabel": "exampleTimeSeeder",
       "outputSeedLabel": "seed",
       "inputRecoLabel": "xtalFitter",
       "inputFitResultsLabel": "fitResults",
-      "debug":true,
+      "debug":false,
       "seedFromConfig":true,
       "defaultSeed": 100.0
     },
@@ -148,7 +165,7 @@
       "debug": false,
       "seeded": true,
       "seededExtraLeeway":true,
-      "intputSeededTime":"t0TimeSeeder",
+      "intputSeededTime":"exampleTimeSeeder",
       "intputSeededTimeLabel":"seed"
     },
     {
@@ -180,6 +197,7 @@
   "RecoPath":[
     "jitter",
     "pruned",
+    "t0PeakLocator",
     "timeAligned",
     "pedestal",
     "grouped",
@@ -189,7 +207,7 @@
     "xtalFitEnergyCalibrator",
     "xtalXYPositionFinderFit",
     "xtalXYPositionFinderIntegral",
-    "t0TimeSeeder",
+    "exampleTimeSeeder",
     "xtalFitterSeeded",
     "endOfEventAnalysis"
   ],
@@ -223,7 +241,7 @@
       "restricted_chi2_max": 150,
       "timeoutLimit":2000000,
       "ampGuessScale":2.0,
-      "minimumAmplitude": 10,
+      "minimumAmplitude": 25,
       "maximumAmplitude": 8000,
       "skipClipping":true,
       "pulseFitterMinVal":-2000,
@@ -240,11 +258,11 @@
   "Output": {
     "_drop": [],
     "drop": [
-      "unpacker*",
-      "pruned*",
-      "jitter*",
-      "timeAligned*",
-      "pedestal*"
+      "#unpacker*",
+      "#pruned*",
+      "#jitter*",
+      "#timeAligned*",
+      "#pedestal*"
     ],
     "compressionLevel": 1,
     "compressionAlgorithm": 4

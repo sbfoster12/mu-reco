@@ -39,7 +39,7 @@ void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) {
             if (!seed) {
                 throw std::runtime_error("Failed to retrieve seeded time");
             }
-            std::cout << "Performing a seeded fit around time: " << seed->GetTimeSeed() << std::endl;
+            if (fit_debug) std::cout << "Performing a seeded fit around time: " << seed->GetTimeSeed() << std::endl;
         }
 
         //Make a collection new waveforms
