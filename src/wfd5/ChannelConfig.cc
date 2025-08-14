@@ -8,6 +8,7 @@ ChannelConfig::ChannelConfig(const nlohmann::json& json) {
     subdetector_ = json.value("subdetector", "");
     x_ = json.value("x", 0.0);
     y_ = json.value("y", 0.0);
+    knownTimeOffsetClockTicks_ = json.value("timeOffset", 0.0);
 }
 
 const std::string& ChannelConfig::GetDetectorSystem() const {
@@ -36,6 +37,9 @@ double ChannelConfig::GetX() const {
 double ChannelConfig::GetY() const {
     return y_;
 }
+double ChannelConfig::GetTimeOffset() const {
+    return knownTimeOffsetClockTicks_;
+}
 
 void ChannelConfig::SetDetectorSystem(const std::string& system) {
     detectorSystem_ = system;
@@ -63,6 +67,9 @@ void ChannelConfig::SetX(double ding) {
 void ChannelConfig::SetY(double ding) {
     y_ = ding;
 }
+void ChannelConfig::SetTimeOffset(double ding) {
+    knownTimeOffsetClockTicks_ = ding;
+}
 
 void ChannelConfig::Print() const {
     std::cout << "Crate: " << crateNum_
@@ -70,6 +77,7 @@ void ChannelConfig::Print() const {
                 << ", Channel: " << channelNum_
                 << ", Detector System: " << detectorSystem_
                 << ", Subdetector: " << subdetector_
+                << ", time offset: " << knownTimeOffsetClockTicks_ 
                 << ", x/y: " << x_  << "/" << y_
                 << std::endl;
 }

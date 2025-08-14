@@ -10,6 +10,8 @@
 #pragma link C++ class reco::TimeProfilerService+;
 
 // WFD5 RecoStages
+#pragma link C++ class reco::T0Processor+;
+#pragma link C++ class reco::TimeSeeder+;
 #pragma link C++ class reco::EmptyChannelPruner+;
 #pragma link C++ class reco::EnergyCalibration+;
 #pragma link C++ class reco::JitterCorrector+;

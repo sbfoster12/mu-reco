@@ -32,20 +32,36 @@
       "debug":false
     },
     {
-      "recoClass": "reco::DigitizerTimeAligner",
-      "recoLabel": "timeAligned",
-      "inputRecoLabel": "pruned",
-      "inputWaveformsLabel": "waveforms",
-      "outputWaveformsLabel": "waveforms"
-    },
-    {
       "recoClass": "reco::PedestalCalculator",
       "recoLabel": "pedestal",
-      "inputRecoLabel": "timeAligned",
+      "inputRecoLabel": "pruned",
       "inputWaveformsLabel": "waveforms",
       "outputWaveformsLabel": "waveforms",
       "pedestalMethod" : "FirstN",
       "numSamples": 10
+    },
+    {
+      "recoClass": "reco::T0Processor",
+      "recoLabel": "t0PeakLocator",
+      "inputRecoLabel": "pedestal",
+      "inputWaveformsLabel": "waveforms",
+      "outputWaveformsLabel": "t0",
+      "failOnError":false,
+      "defaultTime":0,
+      "debug":false,
+      "triggerWindowLow":50,
+      "triggerWindowHigh":150
+    },
+    {
+      "recoClass": "reco::DigitizerTimeAligner",
+      "recoLabel": "timeAligned",
+      "inputRecoLabel": "pedestal",
+      "inputWaveformsLabel": "waveforms",
+      "outputWaveformsLabel": "waveforms",
+      "inputT0Reco":"t0PeakLocator",
+      "inputT0Label": "t0",
+      "requireT0Seed":false,
+      "debug":false
     },
     {
       "recoClass": "reco::DetectorGrouper",
@@ -129,6 +145,29 @@
       "outputCaloClusterLabel": "CaloClusters"
     },
     {
+      "recoClass": "reco::TimeSeeder",
+      "recoLabel": "exampleTimeSeeder",
+      "outputSeedLabel": "seed",
+      "inputRecoLabel": "xtalFitter",
+      "inputFitResultsLabel": "fitResults",
+      "debug":false,
+      "seedFromConfig":true,
+      "defaultSeed": 100.0
+    },
+    {
+      "recoClass": "reco::Fitter",
+      "recoLabel": "xtalFitterSeeded",
+      "inputRecoLabel": "grouped",
+      "inputWaveformsLabel": "waveformsXtal",
+      "outputFitResultLabel": "fitResults",
+      "templateFitterLabel": "templateFitter",
+      "debug": false,
+      "seeded": true,
+      "seededExtraLeeway":true,
+      "intputSeededTime":"exampleTimeSeeder",
+      "intputSeededTimeLabel":"seed"
+    },
+    {
       "recoClass": "reco::XYPositionFinder",
       "recoLabel": "xtalXYPositionFinderFit",
       "inputRecoLabel": "xtalFitter",
@@ -157,8 +196,9 @@
   "RecoPath":[
     "jitter",
     "pruned",
-    "timeAligned",
     "pedestal",
+    "t0PeakLocator",
+    "timeAligned",
     "grouped",
     "xtalIntegrator",
     "xtalFitter",
@@ -166,6 +206,8 @@
     "xtalFitEnergyCalibrator",
     "xtalXYPositionFinderFit",
     "xtalXYPositionFinderIntegral",
+    "exampleTimeSeeder",
+    "xtalFitterSeeded",
     "endOfEventAnalysis"
   ],
   "RecoManager": {
@@ -198,16 +240,11 @@
       "restricted_chi2_max": 150,
       "timeoutLimit":2000000,
       "ampGuessScale":2.0,
-      "makeAlignedTree": false,
-      "minimumAmplitude": 10,
+      "minimumAmplitude": 25,
       "maximumAmplitude": 8000,
-      "traceMinVal":-8000,
-      "traceMaxVal":8000,
-      "skipClipping":false,
+      "skipClipping":true,
       "pulseFitterMinVal":-2000,
       "pulseFitterMaxVal":2000,
-      "fit_laser_1":true,
-      "fit_laser_2":true,
       "timeBounds": 4,
       "chi2Threshold": 1,
       "keepSplines": true
@@ -220,11 +257,11 @@
   "Output": {
     "_drop": [],
     "drop": [
-      "unpacker*",
-      "pruned*",
-      "jitter*",
-      "timeAligned*",
-      "pedestal*"
+      "#unpacker*",
+      "#pruned*",
+      "#jitter*",
+      "#timeAligned*",
+      "#pedestal*"
     ],
     "compressionLevel": 1,
     "compressionAlgorithm": 4
