@@ -32,37 +32,36 @@
       "debug":false
     },
     {
+      "recoClass": "reco::PedestalCalculator",
+      "recoLabel": "pedestal",
+      "inputRecoLabel": "pruned",
+      "inputWaveformsLabel": "waveforms",
+      "outputWaveformsLabel": "waveforms",
+      "pedestalMethod" : "FirstN",
+      "numSamples": 10
+    },
+    {
       "recoClass": "reco::T0Processor",
       "recoLabel": "t0PeakLocator",
-      "inputRecoLabel": "pruned",
+      "inputRecoLabel": "pedestal",
       "inputWaveformsLabel": "waveforms",
       "outputWaveformsLabel": "t0",
       "failOnError":false,
       "defaultTime":0,
       "debug":false,
-      "t0Channel":[8,2,0],
       "triggerWindowLow":50,
       "triggerWindowHigh":150
     },
     {
       "recoClass": "reco::DigitizerTimeAligner",
       "recoLabel": "timeAligned",
-      "inputRecoLabel": "pruned",
+      "inputRecoLabel": "pedestal",
       "inputWaveformsLabel": "waveforms",
       "outputWaveformsLabel": "waveforms",
       "inputT0Reco":"t0PeakLocator",
       "inputT0Label": "t0",
       "requireT0Seed":false,
-      "debug":true
-    },
-    {
-      "recoClass": "reco::PedestalCalculator",
-      "recoLabel": "pedestal",
-      "inputRecoLabel": "timeAligned",
-      "inputWaveformsLabel": "waveforms",
-      "outputWaveformsLabel": "waveforms",
-      "pedestalMethod" : "FirstN",
-      "numSamples": 10
+      "debug":false
     },
     {
       "recoClass": "reco::DetectorGrouper",
@@ -197,9 +196,9 @@
   "RecoPath":[
     "jitter",
     "pruned",
+    "pedestal",
     "t0PeakLocator",
     "timeAligned",
-    "pedestal",
     "grouped",
     "xtalIntegrator",
     "xtalFitter",

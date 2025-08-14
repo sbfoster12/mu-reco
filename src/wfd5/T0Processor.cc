@@ -78,6 +78,7 @@ void T0Processor::Process(EventStore& store, const ServiceManager& serviceManage
         auto output = store.getOrCreate<dataProducts::TimeSeed>(this->GetRecoLabel(), outputT0TimeRefLabel_);
         dataProducts::TimeSeed* seed = new ((*output)[0]) dataProducts::TimeSeed();
         output->Expand(1);
+
         
         bool t0Found = false;
         for (int i = 0; i < waveforms->GetEntriesFast(); ++i) {
@@ -91,7 +92,16 @@ void T0Processor::Process(EventStore& store, const ServiceManager& serviceManage
                 peakIndex = waveform->GetPeakIndexInBounds(triggerSearchWindow_.first, triggerSearchWindow_.second);
                 if (debug_) std::cout << "Located T0 peak for seed at index " << peakIndex << " -> time = " << waveform->GetTime(peakIndex) << std::endl;
                 if (debug_) waveform->Show();
-
+                
+                dataProducts::WaveformPeaks peaks = waveform->FindPeaks();
+                if (debug_)
+                {
+                    std::cout << "Found " << peaks.npeaks << " peak(s) at time(s)/amplitude(s)" << std::endl;
+                    for (int j = 0; j < peaks.npeaks; j++)
+                    {
+                        std::cout << "    -> " << peaks.peak_times[j] << " / " << peaks.peak_amplitudes[j] << std::endl;
+                    } 
+                }
                 seed->SetSeed(
                     waveform->GetTime(peakIndex)
                 );
