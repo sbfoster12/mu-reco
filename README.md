@@ -51,8 +51,10 @@ Other important elements of the reconstruction framework include the following:
 ## JSON Configuration File
 The nearline is configured via a JSON file. It configures the unpacker, which reco stages to run, which services to use, and what data products to write to the file. The default configuration file is `mu-reco/config/reco_config.json`. You can modify this file to change the configuration of the nearline. An example configuration file is shown below:
 ```json
-"Unpacker" : {
-    "max_midas_events": -1,
+{
+  
+  "Unpacker" : {
+    "max_midas_events": 10,
     "verbosity": 0
   },
   "RecoStages": [
@@ -72,14 +74,42 @@ The nearline is configured via a JSON file. It configures the unpacker, which re
       "inputWaveformsLabel": "waveforms",
       "outputWaveformsLabel": "waveforms",
       "templateServiceLabel": "templates",
-      "file_name":"pedestals.json",
+      "pedestal_files":"pedestal_files.json",
       "failOnError":false,
       "debug":false
+    },
+    {
+      "recoClass": "reco::EmptyChannelPruner",
+      "recoLabel": "pruned",
+      "inputRecoLabel": "jitter",
+      "inputWaveformsLabel": "waveforms",
+      "outputWaveformsLabel": "waveforms",
+      "minAmplitude":25.0,
+      "file_name":"minimum_amplitudes.json",
+      "keepChannels":[
+        [8,1,2],
+        [8,1,4]
+      ],
+      "failOnError":false,
+      "debug":false
+    },
+    {
+      "recoClass": "reco::PedestalCalculator",
+      "recoLabel": "pedestal",
+      "inputRecoLabel": "pruned",
+      "inputWaveformsLabel": "waveforms",
+      "outputWaveformsLabel": "waveforms",
+      "pedestalMethod" : "FirstN",
+      "numSamples": 20,
+      "debug": true
     }
   ],
+  "_RecoPath":[],
   "RecoPath":[
     "initializer",
-    "jitter"
+    "jitter",
+    "pruned",
+    "pedestal"
   ],
   "RecoManager": {
     "timeProfilerLabel": "timeProfiler"
@@ -90,7 +120,7 @@ The nearline is configured via a JSON file. It configures the unpacker, which re
     {
       "type": "reco::ChannelMapService",
       "label": "channelMap",
-      "channel_map_config_files":"channel_map_config_files.json"
+      "channel_map_files":"channel_map_files.json"
     },
     {
       "type": "reco::TimeProfilerService",
@@ -99,11 +129,16 @@ The nearline is configured via a JSON file. It configures the unpacker, which re
   ],
   "Output": {
     "drop": [
-      "unpacker*"
+      "unpacker*",
+      "#initializer*",
+      "pruned*",
+      "jitter*",
+      "#pedestal*"
     ],
     "compressionLevel": 1,
     "compressionAlgorithm": 4
   }
+}
 ```
 - The `Unpacker` block configures the unpacker. Set `max_midas_events` to `-1` to run over all midas event.
 - The `RecoStages` array defines the reconstruction stages you have access to (doesn't guarantee they are run; see `RecoPath`). Each `RecoStage` block in the array must have the `recoClass` and `recoLabel` fields. The `recoClass` is the name of the class that implements the reco stage (see all possible `RecoStages` in `mu-reco/src/common` or `mu-reco/src/wfd5`; it must derive from the `reco::RecoStage` class). The `recoLabel` is a user-defined label (whatever you want) that is used to identify the reco stage. This label is used as the prefix to all data products produced by the reco stage. You can have any other json-parsable parameters. 
@@ -113,6 +148,66 @@ The nearline is configured via a JSON file. It configures the unpacker, which re
 - The `Services` array defines the services you have access to.
 - The `Output` block configures the output ROOT file. You can set which data products to drop from the output file. Provide a list of data product names. You can use the `*` wildcard to drop select multiple data products, e.g. `unpacker*` will drop all data products that start with `unpacker`.
 
+# Configurations based on interval-of-validity (IOV)
+Some configuration settings depend on an interval of validity (IOV), defined as a range of run numbers. The idea here is that the experimental conditions may change over time. To accomodate these changes, the nearline can be configured to use different configuration files based on an IOV and the run number of the file being processed.
+
+We'll take a look at the structure through an example. We'll pick the even/odd pedestals. In `mu-reco/config/pedestals_iov.json`, we have
+```json
+{
+    "pedestals_iov": [
+        {"file":"pedestals.json", "iov":[0,30000]}
+    ]
+}
+```
+`"pedestals_iov"` is a json array that should contain the different running configurations. Each configuration is a json object with two fields: `"file"` and `"iov"`. The `"file"` field is the name of the configuration file, and the `"iov"` field is an array with two elements, the start and end run numbers of the IOV. In this case, the configuration file is `pedestals.json`, which looks like
+```json
+{
+    "pedestals": [
+      {
+         "crateNum": 8,
+         "amcSlotNum": 1,
+         "channelNum": 0,
+         "pedestal": 4.0
+      },
+...
+}
+```
+Then, in the code, we can access the proper IOV like so:
+```cpp
+void JitterCorrector::Configure(const nlohmann::json& config, const ServiceManager& serviceManager, EventStore& eventStore) {
+
+    inputRecoLabel_ = config.value("inputRecoLabel", "unpacker");
+    inputWaveformsLabel_ = config.value("inputWaveformsLabel", "WFD5WaveformCollection");
+    outputWaveformsLabel_ = config.value("outputWaveformsLabel", "WaveformsCorreted");
+    templateLoaderServiceLabel_ = config.value("templateLoaderServiceLabel", "templateLoader");
+    failOnError_ = config.value("failOnError", false);
+    debug_ = config.value("debug",false);
+
+    // Set up the parser
+    auto& jsonParserUtil = reco::JsonParserUtil::instance();
+
+    // Get the run number from the configuration
+    int run = configHolder_->GetRun();
+    int subrun = configHolder_->GetSubrun();
+
+    // Get the pedestal configuration from the IOV list using the run and subrun
+    auto pedestalConfig =  jsonParserUtil.GetConfigFromIOVList(config, run, subrun, "pedestals_iov", debug_);
+    if (pedestalConfig.empty()) {
+        throw std::runtime_error("JitterCorrector configuration file not found for run: " + std::to_string(run) + ", subrun: " + std::to_string(subrun));
+    }   
+
+    for (const auto& configi : pedestalConfig["pedestals"]) 
+    {
+        offsetMap_[std::make_tuple(configi["crateNum"], configi["amcSlotNum"], configi["channelNum"])] = configi["pedestal"];
+        if (debug_) std::cout << "Loading configuration for odd/even difference in channel ("
+            << configi["crateNum"]      << " / "
+            << configi["amcSlotNum"]        << " / "
+            << configi["channelNum"]    << ") -> " 
+            << configi["pedestal"]
+            << std::endl;
+    }
+}
+```
 
 ## Instructions for adding a new reco stage
 To add a new reco stage, you should follow the following steps:
