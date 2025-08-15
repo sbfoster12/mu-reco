@@ -6,6 +6,7 @@
 
 // Common reco/service classes
 #pragma link C++ class reco::RecoStage+;
+#pragma link C++ class reco::TemplateStage+;
 #pragma link C++ class reco::Service+;
 #pragma link C++ class reco::TimeProfilerService+;
 

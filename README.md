@@ -114,7 +114,7 @@ The nearline is configured via a JSON file. It configures the unpacker, which re
 
 ## Instructions for adding a new reco stage
 To add a new reco stage, you should follow the following steps:
-1. Copy an existing RecoStage (e.g. `include/reco/wfd5/JitterCorrector.hh`) and modify it. It should derive from the `reco::RecoStage` class and must implement a couple virtual methods.
+1. Copy an existing RecoStage and modify it: there is a template you can copy here: `include/reco/common/TemplateStage.hh`; and copy the source file `src/common/TemplateStage.cc`. Your stage must derive from the `reco::RecoStage` class and must implement a couple virtual methods.
 2. Add the class to the `include/reco/LinkDef.hh` file, so ROOT can generate the dictionary for it.
 3. To define the reco stage in your job, add it to the `RecoStages` array in the `reco_config.json` file. You can add any parameters in the json that you then must parse in the `Configure` method of the RecoStage. If you want to actually run the reco stage, add it to the `RecoPath` array. The reco stages will be executed in the order they are defined in the `RecoPath` array. The `RecoPath` is used to decouple stage definition from execution.
 4. Often times, you will want to access collections from the `EventStore`. You can do this with a get method: `TClonesArray* waveforms = store.get<const dataProducts::WFD5Waveform>(recoLabel, dataLabel);` where `recoLabel` is the label of the reco stage and `dataLabel` is the label of the data product you want to access. This will return a `TClonesArray*` object that you can loop over. A possible workflow might look like this:
