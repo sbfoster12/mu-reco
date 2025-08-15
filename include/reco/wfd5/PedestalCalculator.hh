@@ -31,6 +31,7 @@ namespace reco {
         std::string outputWaveformsLabel_;
         std::string pedestalMethod_; // e.g. "FirstN", "MiddleN", "LastN"
         int numSamples_;
+        bool debug_;
 
         ClassDefOverride(PedestalCalculator, 1);
     };

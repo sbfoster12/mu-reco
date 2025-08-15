@@ -11,6 +11,19 @@ void PedestalCalculator::Configure(const nlohmann::json& config, const ServiceMa
     outputWaveformsLabel_ = config.value("outputWaveformsLabel", "Waveforms");
     pedestalMethod_ = config.value("pedestalMethod", "FirstN");
     numSamples_ = config.value("numSamples", 10);
+    debug_ = config.value("debug", false);
+
+    if (debug_) {
+        std::cout << "-> reco::PedestalCalculator configured with:\n"
+                << "  inputRecoLabel: " << inputRecoLabel_ << "\n"
+                << "  inputWaveformsLabel: " << inputWaveformsLabel_ << "\n"
+                << "  outputWaveformsLabel: " << outputWaveformsLabel_ << "\n"
+                << "  pedestalMethod: " << pedestalMethod_ << "\n"
+                << "  numSamples: " << numSamples_ << "\n";
+    }
+
+    // Example of making a histogram
+    eventStore.putHistogram("h_pedestals", std::make_shared<TH1D>("h_pedestals", "Pedestals", 2000, -2000, 0));
 }
 
 void PedestalCalculator::Process(EventStore& store, const ServiceManager& serviceManager) {
@@ -18,6 +31,8 @@ void PedestalCalculator::Process(EventStore& store, const ServiceManager& servic
     try {
          // Get the input waveforms
         auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
+
+        // auto channelMapService = serviceManager.Get<reco::ChannelMapService>(channelMapServiceLabel_);
 
         //Make a collection new waveforms
         auto newWaveforms = store.getOrCreate<dataProducts::WFD5Waveform>(this->GetRecoLabel(), outputWaveformsLabel_);
@@ -32,6 +47,9 @@ void PedestalCalculator::Process(EventStore& store, const ServiceManager& servic
             newWaveforms->Expand(i + 1);
 
              ComputePedestal(newWaveform);
+
+             // Fill the histogram
+             store.GetHistogram("h_pedestals")->Fill(newWaveform->pedestalLevel);
         }
     } catch (const std::exception& e) {
        throw std::runtime_error(std::string("PedestalCalculator error: ") + e.what());
