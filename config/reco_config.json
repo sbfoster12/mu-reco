@@ -21,7 +21,7 @@
       "inputWaveformsLabel": "waveforms",
       "outputWaveformsLabel": "waveforms",
       "templateServiceLabel": "templates",
-      "pedestal_files":"pedestal_files.json",
+      "pedestals_iov":"pedestals_iov.json",
       "failOnError":false,
       "debug":false
     },
@@ -128,9 +128,7 @@
       "outputPeaksLabel": "integralsCalibrated",
       "integrals":true,
       "failOnError":false,
-      "constant_files":[
-        {"iov":[0,30000],"file":"energy_calibration_default.json"}
-      ],
+      "energy_calibration_iov":"energy_calibration_iov.json",
       "debug":false
     },
     {
@@ -141,9 +139,7 @@
       "outputPeaksLabel": "fitResultsCalibrated",
       "integrals":false,
       "failOnError":false,
-      "constant_files":[
-        {"iov":[0,30000],"file":"energy_calibration_default.json"}
-      ],
+      "energy_calibration_iov":"energy_calibration_iov.json",
       "debug":false
     },
     {
@@ -230,12 +226,12 @@
     {
       "type": "reco::ChannelMapService",
       "label": "channelMap",
-      "channel_map_files":"channel_map_files.json"
+      "channel_map_iov":"channel_map_iov.json"
     },
     {
       "type": "reco::TemplateLoaderService",
       "label": "templateLoader",
-      "file_name": "templates.json"
+      "templates_iov": "templates_iov.json"
     },
     {
       "type": "reco::TemplateFitterService",

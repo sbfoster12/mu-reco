@@ -16,37 +16,44 @@ void EnergyCalibration::Configure(const nlohmann::json& config, const ServiceMan
     debug_ = config.value("debug",false);    
     integrals_ = config.value("integrals",false);
 
-
+    // Set up the parser
     auto& jsonParserUtil = reco::JsonParserUtil::instance();
-    // std::cout << "-> reco::EnergyCalibration: Configuring with file: " << file_name_ << std::endl;
-    // auto calibConfig = jsonParserUtil.GetPathAndParseFile(file_name_);
-    
-    int runNum = 0;
-    bool found_calib = false;
-    json thisConfig;
-    std::string file_path = "";
-    for (auto &configi: config["constant_files"])
-    {
-        auto iov = configi["iov"];
-        if (runNum >= iov[0] && runNum <= iov[1])
-        {
-            found_calib = true;
-            if (debug_) std::cout << "Found calibration file for IOV [" 
-                << iov[0] << " - " << iov[1] << ") -> " 
-                << configi["file"] << std::endl;
-            thisConfig = jsonParserUtil.GetPathAndParseFile(
-                configi["file"],
-                file_path
-            );
-        }
+
+    // Get the run number from the configuration
+    int run = configHolder_->GetRun();
+    int subrun = configHolder_->GetSubrun();
+
+    // Check the parameter exists
+    if (!config.contains("energy_calibration_iov")) {
+        throw std::runtime_error("EnergyCalibration configuration must contain 'energy_calibration_iov' key");
     }
-    if (failOnError_ && !found_calib)
-    {
-        std::cerr << "Unable to find energy calibration constants" << std::endl;
-        throw;
+    
+    // Get the iov json file
+    auto iovConfigListFileName = config.value("energy_calibration_iov","");
+    std::string iovConfigListFilePath = "";
+    auto iovConfigJson = jsonParserUtil.GetPathAndParseFile(iovConfigListFileName, iovConfigListFilePath, debug_);
+    
+    // Check that the list exists in the json file
+    if (!iovConfigJson.contains("energy_calibration_iov")) {
+        throw std::runtime_error("EnergyCalibration: File " + iovConfigListFilePath + " must contain 'energy_calibration_iov' key");
     }
 
-    for (const auto& configi : thisConfig["calibration"]) 
+    // Get the iov list and check it is an array
+    auto iovConfigList = iovConfigJson["energy_calibration_iov"];
+    if (!iovConfigList.is_array()) {
+        throw std::runtime_error("'energy_calibration_iov' key must contain an array");
+    }
+    
+    // Determine the correct configuration based on run and subrun from the iov list
+    auto iovConfigMatch= jsonParserUtil.GetIOVMatch(iovConfigList, run, subrun);
+
+    // Now get the actual configuration
+    std::string configFileName = iovConfigMatch.value("file","");
+    std::string configFilePath = "";
+    auto energyCalibConfig = jsonParserUtil.GetPathAndParseFile(configFileName, configFilePath, debug_);
+    std::cout << "-> reco::EnergyCalibration: Configuring with file: " << configFilePath << std::endl;
+
+    for (const auto& configi : energyCalibConfig["calibration"]) 
     {
         calibrationMap_[std::make_tuple(configi["crateNum"], configi["amcSlotNum"], configi["channelNum"])] = configi["calib"];
         // if (debug_) 
@@ -57,10 +64,6 @@ void EnergyCalibration::Configure(const nlohmann::json& config, const ServiceMan
             << configi["calib"]
             << std::endl;
     }
-
-    // Create some histograms
-    // auto hist = std::make_shared<TH1D>("energy", "Energy Spectrum", 100, 0, 1000);
-    // eventStore.putHistogram("energy", std::move(hist));
 }
 
 void EnergyCalibration::Process(EventStore& store, const ServiceManager& serviceManager) const {
@@ -121,26 +124,7 @@ void EnergyCalibration::Process(EventStore& store, const ServiceManager& service
                 output->Expand(i + 1);   
             }
         }
-
-        //Make a collection new waveforms
-
-        // for (int i = 0; i < waveforms->GetEntriesFast(); ++i) {
-        //     auto* waveform = static_cast<dataProducts::WFD5Waveform*>(waveforms->ConstructedAt(i));
-        //     if (!waveform) {
-        //         throw std::runtime_error("Failed to retrieve waveform at index " + std::to_string(i));
-        //     }
-        //     //Make the new waveform
-        //     dataProducts::WFD5Waveform* newWaveform = new ((*newWaveforms)[i]) dataProducts::WFD5Waveform(waveform);
-        //     newWaveforms->Expand(i + 1);
-
-        //     // ApplyJitterCorrection(newWaveform);
-        // }
     } catch (const std::exception& e) {
        throw std::runtime_error(std::string("EnergyCalibration error: ") + e.what());
     }
 }
-
-// void EnergyCalibration::CorrectEnergy(dataProducts::WFD5Waveform* wf) {
-    // Implement jitter correction here
-    
-// }

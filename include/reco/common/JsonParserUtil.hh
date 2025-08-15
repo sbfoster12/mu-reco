@@ -21,7 +21,7 @@ namespace reco {
 
         json GetPathAndParseFile(const std::string& file_name, std::string& file_path, bool debug_ = false) const;
 
-        std::string GetFileFromRunSubrun(int run, int subrun, const std::string& topFileName, const std::string& jsonKey) const;
+        json GetIOVMatch(const json& iovList, int run, int subrun) const;
 
         json ParseFile(const std::string& filename) const;
     };

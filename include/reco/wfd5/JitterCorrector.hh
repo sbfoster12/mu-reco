@@ -32,7 +32,6 @@ namespace reco {
 
         std::map<dataProducts::ChannelID, int> offsetMap_;
 
-        std::string pedestal_files_;
         bool debug_;
         bool failOnError_;
 

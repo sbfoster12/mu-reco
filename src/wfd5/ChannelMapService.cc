@@ -12,14 +12,30 @@ using namespace reco;
     
     std::cout << "-> reco::ChannelMapService: Configuring ChannelMapService for run: " << run << ", subrun: " << subrun << std::endl;
 
-    // Get the top level json file (it lists all channel map files)
-    if (!config.contains("channel_map_files")) {
-        throw std::runtime_error("ChannelMapService configuration must contain 'channel_map_files' key");
+    // Check the parameter exists
+    if (!config.contains("channel_map_iov")) {
+        throw std::runtime_error("ChannelMapService configuration must contain 'channel_map_iov' key");
     }
 
-    // Open the top level file
-    auto topFileName = config.value("channel_map_files","");
-    std::string configFileName = jsonParserUtil.GetFileFromRunSubrun(run, subrun, topFileName, "channel_map_files");
+    // Get the list of channel map configurations per iov
+    auto iovConfigListFileName = config.value("channel_map_iov","");
+    std::string iovConfigListFilePath = "";
+    auto iovConfigJson = jsonParserUtil.GetPathAndParseFile(iovConfigListFileName, iovConfigListFilePath);
+    
+    // Check that the list exists
+    if (!iovConfigJson.contains("channel_map_iov")) {
+        throw std::runtime_error("ChannelMapService: File " + iovConfigListFilePath + " must contain 'channel_map_iov' key");
+    }
+    auto iovConfigList = iovConfigJson["channel_map_iov"];
+    if (!iovConfigList.is_array()) {
+        throw std::runtime_error("'channel_map_iov' key must contain an array");
+    }
+    
+    // Determine the correct configuration based on run and subrun
+    auto iovConfigMatch = jsonParserUtil.GetIOVMatch(iovConfigList, run, subrun);
+
+    // Now get the actual configuration now
+    std::string configFileName = iovConfigMatch.value("file","");
 
     if (configFileName.empty()) {
         throw std::runtime_error("ChannelMapService configuration file not found for run: " + std::to_string(run) + ", subrun: " + std::to_string(subrun));
@@ -28,6 +44,9 @@ using namespace reco;
     try {
         std::string configFilePath = "";
         auto channelMapJson = jsonParserUtil.GetPathAndParseFile(configFileName, configFilePath);
+        if (channelMapJson.empty()) {
+            throw std::runtime_error("ChannelMapService configuration file not found for run: " + std::to_string(run) + ", subrun: " + std::to_string(subrun));
+        }
         std::cout << "-> reco::ChannelMapService: Loading channel map from file: " << configFilePath << std::endl;
 
         if (!channelMapJson.contains("channelMap")) {
