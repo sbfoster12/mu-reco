@@ -13,34 +13,16 @@ using namespace reco;
     std::cout << "-> reco::ChannelMapService: Configuring ChannelMapService for run: " << run << ", subrun: " << subrun << std::endl;
 
     // Get the top level json file (it lists all channel map files)
-    if (!config.contains("channel_map_config_files")) {
-        throw std::runtime_error("ChannelMapService configuration must contain 'channel_map_config_files' key");
+    if (!config.contains("channel_map_files")) {
+        throw std::runtime_error("ChannelMapService configuration must contain 'channel_map_files' key");
     }
 
     // Open the top level file
-    auto topFileName = config.value("channel_map_config_files","");
-    std::string topFilePath = "";
-    if (topFileName.find('/') != std::string::npos) {
-        // If not a base name, try using this path directly
-        topFilePath = topFileName;
-    } else {
-        // If a base name, prepend the config directory
-        topFilePath = std::string(std::getenv("MU_RECO_PATH")) + "/config/" + topFileName;
-    }
-    std::cout << "-> reco::ChannelMapService: Loading top level channel map file from " << topFilePath << std::endl;
-    auto allChannelMapsJson = jsonParserUtil.ParseFile(topFilePath);
-
-    // Now we want to find the correct configuration file for the given run and subrun
-    if (!allChannelMapsJson.contains("channel_map_config_files")) {
-        throw std::runtime_error("ChannelMapService configuration file must contain 'channel_map_config_files' key");
-    }
-    const auto& configFiles = allChannelMapsJson["channel_map_config_files"];
-
-    // Get the appropriate configuration file for the given run and subrun
-    std::string configFileName = GetFileFromRunSubrun(run, subrun, configFiles);
+    auto topFileName = config.value("channel_map_files","");
+    std::string configFileName = jsonParserUtil.GetFileFromRunSubrun(run, subrun, topFileName);
 
     if (configFileName.empty()) {
-        throw std::runtime_error("ChannelMapService configuration file must contain 'file' key");
+        throw std::runtime_error("ChannelMapService configuration file not found for run: " + std::to_string(run) + ", subrun: " + std::to_string(subrun));
     }
     // Parse the channel map file
     try {
@@ -92,29 +74,4 @@ using namespace reco;
     } catch (const std::exception& e) {
         throw std::runtime_error("Failed to parse channel map file: " + std::string(e.what()));
     }
-}
-
-std::string ChannelMapService::GetFileFromRunSubrun(int run, int subrun, const nlohmann::json& configFiles) {
-    // This function retrieves the appropriate configuration file based on the run and subrun numbers
-    // It requires that the configFiles is a JSON array of configFile, which each have an iov and file field
-    for (const auto& configFile : configFiles) {
-        if (!configFile.contains("iov") || !configFile["iov"].is_array() || configFile["iov"].size() != 2) {
-            throw std::runtime_error("Each configuration file must contain 'iov' key with an array of two elements");
-            return "";
-        }
-        int startRun = configFile["iov"][0];
-        int endRun = configFile["iov"][1];
-        if (run >= startRun && run <= endRun) {
-            if (!configFile.contains("file")) {
-                throw std::runtime_error("Configuration file must contain 'file' key");
-                return "";
-            }
-            std::cout << "-> reco::ChannelMapService: Found configuration file for run: " << run
-                      << ", subrun: " << subrun << " -> " << configFile["file"]
-                      << " with IOV: [" << startRun << ", " << endRun << "]" << std::endl;
-            return configFile["file"];
-        }
-    }
-
-    return "";
 }

@@ -36,6 +36,8 @@ namespace reco {
             return ParseFile(file_path_);  // Example usage of JsonParserUtil
         }
 
+        std::string GetFileFromRunSubrun(int run, int subrun, const std::string& topFileName) const;
+
         json ParseFile(const std::string& filename) const;
     };
 

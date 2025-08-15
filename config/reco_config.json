@@ -230,7 +230,7 @@
     {
       "type": "reco::ChannelMapService",
       "label": "channelMap",
-      "channel_map_config_files":"channel_map_config_files.json"
+      "channel_map_files":"channel_map_files.json"
     },
     {
       "type": "reco::TemplateLoaderService",
