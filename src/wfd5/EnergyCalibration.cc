@@ -23,35 +23,15 @@ void EnergyCalibration::Configure(const nlohmann::json& config, const ServiceMan
     int run = configHolder_->GetRun();
     int subrun = configHolder_->GetSubrun();
 
-    // Check the parameter exists
-    if (!config.contains("energy_calibration_iov")) {
-        throw std::runtime_error("EnergyCalibration configuration must contain 'energy_calibration_iov' key");
+   // Get the energy calibration configuration from the IOV list using the run and subrun
+    auto energyCalibConfig =  jsonParserUtil.GetConfigFromIOVList(config, run, subrun, "energy_calibration_iov", debug_);
+    if (energyCalibConfig.empty()) {
+        if (failOnError_) {
+            throw std::runtime_error("EnergyCalibration configuration file not found for run: " + std::to_string(run) + ", subrun: " + std::to_string(subrun));
+        } else {
+            std::cout << "-> reco::EnergyCalibration: Warning, no configuration found, but proceeding, because failOnError is false" << std::endl;
+        }
     }
-    
-    // Get the iov json file
-    auto iovConfigListFileName = config.value("energy_calibration_iov","");
-    std::string iovConfigListFilePath = "";
-    auto iovConfigJson = jsonParserUtil.GetPathAndParseFile(iovConfigListFileName, iovConfigListFilePath, debug_);
-    
-    // Check that the list exists in the json file
-    if (!iovConfigJson.contains("energy_calibration_iov")) {
-        throw std::runtime_error("EnergyCalibration: File " + iovConfigListFilePath + " must contain 'energy_calibration_iov' key");
-    }
-
-    // Get the iov list and check it is an array
-    auto iovConfigList = iovConfigJson["energy_calibration_iov"];
-    if (!iovConfigList.is_array()) {
-        throw std::runtime_error("'energy_calibration_iov' key must contain an array");
-    }
-    
-    // Determine the correct configuration based on run and subrun from the iov list
-    auto iovConfigMatch= jsonParserUtil.GetIOVMatch(iovConfigList, run, subrun);
-
-    // Now get the actual configuration
-    std::string configFileName = iovConfigMatch.value("file","");
-    std::string configFilePath = "";
-    auto energyCalibConfig = jsonParserUtil.GetPathAndParseFile(configFileName, configFilePath, debug_);
-    std::cout << "-> reco::EnergyCalibration: Configuring with file: " << configFilePath << std::endl;
 
     for (const auto& configi : energyCalibConfig["calibration"]) 
     {

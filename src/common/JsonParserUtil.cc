@@ -59,5 +59,46 @@ json JsonParserUtil::GetIOVMatch(const json& iovList, int run, int subrun) const
         }
     }
     // return an empty json object
+    std::cout << "-> reco::JsonParserUtil: No configuration file found for run: " << run
+              << ", subrun: " << subrun << std::endl;
     return json();
+}
+
+
+json JsonParserUtil::GetConfigFromIOVList(json config, int run, int subrun, std::string iov_label, bool debug) {
+    // Set up the parser
+    auto& jsonParserUtil = reco::JsonParserUtil::instance();
+
+    // Check the parameter exists
+    if (!config.contains(iov_label)) {
+        throw std::runtime_error("Error: Configuration must contain '" + iov_label + "' key");
+    }
+
+    // Get the list of configurations per iov
+    auto iovConfigListFileName = config.value(iov_label,"");
+    std::string iovConfigListFilePath = "";
+    auto iovConfigJson = GetPathAndParseFile(iovConfigListFileName, iovConfigListFilePath, debug);
+    
+    // Check that the list exists
+    if (!iovConfigJson.contains(iov_label)) {
+        throw std::runtime_error("Error: File " + iovConfigListFilePath + " must contain '" + iov_label + "' key");
+    }
+    auto iovConfigList = iovConfigJson[iov_label];
+    if (!iovConfigList.is_array()) {
+        throw std::runtime_error("'" + iov_label + "' key must contain an array");
+    }
+    
+    // Determine the correct configuration based on run and subrun
+    auto iovConfigMatch = GetIOVMatch(iovConfigList, run, subrun);
+    if (iovConfigMatch.empty()) {
+        return json(); // Return an empty json object if no match is found
+    }
+
+    // Now get the actual configuration now
+    std::string configFileName = iovConfigMatch.value("file","");
+    std::string configFilePath = "";
+    auto thisConfig = GetPathAndParseFile(configFileName, configFilePath, debug);
+    std::cout << "-> reco::JsonParserUtil: Loading configuration from file: " << configFilePath << std::endl;
+
+    return thisConfig;
 }

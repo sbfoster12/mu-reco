@@ -10,43 +10,19 @@ void TemplateLoaderService::Configure(const nlohmann::json& config, EventStore& 
     // Get the run number from the configuration
     int run = configHolder_->GetRun();
     int subrun = configHolder_->GetSubrun();
-
-    // Check the parameter exists
-    if (!config.contains("templates_iov")) {
-        throw std::runtime_error("TemplateLoaderService configuration must contain 'templates_iov' key");
-    }
-
-    // Get the list of template configurations per iov
-    auto iovConfigListFileName = config.value("templates_iov","");
-    std::string iovConfigListFilePath = "";
-    auto iovConfigJson = jsonParserUtil.GetPathAndParseFile(iovConfigListFileName, iovConfigListFilePath, debug_);
     
-    // Check that the list exists
-    if (!iovConfigJson.contains("templates_iov")) {
-        throw std::runtime_error("TemplateLoaderService: File " + iovConfigListFilePath + " must contain 'templates_iov' key");
-    }
-    auto iovConfigList = iovConfigJson["templates_iov"];
-    if (!iovConfigList.is_array()) {
-        throw std::runtime_error("'templates_iov' key must contain an array");
-    }
-    
-    // Determine the correct configuration based on run and subrun
-    auto iovConfigMatch = jsonParserUtil.GetIOVMatch(iovConfigList, run, subrun);
-
-    // Now get the actual configuration now
-    std::string configFileName = iovConfigMatch.value("file","");
-    std::string configFilePath = "";
-    auto templateConfigJson = jsonParserUtil.GetPathAndParseFile(configFileName, configFilePath, debug_);
+    // Get the energy calibration configuration from the IOV list using the run and subrun
+    auto templateConfigJson =  jsonParserUtil.GetConfigFromIOVList(config, run, subrun, "templates_iov", debug_);
     if (templateConfigJson.empty()) {
         throw std::runtime_error("TemplateLoaderService configuration file not found for run: " + std::to_string(run) + ", subrun: " + std::to_string(subrun));
     }
-   
+    
+    // Now parse the configuration
     if (!templateConfigJson.contains("templates")) {
         throw std::runtime_error("Template configuration JSON must contain 'templates' key");
     }
 
     templateConfig_ = templateConfigJson["templates"];
-    std::cout << "-> reco::TemplateLoaderService: Loading template configuration from file: " << configFilePath << std::endl;
  
     std::shared_ptr<dataProducts::SplineHolder> sharedHolder = std::make_shared<dataProducts::SplineHolder>();
     splineHolder_ = sharedHolder;

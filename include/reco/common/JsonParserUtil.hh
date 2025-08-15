@@ -23,6 +23,8 @@ namespace reco {
 
         json GetIOVMatch(const json& iovList, int run, int subrun) const;
 
+        json GetConfigFromIOVList(json config, int run, int subrun, std::string iov_label, bool debug);
+
         json ParseFile(const std::string& filename) const;
     };
 

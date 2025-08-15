@@ -20,36 +20,11 @@ void JitterCorrector::Configure(const nlohmann::json& config, const ServiceManag
     int run = configHolder_->GetRun();
     int subrun = configHolder_->GetSubrun();
 
-    // Check the parameter exists
-    if (!config.contains("pedestals_iov")) {
-        throw std::runtime_error("JitterCorrector configuration must contain 'pedestals_iov' key");
-    }
-
-    // Get the list of pedestal configurations per iov
-    auto iovConfigListFileName = config.value("pedestals_iov","");
-    std::string iovConfigListFilePath = "";
-    auto iovConfigJson = jsonParserUtil.GetPathAndParseFile(iovConfigListFileName, iovConfigListFilePath, debug_);
-    
-    // Check that the list exists
-    if (!iovConfigJson.contains("pedestals_iov")) {
-        throw std::runtime_error("JitterCorrector: File " + iovConfigListFilePath + " must contain 'pedestals_iov' key");
-    }
-    auto iovConfigList = iovConfigJson["pedestals_iov"];
-    if (!iovConfigList.is_array()) {
-        throw std::runtime_error("'pedestals_iov' key must contain an array");
-    }
-    
-    // Determine the correct configuration based on run and subrun
-    auto iovConfigMatch = jsonParserUtil.GetIOVMatch(iovConfigList, run, subrun);
-
-    // Now get the actual configuration now
-    std::string configFileName = iovConfigMatch.value("file","");
-    std::string configFilePath = "";
-    auto pedestalConfig = jsonParserUtil.GetPathAndParseFile(configFileName, configFilePath, debug_);
+    // Get the pedestal configuration from the IOV list using the run and subrun
+    auto pedestalConfig =  jsonParserUtil.GetConfigFromIOVList(config, run, subrun, "pedestals_iov", debug_);
     if (pedestalConfig.empty()) {
         throw std::runtime_error("JitterCorrector configuration file not found for run: " + std::to_string(run) + ", subrun: " + std::to_string(subrun));
     }   
-    std::cout << "-> reco::JitterCorrector: Loading pedestal configuration from file: " << configFilePath << std::endl;
 
     for (const auto& configi : pedestalConfig["pedestals"]) 
     {
