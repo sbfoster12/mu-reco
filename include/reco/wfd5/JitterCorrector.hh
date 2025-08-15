@@ -14,7 +14,7 @@ namespace reco {
 
     class JitterCorrector : public RecoStage {
     public:
-        JitterCorrector() : correctionFactor_() {}
+        JitterCorrector() {}
         ~JitterCorrector() override = default;
 
         void Configure(const json& config, const ServiceManager& serviceManager, EventStore& eventStore) override;
@@ -28,8 +28,7 @@ namespace reco {
         std::string inputWaveformsLabel_;
         std::string outputWaveformsLabel_;
         std::string templateLoaderServiceLabel_;
-        double correctionFactor_;
-
+        
         std::map<dataProducts::ChannelID, int> offsetMap_;
 
         bool debug_;
