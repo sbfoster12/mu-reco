@@ -42,7 +42,7 @@ void XYPositionFinder::Configure(const nlohmann::json& config, const ServiceMana
 }
 
 
-void XYPositionFinder::ProcessIntegralsToXY(TClonesArray* input, dataProducts::ClusteredHits* thisCluster)
+void XYPositionFinder::ProcessIntegralsToXY(TClonesArray* input, dataProducts::ClusteredHits* thisCluster) const
 {
     for (int i = 0; i < input->GetEntriesFast(); ++i) {
         auto* waveform = static_cast<dataProducts::WaveformIntegral*>(input->ConstructedAt(i));
@@ -57,7 +57,7 @@ void XYPositionFinder::ProcessIntegralsToXY(TClonesArray* input, dataProducts::C
     }
 }
 
-void XYPositionFinder::ProcessFitsToXY(TClonesArray* input, dataProducts::ClusteredHits* thisCluster)
+void XYPositionFinder::ProcessFitsToXY(TClonesArray* input, dataProducts::ClusteredHits* thisCluster) const
 {
     for (int i = 0; i < input->GetEntriesFast(); ++i) {
         auto* fit = static_cast<dataProducts::WaveformFit*>(input->ConstructedAt(i));
@@ -95,7 +95,7 @@ void XYPositionFinder::ProcessFitsToXY(TClonesArray* input, dataProducts::Cluste
     
 }
 
-void XYPositionFinder::Cluster(dataProducts::ClusteredHits* thisCluster)
+void XYPositionFinder::Cluster(dataProducts::ClusteredHits* thisCluster) const
 {
     double avgX = 0.0;
     double avgY = 0.0;
@@ -115,7 +115,7 @@ void XYPositionFinder::Cluster(dataProducts::ClusteredHits* thisCluster)
     thisCluster->y = avgY;
 }
 
-void XYPositionFinder::Process(EventStore& store, const ServiceManager& serviceManager) {
+void XYPositionFinder::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // std::cout << "XYPositionFinder with name '" << this->GetLabel() << "' is processing...\n";
     try {
         // // Get original waveforms as const shared_ptr collection (safe because get is const)

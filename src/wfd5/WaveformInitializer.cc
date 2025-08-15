@@ -12,7 +12,7 @@ void WaveformInitializer::Configure(const nlohmann::json& config, const ServiceM
     debug_ = config.value("debug",false);
 }
 
-void WaveformInitializer::Process(EventStore& store, const ServiceManager& serviceManager) {
+void WaveformInitializer::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // std::cout << "WaveformInitializer with name '" << GetRecoLabel() << "' is processing...\n";
     try {
          // Get the input waveforms

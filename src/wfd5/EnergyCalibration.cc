@@ -61,7 +61,7 @@ void EnergyCalibration::Configure(const nlohmann::json& config, const ServiceMan
     // eventStore.putHistogram("energy", std::move(hist));
 }
 
-void EnergyCalibration::Process(EventStore& store, const ServiceManager& serviceManager) {
+void EnergyCalibration::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // std::cout << "EnergyCalibration with name '" << GetRecoLabel() << "' is processing...\n";
     try {
          // Get the input waveforms
@@ -87,7 +87,7 @@ void EnergyCalibration::Process(EventStore& store, const ServiceManager& service
                 }
                 else
                 {
-                    scale = calibrationMap_[inputObject->GetID()];
+                    scale = calibrationMap_.at(inputObject->GetID());
                     outputObject->CalibrateEnergies(scale);
                 }
                 output->Expand(i + 1);
@@ -113,7 +113,7 @@ void EnergyCalibration::Process(EventStore& store, const ServiceManager& service
                 }
                 else
                 {
-                    scale = calibrationMap_[inputObject->GetID()];
+                    scale = calibrationMap_.at(inputObject->GetID());
                     outputObject->CalibrateEnergies(scale);
                 }
                 output->Expand(i + 1);   

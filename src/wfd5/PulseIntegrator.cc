@@ -47,8 +47,7 @@ void PulseIntegrator::Configure(const nlohmann::json& config, const ServiceManag
 
 }
 
-void PulseIntegrator::Process(EventStore& store, const ServiceManager& serviceManager) 
-{
+void PulseIntegrator::Process(EventStore& store, const ServiceManager& serviceManager)  const {
 
     // get the input waveforms
     auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
@@ -79,7 +78,7 @@ void PulseIntegrator::Process(EventStore& store, const ServiceManager& serviceMa
         // check if ID is in the override list, otherwise do the default processing
         if (channelConfigMap_.count(waveform->GetID()))
         {
-            thisConfig = channelConfigMap_[waveform->GetID()];
+            thisConfig = channelConfigMap_.at(waveform->GetID());
         }
         else
         {

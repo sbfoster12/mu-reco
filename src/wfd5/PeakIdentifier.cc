@@ -11,7 +11,7 @@ void PeakIdentifier::Configure(const nlohmann::json& config, const ServiceManage
     outputPeaksLabel_ = config.value("outputPeaksLabel", "Peaks");
 }
 
-void PeakIdentifier::Process(EventStore& store, const ServiceManager& serviceManager) {
+void PeakIdentifier::Process(EventStore& store, const ServiceManager& serviceManager) const {
 //     // std::cout << "PeakIdentifier with name '" << GetLabel() << "' is processing...\n";
 //     try {
 //         // Get original waveforms as const shared_ptr collection (safe because get is const)

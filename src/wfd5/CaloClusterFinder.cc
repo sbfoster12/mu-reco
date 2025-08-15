@@ -11,7 +11,7 @@ void CaloClusterFinder::Configure(const nlohmann::json& config, const ServiceMan
     outputCaloClusterLabel_ = config.value("outputCaloClusterLabel", "");
 }
 
-void CaloClusterFinder::Process(EventStore& store, const ServiceManager& serviceManager) {
+void CaloClusterFinder::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // // std::cout << "CaloClusterFinder with name '" << GetLabel() << "' is processing...\n";
     // try {
     //     // // Get original waveforms as const shared_ptr collection (safe because get is const)

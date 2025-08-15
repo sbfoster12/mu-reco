@@ -67,7 +67,7 @@ void T0Processor::Configure(const nlohmann::json& config, const ServiceManager& 
     // eventStore.putHistogram("energy", std::move(hist));
 }
 
-void T0Processor::Process(EventStore& store, const ServiceManager& serviceManager) {
+void T0Processor::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // std::cout << "T0Processor with name '" << GetRecoLabel() << "' is processing...\n";
     try {
          // Get the input waveforms

@@ -11,7 +11,7 @@ void DetectorGrouper::Configure(const nlohmann::json& config, const ServiceManag
     channelMapServiceLabel_ = config.value("channelMapServiceLabel", "channelMap");
 }
 
-void DetectorGrouper::Process(EventStore& store, const ServiceManager& serviceManager) {
+void DetectorGrouper::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // std::cout << "DetectorGrouper with name '" << GetLabel() << "' is processing...\n";
     try {
         // Get the input waveforms

@@ -19,10 +19,10 @@ namespace reco {
 
         void Configure(const json& config, const ServiceManager& serviceManager, EventStore& eventStore) override;
 
-        void Process(EventStore& store, const ServiceManager& serviceManager) override;
+        void Process(EventStore& store, const ServiceManager& serviceManager) const override;
 
     private:
-        void ApplyJitterCorrection(dataProducts::WFD5Waveform* wf);
+        void ApplyJitterCorrection(dataProducts::WFD5Waveform* wf) const;
 
         std::string inputRecoLabel_;
         std::string inputWaveformsLabel_;

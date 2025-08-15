@@ -52,7 +52,7 @@ void EmptyChannelPruner::Configure(const nlohmann::json& config, const ServiceMa
     }
 }
 
-void EmptyChannelPruner::Process(EventStore& store, const ServiceManager& serviceManager) {
+void EmptyChannelPruner::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // std::cout << "EmptyChannelPruner with name '" << GetRecoLabel() << "' is processing...\n";
     try {
          // Get the input waveforms
@@ -72,7 +72,7 @@ void EmptyChannelPruner::Process(EventStore& store, const ServiceManager& servic
             }
 
             this_id = waveform->GetID();
-            thisMinAmplitude = minAmplMap_.count(this_id) ? minAmplMap_[this_id] : minAmplitude_;
+            thisMinAmplitude = minAmplMap_.count(this_id) ? minAmplMap_.at(this_id) : minAmplitude_;
             if (debug_) 
             {
                 std::cout << "Evaluating channel ("

@@ -23,7 +23,7 @@ namespace reco {
         virtual ~RecoStage() = default;
 
         virtual void Configure(const nlohmann::json& config, const ServiceManager& serviceManager, EventStore& eventStore) = 0;
-        virtual void Process(EventStore& eventStore, const ServiceManager& serviceManager) = 0;
+        virtual void Process(EventStore& eventStore, const ServiceManager& serviceManager) const = 0;
         void RunStage(EventStore& eventStore, const ServiceManager& serviceManager);
 
         void SetRecoLabel(const std::string& recoLabel) { recoLabel_ = recoLabel; }

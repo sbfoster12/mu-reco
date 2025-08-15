@@ -11,7 +11,7 @@ void PileupIdentifier::Configure(const nlohmann::json& config, const ServiceMana
     outputPileupLabel_ = config.value("outputPileupLabel", "Pileup");
 }
 
-void PileupIdentifier::Process(EventStore& store, const ServiceManager& serviceManager) {
+void PileupIdentifier::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // // std::cout << "PileupIdentifier with name '" << GetLabel() << "' is processing...\n";
     // try {
     //     // Get original waveforms as const shared_ptr collection (safe because get is const)

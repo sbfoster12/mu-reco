@@ -23,9 +23,9 @@ namespace reco {
 
         void Configure(const json& config, const ServiceManager& serviceManager, EventStore& eventStore) override;
 
-        void Process(EventStore& store, const ServiceManager& serviceManager) override;
+        void Process(EventStore& store, const ServiceManager& serviceManager) const override;
 
-        void PerformRFFit(const dataProducts::WFD5Waveform* waveform, dataProducts::RFWaveformFit* fitResult);
+        void PerformRFFit(const dataProducts::WFD5Waveform* waveform, dataProducts::RFWaveformFit* fitResult) const;
 
 
     private:

@@ -21,7 +21,7 @@ namespace reco {
 
         void Configure(const json& config, const ServiceManager& serviceManager, EventStore& eventStore) override;
 
-        void Process(EventStore& store, const ServiceManager& serviceManager) override;
+        void Process(EventStore& store, const ServiceManager& serviceManager) const override;
 
     private:
 
@@ -33,15 +33,16 @@ namespace reco {
         int weighting_;
         int fitIndex_;
 
-        std::vector<double> xs,ys,weights,energies;
-        double weightSum;
+        // Mutable members
+        mutable std::vector<double> xs,ys,weights,energies;
+        mutable double weightSum;
 
         bool useFirstFitInFitSequence_,useHighestEnergyFit_;
         bool useFirstFitinTime_;
 
-        void ProcessIntegralsToXY(TClonesArray* input, dataProducts::ClusteredHits* thisCluster);
-        void ProcessFitsToXY(TClonesArray* input, dataProducts::ClusteredHits* thisCluster);
-        void Cluster(dataProducts::ClusteredHits* thisCluster);
+        void ProcessIntegralsToXY(TClonesArray* input, dataProducts::ClusteredHits* thisCluster) const;
+        void ProcessFitsToXY(TClonesArray* input, dataProducts::ClusteredHits* thisCluster) const;
+        void Cluster(dataProducts::ClusteredHits* thisCluster) const;
 
         ClassDefOverride(XYPositionFinder, 1);
     };

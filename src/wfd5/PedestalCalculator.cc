@@ -26,7 +26,7 @@ void PedestalCalculator::Configure(const nlohmann::json& config, const ServiceMa
     eventStore.putHistogram("h_pedestals", std::make_shared<TH1D>("h_pedestals", "Pedestals", 2000, -2000, 0));
 }
 
-void PedestalCalculator::Process(EventStore& store, const ServiceManager& serviceManager) {
+void PedestalCalculator::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // std::cout << "PedestalCalculator with name '" << GetLabel() << "' is processing...\n";
     try {
          // Get the input waveforms
@@ -56,7 +56,7 @@ void PedestalCalculator::Process(EventStore& store, const ServiceManager& servic
     }
 }
 
-void PedestalCalculator::ComputePedestal(dataProducts::WFD5Waveform* wf) {
+void PedestalCalculator::ComputePedestal(dataProducts::WFD5Waveform* wf) const {
     
     // Initialize the pedestal
     double pedestal = 0.0;

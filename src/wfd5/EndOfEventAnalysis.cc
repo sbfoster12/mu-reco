@@ -12,7 +12,7 @@ void EndOfEventAnalysis::Configure(const nlohmann::json& config, const ServiceMa
     eventStore.putHistogram("h_lyso_pedestals", std::make_shared<TH1D>("h_lyso_pedestals", "Pedestals", 2000, -2000, 0));
 }
 
-void EndOfEventAnalysis::Process(EventStore& store, const ServiceManager& serviceManager) {
+void EndOfEventAnalysis::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // std::cout << "EndOfEventAnalysis with name '" << GetRecoLabel() << "' is processing...\n";
     try {
          // Get the input waveforms

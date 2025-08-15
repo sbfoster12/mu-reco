@@ -34,14 +34,14 @@ void DigitizerTimeAligner::Configure(const nlohmann::json& config, const Service
 
 }
 
-void DigitizerTimeAligner::Process(EventStore& store, const ServiceManager& serviceManager) {
+void DigitizerTimeAligner::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // std::cout << "DigitizerTimeAligner with name '" << GetLabel() << "' is processing...\n";
     try {
          // Get the input waveforms
         auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
         auto seeds = store.get<const dataProducts::TimeSeed>(inputT0Reco_, inputT0Label_);
 
-        foundSeed_ = false;
+        bool foundSeed = false;
         dataProducts::TimeSeed* seed = static_cast<dataProducts::TimeSeed*>(seeds->ConstructedAt(0));
         dataProducts::WFD5Waveform* seed_wf;
         if (!seed) {
@@ -53,7 +53,7 @@ void DigitizerTimeAligner::Process(EventStore& store, const ServiceManager& serv
                 if (requireT0Seed_) throw std::runtime_error("Failed to retrieve T0 waveform from TimeSeed inputs");
                 seed = new dataProducts::TimeSeed();
             } else {
-                foundSeed_ = true;
+                foundSeed = true;
                 seed_wf = (dataProducts::WFD5Waveform*) ((seed->inputs[0]).GetObject());
             }
         }
@@ -71,21 +71,21 @@ void DigitizerTimeAligner::Process(EventStore& store, const ServiceManager& serv
             dataProducts::WFD5Waveform* newWaveform = new ((*newWaveforms)[i]) dataProducts::WFD5Waveform(waveform);
             newWaveforms->Expand(i + 1);
 
-            ApplyTimeAligner(newWaveform, seed, seed_wf);
+            ApplyTimeAligner(newWaveform, seed, seed_wf, foundSeed);
         }
     } catch (const std::exception& e) {
        throw std::runtime_error(std::string("DigitizerTimeAligner error: ") + e.what());
     }
 }
 
-void DigitizerTimeAligner::ApplyTimeAligner(dataProducts::WFD5Waveform* wf, dataProducts::TimeSeed *seed, dataProducts::WFD5Waveform* seed_wf) {
+void DigitizerTimeAligner::ApplyTimeAligner(dataProducts::WFD5Waveform* wf, dataProducts::TimeSeed *seed, dataProducts::WFD5Waveform* seed_wf, bool foundSeed) const {
     if (debug_) std::cout << "Applying time alignment to waveform " << wf << std::endl;
     double known_offset = 0.0;
     if (knownTimeOffsetMap_.count(wf->GetID()))
     {
-        known_offset = knownTimeOffsetMap_[wf->GetID()];
+        known_offset = knownTimeOffsetMap_.at(wf->GetID());
     }
-    if (foundSeed_)
+    if (foundSeed)
     {
         if (debug_) std::cout << "   -> Found time seed:" << seed << " with time " << seed->GetTimeSeed() << std::endl;
         if (debug_) std::cout << "   -> known offset for this channel: " << known_offset << std::endl;

@@ -16,7 +16,7 @@ void RFFitter::Configure(const nlohmann::json& config, const ServiceManager& ser
     fitOption_ = config.value("fitOption", "R");
 }
 
-void RFFitter::Process(EventStore& store, const ServiceManager& serviceManager) {
+void RFFitter::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // std::cout << "RFFitter with name '" << GetRecoLabel() << "' is processing...\n";
     try {
          // Get the input waveforms
@@ -44,7 +44,7 @@ void RFFitter::Process(EventStore& store, const ServiceManager& serviceManager) 
     }
 }
 
-void RFFitter::PerformRFFit(const dataProducts::WFD5Waveform* waveform, dataProducts::RFWaveformFit* fitResult) {
+void RFFitter::PerformRFFit(const dataProducts::WFD5Waveform* waveform, dataProducts::RFWaveformFit* fitResult) const {
     // std::cout << "Performing RF fit for waveform with index: " << waveform->waveformIndex << std::endl;
 
     // Get the trace

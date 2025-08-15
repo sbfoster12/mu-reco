@@ -47,7 +47,7 @@
       "inputWaveformsLabel": "waveforms",
       "outputWaveformsLabel": "waveforms",
       "pedestalMethod" : "FirstN",
-      "numSamples": 10,
+      "numSamples": 20,
       "debug": true
     }
   ],

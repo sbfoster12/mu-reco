@@ -20,7 +20,7 @@ namespace reco {
 
         void Configure(const json& config, const ServiceManager& serviceManager, EventStore& eventStore) override;
 
-        void Process(EventStore& store, const ServiceManager& serviceManager) override;
+        void Process(EventStore& store, const ServiceManager& serviceManager) const override;
 
     private:
         std::string inputRecoLabel_;

@@ -47,7 +47,7 @@ void JitterCorrector::Configure(const nlohmann::json& config, const ServiceManag
     // eventStore.putHistogram("energy", std::move(hist));
 }
 
-void JitterCorrector::Process(EventStore& store, const ServiceManager& serviceManager) {
+void JitterCorrector::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // std::cout << "JitterCorrector with name '" << GetRecoLabel() << "' is processing...\n";
     try {
          // Get the input waveforms
@@ -72,7 +72,7 @@ void JitterCorrector::Process(EventStore& store, const ServiceManager& serviceMa
     }
 }
 
-void JitterCorrector::ApplyJitterCorrection(dataProducts::WFD5Waveform* wf) {
+void JitterCorrector::ApplyJitterCorrection(dataProducts::WFD5Waveform* wf) const {
     // Implement jitter correction here
     if (offsetMap_.count(wf->GetID()))
     {
@@ -80,10 +80,10 @@ void JitterCorrector::ApplyJitterCorrection(dataProducts::WFD5Waveform* wf) {
             << std::get<0>(wf->GetID()) << " / "
             << std::get<1>(wf->GetID()) << " / "
             << std::get<2>(wf->GetID()) << " with " 
-            << offsetMap_[wf->GetID()]
+            << offsetMap_.at(wf->GetID())
             << std::endl;
         wf->JitterCorrect(
-            offsetMap_[wf->GetID()]
+            offsetMap_.at(wf->GetID())
         );
     }
     else if (failOnError_)

@@ -13,7 +13,7 @@ void TemplateStage::Configure(const nlohmann::json& config, const ServiceManager
 
 }
 
-void TemplateStage::Process(EventStore& store, const ServiceManager& serviceManager) {
+void TemplateStage::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // std::cout << "TemplateStage with name '" << GetRecoLabel() << "' is processing...\n";
     try {
          // Get the input waveforms

@@ -19,9 +19,9 @@ namespace reco {
 
         void Configure(const json& config, const ServiceManager& serviceManager, EventStore& eventStore) override;
 
-        void Process(EventStore& store, const ServiceManager& serviceManager) override;
+        void Process(EventStore& store, const ServiceManager& serviceManager) const override;
 
-        void ApplyTimeAligner(dataProducts::WFD5Waveform* wf, dataProducts::TimeSeed* seed, dataProducts::WFD5Waveform* seed_wf);
+        void ApplyTimeAligner(dataProducts::WFD5Waveform* wf, dataProducts::TimeSeed* seed, dataProducts::WFD5Waveform* seed_wf, bool foundSeed) const;
 
     private:
 
@@ -34,7 +34,6 @@ namespace reco {
         std::string inputT0Reco_;
         std::string inputT0Label_;
         bool requireT0Seed_;
-        bool foundSeed_;
         bool debug_;
 
         std::map<dataProducts::ChannelID, double> knownTimeOffsetMap_;

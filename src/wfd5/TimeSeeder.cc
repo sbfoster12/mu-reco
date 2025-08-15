@@ -42,7 +42,7 @@ void TimeSeeder::Configure(const nlohmann::json& config, const ServiceManager& s
 
 }
 
-void TimeSeeder::Process(EventStore& store, const ServiceManager& serviceManager) {
+void TimeSeeder::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // std::cout << "TimeSeeder with name '" << GetRecoLabel() << "' is processing...\n";
     try {
          // Get the input waveforms

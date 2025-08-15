@@ -19,7 +19,7 @@ void Fitter::Configure(const nlohmann::json& config, const ServiceManager& servi
 
 }
 
-void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) {
+void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) const {
     // std::cout << "Fitter with name '" << GetRecoLabel() << "' is processing...\n";
     try {
 
