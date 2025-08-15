@@ -154,20 +154,19 @@ To add a new service, you should follow the following steps:
 4. Services are accessible in a `RecoStage` via the `ServiceManager` class. You can get a service by its label, e.g. `reco::Service templateFitter = serviceManager.Get<TemplateFitterService>(templateFitterLabel);` where the argument is the label given to the service in the json configuration.
 
 ## Making histograms
-Histograms you make need to be added to the `EventStore`. The `EventStore` holds the collections of dataProducts for event event, the odb, and histograms that persistent event-to-event. Add a histogram like so:
+Histograms you make need to be added to the `EventStore`. The `EventStore` holds the collections of dataProducts for each event, the odb, and histograms that persist event-to-event. To add a histogram, you can do something like this in your `RecoStage`'s `Configure` method:
 ```cpp
-// Create some histograms
-auto hist = std::make_shared<TH1D>("energy", "Energy Spectrum", 100, 0, 1000);
-eventStore.putHistogram("energy", hist);
-```
-where it is assumed you made the `eventStore` object previously via ` reco::EventStore eventStore;`.
-
-You can then retrieve (and fill) the histogram later using:
-```cpp
-eventStore.GetHistogram("energy")->Fill(50);
+// Create a histogram
+ eventStore.putHistogram("h_pedestals", std::make_shared<TH1D>("h_pedestals", "Pedestals", 2000, -2000, 0));
 ```
 
-Finally, writing the histograms to a ROOT file is handled by the `OutputManager`:
+You can then retrieve (and fill) the histogram later (say in the `Process` method) using:
+```cpp
+eventStore.GetHistogram("h_pedestals")->Fill(50);
+```
+Notice that the name of the histograms is used as the key in the `EventStore`.
+
+Finally, writing the histograms to a ROOT file is handled by the `OutputManager` and is done in the main application for you:
 ```cpp
  outputManager->WriteHistograms(eventStore);
  ```
