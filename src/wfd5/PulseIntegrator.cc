@@ -28,7 +28,8 @@ void PulseIntegrator::Configure(const nlohmann::json& config, const ServiceManag
 
     // parse the individual channel config
     auto& jsonParserUtil = reco::JsonParserUtil::instance();
-    json_ = jsonParserUtil.GetPathAndParseFile(file_name_, debug_);
+    std::string file_path = "";
+    json_ = jsonParserUtil.GetPathAndParseFile(file_name_, file_path, debug_);
 
     for (const auto& configi : json_["integrators"]) {
         std::vector<int> jid = configi["channel"];

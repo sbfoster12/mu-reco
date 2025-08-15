@@ -27,15 +27,8 @@ using namespace reco;
     // Parse the channel map file
     try {
         std::string configFilePath = "";
-        if (configFileName.find('/') != std::string::npos) {
-            // If not a base name, try using this path directly
-            configFilePath = configFileName;
-        } else {
-            // If a base name, prepend the config directory
-            configFilePath = std::string(std::getenv("MU_RECO_PATH")) + "/config/" + configFileName;
-        }
+        auto channelMapJson = jsonParserUtil.GetPathAndParseFile(configFileName, configFilePath);
         std::cout << "-> reco::ChannelMapService: Loading channel map from file: " << configFilePath << std::endl;
-        auto channelMapJson = jsonParserUtil.ParseFile(configFilePath);
 
         if (!channelMapJson.contains("channelMap")) {
             throw std::runtime_error("Channel map JSON must contain 'channelMap' key");

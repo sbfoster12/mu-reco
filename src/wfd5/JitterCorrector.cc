@@ -10,28 +10,30 @@ void JitterCorrector::Configure(const nlohmann::json& config, const ServiceManag
     inputWaveformsLabel_ = config.value("inputWaveformsLabel", "WFD5WaveformCollection");
     outputWaveformsLabel_ = config.value("outputWaveformsLabel", "WaveformsCorreted");
     templateLoaderServiceLabel_ = config.value("templateLoaderServiceLabel", "templateLoader");
-    file_name_ = config.value("file_name", "pedestals.json");
+    pedestal_files_ = config.value("pedestal_files", "pedestal_files.json");
     failOnError_ = config.value("failOnError", false);
     debug_ = config.value("debug",false);
 
-    // std::string file_name = config.value("file_name", "templates.json");
-    std::string file_path_ = "";
-    if (file_name_.find('/') != std::string::npos) {
-        // If not a base name, try using this path directly
-        file_path_ = file_name_;
-    } else {
-        // If a base name, prepend the config directory
-        file_path_ = std::string(std::getenv("MU_RECO_PATH")) + "/config/" + file_name_;
-    }
-    if (!std::filesystem::exists(file_path_)) {
-        throw std::runtime_error("JitterCorrector: File not found: " + file_path_);
-    }
-    std::cout << "-> reco::JitterCorrector: Configuring with file: " << file_path_ << std::endl;
-    
+    // Set up the parser
     auto& jsonParserUtil = reco::JsonParserUtil::instance();
-    auto pedestalConfig_ = jsonParserUtil.ParseFile(file_path_);  
 
-    for (const auto& configi : pedestalConfig_["pedestals"]) 
+    // Get the run number from the configuration
+    int run = configHolder_->GetRun();
+    int subrun = configHolder_->GetSubrun();
+
+    // Get the top level json file (it lists all pedestal files)
+    if (!config.contains("pedestal_files")) {
+        throw std::runtime_error("JitterCorrector configuration must contain 'pedestal_files' key");
+    }
+
+    // Open the top level file
+    auto topFileName = config.value("pedestal_files","");
+    std::string configFileName = jsonParserUtil.GetFileFromRunSubrun(run, subrun, topFileName, "pedestal_files");
+    std::string configFilePath = "";
+    auto pedestalConfig = jsonParserUtil.GetPathAndParseFile(configFileName, configFilePath, debug_);
+    std::cout << "-> reco::JitterCorrector: Configuring with file: " << configFilePath << std::endl;
+
+    for (const auto& configi : pedestalConfig["pedestals"]) 
     {
         offsetMap_[std::make_tuple(configi["crateNum"], configi["amcSlotNum"], configi["channelNum"])] = configi["pedestal"];
         if (debug_) std::cout << "Loading configuration for odd/even difference in channel ("

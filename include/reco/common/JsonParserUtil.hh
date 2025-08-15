@@ -19,22 +19,7 @@ namespace reco {
     
     public: 
 
-        json GetPathAndParseFile(const std::string& file_name, bool debug_ = false) const
-        {
-            std::string file_path_ = "";
-            if (file_name.find('/') != std::string::npos) {
-                // If not a base name, try using this path directly
-                file_path_ = file_name;
-            } else {
-                // If a base name, prepend the config directory
-                file_path_ = std::string(std::getenv("MU_RECO_PATH")) + "/config/" + file_name;
-            }
-            if (!std::filesystem::exists(file_path_)) {
-                throw std::runtime_error("JsonParserUtil: File not found: " + file_path_);
-            }
-            if (debug_) std::cout << "-> JsonParserUtil: Configuring with file: " << file_path_ << std::endl;
-            return ParseFile(file_path_);  // Example usage of JsonParserUtil
-        }
+        json GetPathAndParseFile(const std::string& file_name, std::string& file_path, bool debug_ = false) const;
 
         std::string GetFileFromRunSubrun(int run, int subrun, const std::string& topFileName, const std::string& jsonKey) const;
 

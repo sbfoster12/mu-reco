@@ -21,7 +21,7 @@
       "inputWaveformsLabel": "waveforms",
       "outputWaveformsLabel": "waveforms",
       "templateServiceLabel": "templates",
-      "file_name":"pedestals.json",
+      "pedestal_files":"pedestal_files.json",
       "failOnError":false,
       "debug":false
     },

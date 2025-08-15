@@ -24,6 +24,7 @@ void EnergyCalibration::Configure(const nlohmann::json& config, const ServiceMan
     int runNum = 0;
     bool found_calib = false;
     json thisConfig;
+    std::string file_path = "";
     for (auto &configi: config["constant_files"])
     {
         auto iov = configi["iov"];
@@ -34,7 +35,8 @@ void EnergyCalibration::Configure(const nlohmann::json& config, const ServiceMan
                 << iov[0] << " - " << iov[1] << ") -> " 
                 << configi["file"] << std::endl;
             thisConfig = jsonParserUtil.GetPathAndParseFile(
-                configi["file"]
+                configi["file"],
+                file_path
             );
         }
     }

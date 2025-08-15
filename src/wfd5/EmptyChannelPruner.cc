@@ -20,7 +20,8 @@ void EmptyChannelPruner::Configure(const nlohmann::json& config, const ServiceMa
     {
         std::string file_name = config.value("file_name", "minimum_amplitudes.json");  
         std::cout << "-> EmptyChannelPruner::Reading in custom minimum amplitudes from file: " << file_name << std::endl;  
-        auto minAmpChannelConfig_ = jsonParserUtil.GetPathAndParseFile(file_name);  
+        std::string file_path = "";
+        auto minAmpChannelConfig_ = jsonParserUtil.GetPathAndParseFile(file_name,file_path);  
         
         for (const auto& configi : minAmpChannelConfig_["minimumAmplitudes"]) 
         {

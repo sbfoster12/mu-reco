@@ -1,0 +1,5 @@
+{
+    "pedestal_files": [
+        {"file":"pedestals.json", "iov":[0,30000]}
+    ]
+}

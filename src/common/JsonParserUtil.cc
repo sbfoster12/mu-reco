@@ -21,12 +21,30 @@ json JsonParserUtil::ParseFile(const std::string& filename) const {
     return j;
 }
 
+json JsonParserUtil::GetPathAndParseFile(const std::string& file_name, std::string& file_path, bool debug_) const {
+    // Check if config file exists
+    if (file_name.find('/') != std::string::npos) {
+        // If not a base name, try using this path directly
+        file_path = file_name;
+    } else {
+        // Check if the file is in the current directory
+        if (std::filesystem::exists(file_name)) {
+            file_path = file_name;
+        } else {
+            // Otherwise, prepend the config directory from the environment variable
+            file_path = std::string(std::getenv("MU_RECO_PATH")) + "/config/" + file_name;
+        }
+    }
+    if (!std::filesystem::exists(file_path)) {
+        std::cerr << "Config file doesn't exist. Could not find " << file_path << std::endl;
+        return 1;
+    }
+    return ParseFile(file_path);  // Example usage of JsonParserUtil
+}
+
  std::string JsonParserUtil::GetFileFromRunSubrun(int run, int subrun, const std::string& topFileName, const std::string& jsonKey) const {
   // This function retrieves the appropriate configuration file based on the run and subrun numbers
   // It uses the IOV file located at topFileName
-
-  // We need the singleton
-  auto& jsonParserUtil = reco::JsonParserUtil::instance();
 
   // Open the top level file
   std::string topFilePath = "";
@@ -38,7 +56,7 @@ json JsonParserUtil::ParseFile(const std::string& filename) const {
       topFilePath = std::string(std::getenv("MU_RECO_PATH")) + "/config/" + topFileName;
   }
   std::cout << "-> reco::JsonParserUtil: Loading top level file from " << topFilePath << std::endl;
-  auto topJsonFile = jsonParserUtil.ParseFile(topFilePath);
+  auto topJsonFile = ParseFile(topFilePath);
 
   if (!topJsonFile.contains(jsonKey)) {
     throw std::runtime_error("reco::JsonParserUtil configuration file must contain '" + jsonKey + "' key");
