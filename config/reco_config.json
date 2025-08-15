@@ -28,8 +28,8 @@
     {
       "recoClass": "reco::EmptyChannelPruner",
       "recoLabel": "pruned",
-      "inputRecoLabel": "unpacker",
-      "inputWaveformsLabel": "WFD5WaveformCollection",
+      "inputRecoLabel": "jitter",
+      "inputWaveformsLabel": "waveforms",
       "outputWaveformsLabel": "waveforms",
       "minAmplitude":25.0,
       "file_name":"minimum_amplitudes.json",
