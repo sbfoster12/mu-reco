@@ -1,6 +1,6 @@
 # mu-reco
 
-A C++ library to perform reconstruction on unpacked MIDAS data.
+A C++ library that provides a framework for performing reconstruction on unpacked MIDAS data. This library is used for the LYSO 2025 test beam.
 
 ## Requirements
 
@@ -8,6 +8,9 @@ A C++ library to perform reconstruction on unpacked MIDAS data.
 - [ROOT]
 - [mu-data-products]
 - [mu-unpackers]
+
+## If you are here to learn about the reconstruction framework...
+...go to Section [Reconstruction Framework](#reconstruction-framework).
 
 ## Cloning the repository
 
@@ -17,11 +20,11 @@ You can either clone this repository on its own via:
 git clone https://github.com/PIONEER-Experiment/mu-reco.git
 ``` 
 
-or you can clone the app level repository. Follow the instructions here: https://github.com/PIONEER-Experiment/mu-app
+or you can clone the app level repository. For cloning the app level repository, follow the instructions here: https://github.com/PIONEER-Experiment/mu-app. It is recommended to clone the app level repository, as this repository does not produce a standalone executable, but rather is used as a library for the app level repository.
 
 ## Build instructions
 
-If you are building this repository on its own, you should first build and install the mu-data-products library and the mu-unpackers library. Details can be found here https://github.com/PIONEER-Experiment/mu-data-products.git and here https://github.com/PIONEER-Experiment/mu-unpackers.git.
+If you are building this repository on its own (not recommended), you should first build and install the mu-data-products library and the mu-unpackers library. Details can be found here https://github.com/PIONEER-Experiment/mu-data-products.git and here https://github.com/PIONEER-Experiment/mu-unpackers.git.
 
 You should then source the `setenv.sh` script to set up the environment, and then you can build:
 
@@ -29,18 +32,84 @@ You should then source the `setenv.sh` script to set up the environment, and the
 source ./scripts/setenv.sh
 ./scripts/build.sh -o
 ```
+Building the library will produce a shared library `libmu_reco.dylib` (or `libmu_reco.so`) in the `build/lib` directory.
 
-## Running the application
+## Reconstruction Framework
+The reconstruction framework is designed to provide some organization and modularity around running alogorithms on data. It allows you to define a series of reconstruction stages that can process collections of data products from the unpacker, which itself operates on a raw midas file.
 
-Building the application will create an executable for running reco over the WFD5 unpacked data.
+The framework has two key features: `RecoStages` and `Services`. A `RecoStage` is a class that runs a physics algorithm on a collection of data products (or more than one collection) and produces a new collection of data products. An example of a `RecoStage` is the JitterCorrector, which corrects the waveform's even/odd pedestal jitters. A `Service` is a class that provides commonly needed utilities to a `RecoStage` and is shared and accessible by all stages. An example of a service is the ChannelMapService, which provides a mapping from physical detector slots (crate number, AMC slot number, WFD5 channel number) to the physical detector with a detector system and sub detector name.
 
-Assuming that `my_file.mid` is your midas file, you can run the reco via:
-```bash
-./install/bin/reco_wfd5 .reco_config.json my_file.mid 0
+Each of these elements (the `RecoStages` and `Services`) have their own manager: there is the `RecoManager` and the `ServiceManager`. The `RecoManager` is responsible for configuring all the user-defined `RecoStages` and executing them in the order they are defined, while the `ServiceManager` is responsible for configuring and providing access to the user-defined `Services`.
+
+Other important elements of the reconstruction framework include the following:
+- `ConfigHolder`: This class holds the configuration for the reconstruction framework. It is loaded from a JSON file (e.g. `reco_config.json`) and provides each part of the program with access to the configuration parameters.
+- `EventStore`: The event store carries around all the data products for the current event, as well as things like the run and subrun number, the odb, and histograms. The collections of data products are stored as `TClonesArray` objects. Note that the `TClonesArrays` are reused event-to-event. Importantly, the `EventStore`'s `clear` method calls `Clear("C")` on each `TClonesArray`, which clears the contents of the array to get you ready for the next event.
+- `OutputManager`: This class holds the output ROOT file, the output tree, histograms, and anything else that is written to the file. One importantly thing is does is write the `EventStore` to the tree after each event. This is done with `void FillEvent(const EventStore& eventStore);` The first time this is called, the output manager will create the necessary branches in the tree and have them point to the `TClonesArray` objects in the `EventStore`. In this way, the data always lives in the `EventStore`, and the `OutputManager` just writes it to the tree. 
+
+## JSON Configuration File
+The nearline is configured via a JSON file. It configures the unpacker, which reco stages to run, which services to use, and what data products to write to the file. The default configuration file is `mu-reco/config/reco_config.json`. You can modify this file to change the configuration of the nearline. An example configuration file is shown below:
+```json
+"Unpacker" : {
+    "max_midas_events": -1,
+    "verbosity": 0
+  },
+  "RecoStages": [
+    {
+      "recoClass": "reco::WaveformInitializer",
+      "recoLabel": "initializer",
+      "inputRecoLabel": "unpacker",
+      "inputWaveformsLabel": "WFD5WaveformCollection",
+      "outputWaveformsLabel": "waveforms",
+      "failOnError":false,
+      "debug":false
+    },
+    {
+      "recoClass": "reco::JitterCorrector",
+      "recoLabel": "jitter",
+      "inputRecoLabel": "initializer",
+      "inputWaveformsLabel": "waveforms",
+      "outputWaveformsLabel": "waveforms",
+      "templateServiceLabel": "templates",
+      "file_name":"pedestals.json",
+      "failOnError":false,
+      "debug":false
+    }
+  ],
+  "RecoPath":[
+    "initializer",
+    "jitter"
+  ],
+  "RecoManager": {
+    "timeProfilerLabel": "timeProfiler"
+  },
+  "ServiceManager": {
+  },
+  "Services": [
+    {
+      "type": "reco::ChannelMapService",
+      "label": "channelMap",
+      "channel_map_config_files":"channel_map_config_files.json"
+    },
+    {
+      "type": "reco::TimeProfilerService",
+      "label": "timeProfiler"
+    }
+  ],
+  "Output": {
+    "drop": [
+      "unpacker*"
+    ],
+    "compressionLevel": 1,
+    "compressionAlgorithm": 4
+  }
 ```
-where the `0` is the verbosity level. Note that the config file must be in the `mu-reco/config` directory. The program will search for config files in the directory `$MU_RECO_PATH/config` which is set by the `setenv.sh` script.
-
-Running these commands will run the reconstruction configured in `reco_config.json` and will create a ROOT file that you can use for all your analysis needs!
+- The `Unpacker` block configures the unpacker. Set `max_midas_events` to `-1` to run over all midas event.
+- The `RecoStages` array defines the reconstruction stages you have access to (doesn't guarantee they are run; see `RecoPath`). Each `RecoStage` block in the array must have the `recoClass` and `recoLabel` fields. The `recoClass` is the name of the class that implements the reco stage (see all possible `RecoStages` in `mu-reco/src/common` or `mu-reco/src/wfd5`; it must derive from the `reco::RecoStage` class). The `recoLabel` is a user-defined label (whatever you want) that is used to identify the reco stage. This label is used as the prefix to all data products produced by the reco stage. You can have any other json-parsable parameters. 
+- The `RecoPath` array defines the reco stages to run and the order in which they are run. You can edit this path to decided what actually gets run.
+- The `RecoManager` block configures the reco manager.
+- The `ServiceManager` block configures the service manager.
+- The `Services` array defines the services you have access to.
+- The `Output` block configures the output ROOT file. You can set which data products to drop from the output file. Provide a list of data product names. You can use the `*` wildcard to drop select multiple data products, e.g. `unpacker*` will drop all data products that start with `unpacker`.
 
 
 ## Instructions for adding a new reco stage
