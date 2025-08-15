@@ -1,0 +1,88 @@
+{
+  
+  "Unpacker" : {
+    "max_midas_events": 10,
+    "verbosity": 0
+  },
+  "RecoStages": [
+    {
+      "recoClass": "reco::WaveformInitializer",
+      "recoLabel": "initializer",
+      "inputRecoLabel": "unpacker",
+      "inputWaveformsLabel": "WFD5WaveformCollection",
+      "outputWaveformsLabel": "waveforms",
+      "failOnError":false,
+      "debug":false
+    },
+    {
+      "recoClass": "reco::JitterCorrector",
+      "recoLabel": "jitter",
+      "inputRecoLabel": "initializer",
+      "inputWaveformsLabel": "waveforms",
+      "outputWaveformsLabel": "waveforms",
+      "templateServiceLabel": "templates",
+      "file_name":"pedestals.json",
+      "failOnError":false,
+      "debug":false
+    },
+    {
+      "recoClass": "reco::EmptyChannelPruner",
+      "recoLabel": "pruned",
+      "inputRecoLabel": "jitter",
+      "inputWaveformsLabel": "waveforms",
+      "outputWaveformsLabel": "waveforms",
+      "minAmplitude":25.0,
+      "file_name":"minimum_amplitudes.json",
+      "keepChannels":[
+        [8,1,2],
+        [8,1,4]
+      ],
+      "failOnError":false,
+      "debug":false
+    },
+    {
+      "recoClass": "reco::PedestalCalculator",
+      "recoLabel": "pedestal",
+      "inputRecoLabel": "pruned",
+      "inputWaveformsLabel": "waveforms",
+      "outputWaveformsLabel": "waveforms",
+      "pedestalMethod" : "FirstN",
+      "numSamples": 10,
+      "debug": true
+    }
+  ],
+  "_RecoPath":[],
+  "RecoPath":[
+    "initializer",
+    "jitter",
+    "pruned",
+    "pedestal"
+  ],
+  "RecoManager": {
+    "timeProfilerLabel": "timeProfiler"
+  },
+  "ServiceManager": {
+  },
+  "Services": [
+    {
+      "type": "reco::ChannelMapService",
+      "label": "channelMap",
+      "channel_map_config_files":"channel_map_config_files.json"
+    },
+    {
+      "type": "reco::TimeProfilerService",
+      "label": "timeProfiler"
+    }
+  ],
+  "Output": {
+    "drop": [
+      "unpacker*",
+      "#initializer*",
+      "pruned*",
+      "jitter*",
+      "#pedestal*"
+    ],
+    "compressionLevel": 1,
+    "compressionAlgorithm": 4
+  }
+}
