@@ -19,14 +19,14 @@ A C++ library that provides a framework for performing reconstruction on unpacke
 You can either clone this repository on its own via:
 
 ```bash
-git clone https://github.com/PIONEER-Experiment/mu-reco.git
+git clone git@github.com:PIONEER-Experiment/mu-reco.git
 ``` 
 
-or you can clone the app level repository. For cloning the app level repository, follow the instructions here: https://github.com/PIONEER-Experiment/mu-app. It is recommended to clone the app level repository, as this repository does not produce a standalone executable, but rather is used as a library for the app level repository.
+or you can clone the app level repository. For cloning the app level repository, follow the instructions here: git@github.com:PIONEER-Experiment/mu-app. It is recommended to clone the app level repository, as this repository does not produce a standalone executable, but rather is used as a library for the app level repository.
 
 ## Build instructions
 
-If you are building this repository on its own (not recommended), you should first build and install the mu-data-products library and the mu-unpackers library. Details can be found here https://github.com/PIONEER-Experiment/mu-data-products.git and here https://github.com/PIONEER-Experiment/mu-unpackers.git.
+If you are building this repository on its own (not recommended), you should first build and install the mu-data-products library and the mu-unpackers library. Details can be found here git@github.com:PIONEER-Experiment/mu-data-products.git and here git@github.com:PIONEER-Experiment/mu-unpackers.git.
 
 You should then source the `setenv.sh` script to set up the environment, and then you can build:
 
