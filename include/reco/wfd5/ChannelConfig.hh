@@ -20,12 +20,14 @@ public:
     void SetY(double ding);
     double GetX() const;
     double GetY() const;
+    double GetTimeOffset() const;
 
     void SetDetectorSystem(const std::string& system);
     void SetSubdetector(const std::string& sub);
     void SetCrateNum(int crateNum);
     void SetAmcSlotNum(int amcSlotNum);
     void SetChannelNum(int channelNum);
+    void SetTimeOffset(double offset);
 
     void Print() const;
     
@@ -36,6 +38,7 @@ private:
     std::string detectorSystem_;
     std::string subdetector_;
     double x_,y_;
+    double knownTimeOffsetClockTicks_;
 };
 
 #endif // CHANNEL_CONFIG_HH

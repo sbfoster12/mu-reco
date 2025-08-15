@@ -18,9 +18,8 @@
 
 class TemplateFit {
 public:
-    // TemplateFit(TSpline3* spline1, TSpline3* spline2)
     TemplateFit(fitter::CubicSpline* spline1, fitter::CubicSpline* spline2)
-        : minimumAmplitude(100), timeBounds(10), maxPulses(10), chi2Threshold(10), debug(false), single_spline_only(false), restricted_chi2_min(-10), restricted_chi2_max(50), amp_scale_factor(1.0) {
+        : minimumAmplitude(100), timeBounds(10), maxPulses(10), chi2Threshold(10), debug(false), single_spline_only(true), restricted_chi2_min(-10), restricted_chi2_max(50), amp_scale_factor(1.0), is_seeded(false), seeded_extra_leeway(false) {
         if (debug) std::cout << "Creating TemplateFit from: " << spline1 << " / " << spline2 << std::endl;
         if (!spline1 || !spline2) {
             throw std::runtime_error("Error: Splines not initialized!");
@@ -28,8 +27,6 @@ public:
         if (debug) 
         {
             std::cout << "spline eval test"  << std::endl;
-            // std::cout << "    -> " << spline1->Eval(0) << std::endl;
-            // std::cout << "    -> " << spline2->Eval(0) << std::endl;
             std::cout << "    -> " << (*spline1)(0) << std::endl;
             std::cout << "    -> " << (*spline2)(0) << std::endl;
         }
@@ -42,7 +39,6 @@ public:
         // minimizer = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Minimize");
         if (!minimizer)
         {
-            // ROOT::Math::Factory::PrintAvailableMinimizerTypes();
             throw std::runtime_error("Error: Minimzer not created!");
         }
         if (debug) std::cout << "   -> minimizer: " << minimizer << std::endl;
@@ -60,25 +56,50 @@ public:
     {
         // set to default values if no json key is found
         SetMinimumAmplitude( config.value("minimumAmplitude",100) );
+        SetMaximumAmplitude( config.value("maximumAmplitude",10000) );
         SetTimeBounds( config.value("timeBounds",10) );
-        SetMaxPulses( config.value("maxPulses",10) );
-        SetChi2Threshold( config.value("chi2Threshold",10) );
+        SetMaxPulses( config.value("maxPulses",3) );
+        SetChi2Threshold( config.value("chi2Threshold",1) );
 
         setDebug( config.value("debug", false) );
         setSingleTemplate( config.value("singleTemplate", true ) );
         setTimeoutLimit( config.value("timeoutLimit", 100000 ) );
-        SetAmpScale( config.value("ampScale", 1.0 ) );
+        SetAmpScale( config.value("ampGuessScale", 1.0 ) );
         SetMinMaxClippingRange( 
-            config.value("minClippingRange", -2000),
-            config.value("maxClippingRange",  2000)
+            config.value("pulseFitterMinVal", -2000),
+            config.value("pulseFitterMaxVal",  2000)
+        );
+        setRestrictedChi2Range(
+            config.value("restricted_chi2_min", -100),
+            config.value("restricted_chi2_max",  100)
         );
 
     }
 
     void SetMinimumAmplitude(double val) { minimumAmplitude = val; }
+    void SetMaximumAmplitude(double val) { maximumAmplitude = val; }
     void SetTimeBounds(double val) { timeBounds = val; }
     void SetMaxPulses(double val) { maxPulses = val; }
     void SetChi2Threshold(double val) { chi2Threshold = val; }
+
+    void SetSeeded(bool seeded, bool lee)
+    {
+        is_seeded = seeded;
+        seeded_extra_leeway = lee;
+    }
+
+    void AddGuess(double time_guess, double amplitude_guess)
+    {
+        guesses.push_back(amp_scale_factor*amplitude_guess);
+        if(debug) std::cout 
+            << "Setting guess of amplitude/time to: " 
+            << guesses.back() << " / " 
+            << time_guess << " based on input " 
+            << amplitude_guess << " / " << time_guess << std::endl;
+        
+        guesses.push_back(time_guess);
+        whichSplines.push_back(0);
+    }
 
     void SetTSpline(TSpline3* sp, int i)
     {
@@ -164,19 +185,8 @@ public:
     double model(const std::vector<double>& xs, const std::vector<double>& p, std::vector<double>& fittedTrace, bool fullModelEvaluation = true) {
         size_t nPulses = (p.size() - 1) / 2;
         std::fill(fittedTrace.begin(), fittedTrace.end(), p[0]);
-        // if (debug) {
-        //     std::cout << "Model parameters at call time:\n";
-        //     std::cout << "xs size: " << xs.size() << "\n";
-        //     std::cout << "p size: " << p.size() << "\n";
-        //     for (size_t i = 0; i < p.size(); ++i) {
-        //         std::cout << "p[" << i << "] = " << p[i] << "\n";
-        //     }
-        //     std::cout << std::endl;
-        // }
-
 
         for (size_t n = 0; n < nPulses; ++n) {
-            // double output = p[0];
             int whichTemplate = whichSplines[n];
             if (whichTemplate < 0 || whichTemplate > 1) {
                 std::cerr << "Error: whichTemplate out of bounds: " << whichTemplate << std::endl;
@@ -184,29 +194,20 @@ public:
             }
             double amp = p[1 + n * 2];
             double t = p[2 + n * 2];
-            // double xmin = splines[whichTemplate]->GetXmin();
-            // double xmax = splines[whichTemplate]->GetXmax();
-            // std::cout << "Fitted trace: [";
             for (size_t i = 0; i < xs.size(); ++i) {
                 double xi = xs[i] - t;
 
                 // this is a bad idea in general, but may be good for intermediate steps
                 if ((!fullModelEvaluation) && ((xi > restricted_chi2_max) || (xi < restricted_chi2_min))) continue; //this saves time by only evaluating the spline very near the peak
 
-                // if (xi > xmin && xi < xmax) 
-                // {
-                //     // fittedTrace[i] += amp * splines[whichTemplate]->Eval(xi);
                 fittedTrace[i] += amp * (*splines[whichTemplate])(xi) ;
-                // }
-                // std::cout << " " << fittedTrace[i];
             }
-            // std::cout << " ]" << std::endl;
         }
         return 0.0; // Dummy return for now
     }
 
     double abbreviated_chi2(const std::vector<double>& p) {
-        model(xs, p, fittedTrace, false);
+        model(xs, p, fittedTrace, false); // only evaluate near the peak
         double sum = 0.0;
         for (size_t i = 0; i < xs.size(); ++i) {
             double diff = ys[i] - fittedTrace[i];
@@ -275,7 +276,7 @@ public:
             {
                 // set amplitude limits
                 minimizer->SetVariable(i, "A" + std::to_string(i), guess[i], step_size);
-                minimizer->SetVariableLimits(i, minimumAmplitude, 50000 );
+                minimizer->SetVariableLimits(i, minimumAmplitude, maximumAmplitude );
             }
             else if ((i-1)%2 == 1)
             {
@@ -340,7 +341,7 @@ public:
         std::chrono::duration<double, std::micro> elapsed = std::chrono::high_resolution_clock::now() - minimization_start;
         if (debug) std::cout << "reserving space took " << elapsed.count() << " microseconds." << std::endl;
 
-        for (size_t npulses = 0; npulses <= maxPulses; ++npulses) {
+        for (size_t npulses = (guesses.size()-1)/2; npulses <= maxPulses; ++npulses) {
             elapsed = std::chrono::high_resolution_clock::now() - minimization_start;
             if (debug) std::cout << "Starting evaluation of pulse " << npulses << " after " << elapsed.count() << " microseconds." << std::endl;
             if (debug) std::cout << "   -> Looking to beat: " << bestChi2 << std::endl;
@@ -362,7 +363,7 @@ public:
                 {
                     if (debug)
                     {
-                        std::cout << "Prospects for chi2 improvements are good! Trying second spline.\n";
+                        std::cout << "Prospects for chi2 improvements are good! Continuing on. \n";
                     }
                 }
 
@@ -376,6 +377,7 @@ public:
 
                 if (!single_spline_only)
                 {
+                    if (debug) std::cout << "   -> Trying second spline!" << std::endl;
                     whichSplines.back() = 1;
                     auto [chi2_1, params_1] = minimize(guesses, false);
                     better_chi2 = std::min(chi2_0, chi2_1);
@@ -435,12 +437,19 @@ public:
                 break;
             }
 
-            if ( (guesses.size() > 1) && (guesses[guesses.size() -2] < minimumAmplitude + 1) ) {
-                if (debug) {
-                    std::cout << "Amplitude of latest pulse is at limit; stopping minimization.\n";
+            if ( (guesses.size() > 1) && (guesses[guesses.size() -2] < minimumAmplitude + 1)) {
+                if ((guesses.size() == 3) && is_seeded && seeded_extra_leeway)
+                {
+                    if (debug) std::cout << "Amplitude guess is at limit, but we're in a generous seeded mode! Lets try further." << std::endl;
                 }
-                prematureExit = true;
-                break;
+                else 
+                {
+                    if (debug) {
+                        std::cout << "Amplitude of latest pulse is at limit; stopping minimization.\n";
+                    }
+                    prematureExit = true;
+                    break;
+                }
             }
 
             if (debug) std::cout << "Setting bestChi2 to this_chi2 (" << this_chi2 << ")" << std::endl;
@@ -565,6 +574,7 @@ private:
     bool converged = false;
 
     double minimumAmplitude;
+    double maximumAmplitude;
     double timeBounds;
     size_t maxPulses;
     double chi2Threshold;
@@ -580,5 +590,8 @@ private:
     double amp_scale_factor;
     short max_val_without_clipping;
     short min_val_without_clipping;
+
+    bool is_seeded;
+    bool seeded_extra_leeway;
 
 };

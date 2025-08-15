@@ -53,12 +53,19 @@ void PulseIntegrator::Process(EventStore& store, const ServiceManager& serviceMa
     // get the input waveforms
     auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
     
-
     // create the output collection
     auto integrals = store.getOrCreate<dataProducts::WaveformIntegral>(this->GetRecoLabel(), outputIntegralsLabel_);
 
     // loop through each of the waveforms
     PulseIntegrationConfig thisConfig;
+
+    TClonesArray* seeds;
+    dataProducts::TimeSeed* seed;
+    if (seeded_)
+    {
+        seeds = store.get<const dataProducts::TimeSeed>(inputSeedRecoLabel_,inputSeedLabel_);
+        seed = static_cast<dataProducts::TimeSeed*>(seeds->ConstructedAt(0));
+    }
     
     for (int i = 0; i < waveforms->GetEntriesFast(); ++i) 
     {
@@ -90,7 +97,16 @@ void PulseIntegrator::Process(EventStore& store, const ServiceManager& serviceMa
         if (seeded_)
         {
             if (debug_) std::cout << "Performing a seeded integration" << std::endl;
-            throw; //not implemneted yet
+            throw std::runtime_error("Not implmented yet"); //not implemneted yet
+            dataProducts::WaveformIntegral* integral = new ((*integrals)[i]) dataProducts::WaveformIntegral(
+                waveform,
+                thisConfig.nSigma,
+                thisConfig.strategy
+            );
+            integrals->Expand(i+1);
+
+            integral->is_seeded = true;
+            integral->seed = seed;
         }
         else 
         {

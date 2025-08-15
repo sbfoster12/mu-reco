@@ -11,6 +11,12 @@ void Fitter::Configure(const nlohmann::json& config, const ServiceManager& servi
     outputFitResultLabel_ = config.value("outputFitResultLabel", "FitResultXtal");
     templateFitterLabel_ = config.value("templateFitterLabel", "templateFitter");
     fit_debug = config.value("debug", false);
+
+    seeded_ = config.value("seeded",false);
+    seeded_extra_leeway_ = config.value("seededExtraLeeway",false);
+    seededInputReco_ = config.value("intputSeededTime", "timeSeedFinder");
+    seededInputLabel_ = config.value("intputSeededTimeLabel", "seed");
+
 }
 
 void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) {
@@ -22,6 +28,19 @@ void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) {
 
          // Get the input waveforms
         auto waveforms = store.get<const dataProducts::WFD5Waveform>(inputRecoLabel_, inputWaveformsLabel_);
+
+        TClonesArray* seeded_input;
+        dataProducts::TimeSeed* seed;
+        // double seed
+        if(seeded_)
+        {
+            seeded_input = store.get<const dataProducts::TimeSeed>(seededInputReco_,seededInputLabel_);
+            seed = static_cast<dataProducts::TimeSeed*>(seeded_input->ConstructedAt(0));
+            if (!seed) {
+                throw std::runtime_error("Failed to retrieve seeded time");
+            }
+            if (fit_debug) std::cout << "Performing a seeded fit around time: " << seed->GetTimeSeed() << std::endl;
+        }
 
         //Make a collection new waveforms
         auto fitResults = store.getOrCreate<dataProducts::WaveformFit>(this->GetRecoLabel(), outputFitResultLabel_);
@@ -48,16 +67,34 @@ void Fitter::Process(EventStore& store, const ServiceManager& serviceManager) {
                 if (fit_debug)
                 {
                     std::cout << "*********************************" << std::endl;
+                    std::cout << "*********************************" << std::endl;
+                    std::cout << "*********************************" << std::endl;
+                    std::cout << "*********************************" << std::endl;
                     std::cout << "Performing fit on channel " << wf->crateNum << "/" << wf->amcNum << "/" << wf->channelTag << std::endl;
                     std::cout << "    -> Event " << wf->eventNum << " / " << wf->waveformIndex << std::endl;
                 }
                 auto start = std::chrono::high_resolution_clock::now();
                 auto thisfitter = templateFitter->GetFitter(id);
+                // if (see)
                 thisfitter->reset();
                 if (fit_debug) thisfitter->setDebug(true);
                 thisfitter->addTrace(wf->trace, 0.0);
                 auto intermediate = std::chrono::high_resolution_clock::now();
                 // auto bestchi2 = 1;
+                
+                thisfitter->SetSeeded(seeded_,seeded_extra_leeway_);
+                if (seeded_)
+                {
+                    if (fit_debug) std::cout << "Adding a guess based on the seed amp/time of " 
+                        <<  wf->PeakToPeak() 
+                        << " / " 
+                        << seed->GetTimeSeed() 
+                        << std::endl;
+                    thisfitter->AddGuess(seed->GetTimeSeed(), wf->PeakToPeak());
+                    this_fit_result->seed = seed;
+                    this_fit_result->is_seeded = true;
+                }
+
                 auto bestchi2 = thisfitter->performMinimization();
                 if (bestchi2 > 0) thisfitter->setFitResult(this_fit_result);
                 auto end = std::chrono::high_resolution_clock::now();

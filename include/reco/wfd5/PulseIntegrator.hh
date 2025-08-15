@@ -4,6 +4,7 @@
 
 #include <data_products/wfd5/WFD5Waveform.hh>
 #include <data_products/wfd5/WaveformIntegral.hh>
+#include <data_products/wfd5/TimeSeed.hh>
 
 #include "reco/common/RecoStage.hh"
 #include "reco/common/EventStore.hh"

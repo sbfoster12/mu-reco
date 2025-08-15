@@ -2,6 +2,7 @@
 #define FITTER_HH
 
 #include <data_products/wfd5/WFD5Waveform.hh>
+#include <data_products/wfd5/TimeSeed.hh>
 
 #include "reco/common/RecoStage.hh"
 #include "reco/common/EventStore.hh"
@@ -27,7 +28,12 @@ namespace reco {
         std::string templateFitterLabel_;
         bool fit_debug;
 
-        ClassDefOverride(Fitter, 1);
+        bool seeded_;
+        bool seeded_extra_leeway_;
+        std::string seededInputReco_;
+        std::string seededInputLabel_;
+
+        ClassDefOverride(Fitter, 2);
     };
 }
 
