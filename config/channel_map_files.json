@@ -1,5 +1,5 @@
 {
-    "config_files": [
+    "channel_map_files": [
         {"file":"g-2_channel_map.json", "iov":[10000,30000]},
         {"file":"lyso_2023.json", "iov":[0,3000]}
     ]

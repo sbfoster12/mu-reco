@@ -21,7 +21,7 @@ json JsonParserUtil::ParseFile(const std::string& filename) const {
     return j;
 }
 
- std::string JsonParserUtil::GetFileFromRunSubrun(int run, int subrun, const std::string& topFileName) const {
+ std::string JsonParserUtil::GetFileFromRunSubrun(int run, int subrun, const std::string& topFileName, const std::string& jsonKey) const {
   // This function retrieves the appropriate configuration file based on the run and subrun numbers
   // It uses the IOV file located at topFileName
 
@@ -40,13 +40,13 @@ json JsonParserUtil::ParseFile(const std::string& filename) const {
   std::cout << "-> reco::JsonParserUtil: Loading top level file from " << topFilePath << std::endl;
   auto topJsonFile = jsonParserUtil.ParseFile(topFilePath);
 
-  if (!topJsonFile.contains("config_files")) {
-    throw std::runtime_error("reco::JsonParserUtil configuration file must contain 'config_files' key");
+  if (!topJsonFile.contains(jsonKey)) {
+    throw std::runtime_error("reco::JsonParserUtil configuration file must contain '" + jsonKey + "' key");
   }
 
-  auto configFiles = topJsonFile["config_files"];
+  auto configFiles = topJsonFile[jsonKey];
   if (!configFiles.is_array()) {
-      throw std::runtime_error("'config_files' key must contain an array");
+      throw std::runtime_error("'" + jsonKey + "' key must contain an array");
   }
 
   // Loop over each IOV and find the right one

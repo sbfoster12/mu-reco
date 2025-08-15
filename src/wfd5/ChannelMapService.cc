@@ -19,7 +19,7 @@ using namespace reco;
 
     // Open the top level file
     auto topFileName = config.value("channel_map_files","");
-    std::string configFileName = jsonParserUtil.GetFileFromRunSubrun(run, subrun, topFileName);
+    std::string configFileName = jsonParserUtil.GetFileFromRunSubrun(run, subrun, topFileName, "channel_map_files");
 
     if (configFileName.empty()) {
         throw std::runtime_error("ChannelMapService configuration file not found for run: " + std::to_string(run) + ", subrun: " + std::to_string(subrun));
