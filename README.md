@@ -6,6 +6,8 @@ A C++ library that provides a framework for performing reconstruction on unpacke
 
 - [CMake]
 - [ROOT]
+- [ZLIB]
+- [nlohmann_json]
 - [mu-data-products]
 - [mu-unpackers]
 
